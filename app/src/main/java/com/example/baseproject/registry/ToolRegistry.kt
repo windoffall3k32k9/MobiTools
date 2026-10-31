@@ -5,8 +5,12 @@ import com.example.baseproject.R
 import com.example.baseproject.model.ToolDescriptor
 import com.example.baseproject.model.ToolGroup
 import com.example.baseproject.ui.calculator.CalculatorFragment
+import com.example.baseproject.ui.converter.UnitConverterFragment
 import com.example.baseproject.ui.counter.TallyCounterFragment
+import com.example.baseproject.ui.flashlight.FlashlightFragment
+import com.example.baseproject.ui.qr.QrGeneratorFragment
 import com.example.baseproject.ui.stopwatch.StopwatchFragment
+import com.example.baseproject.ui.texttools.TextToolsFragment
 import com.example.baseproject.ui.timer.CountdownTimerFragment
 
 /**
@@ -67,6 +71,54 @@ object ToolRegistry {
                 iconResId = R.drawable.ic_counter,
                 group = ToolGroup.CALCULATION_TIME,
                 createFragment = { TallyCounterFragment() }
+            )
+        )
+
+        // 5. Đèn pin
+        register(
+            ToolDescriptor(
+                id = "flashlight",
+                titleResId = R.string.tool_flashlight_title,
+                descriptionResId = R.string.tool_flashlight_desc,
+                iconResId = R.drawable.ic_flashlight,
+                group = ToolGroup.DEVICE_UTILITY,
+                createFragment = { FlashlightFragment() }
+            )
+        )
+
+        // 6. Tạo mã QR
+        register(
+            ToolDescriptor(
+                id = "qr_generator",
+                titleResId = R.string.tool_qr_generator_title,
+                descriptionResId = R.string.tool_qr_generator_desc,
+                iconResId = R.drawable.ic_qr_code,
+                group = ToolGroup.DEVICE_UTILITY,
+                createFragment = { QrGeneratorFragment() }
+            )
+        )
+
+        // 7. Chuyển đổi đơn vị
+        register(
+            ToolDescriptor(
+                id = "unit_converter",
+                titleResId = R.string.tool_unit_converter_title,
+                descriptionResId = R.string.tool_unit_converter_desc,
+                iconResId = R.drawable.ic_converter,
+                group = ToolGroup.TEXT_CONVERSION,
+                createFragment = { UnitConverterFragment() }
+            )
+        )
+
+        // 8. Công cụ văn bản
+        register(
+            ToolDescriptor(
+                id = "text_tools",
+                titleResId = R.string.tool_text_tools_title,
+                descriptionResId = R.string.tool_text_tools_desc,
+                iconResId = R.drawable.ic_text_format,
+                group = ToolGroup.TEXT_CONVERSION,
+                createFragment = { TextToolsFragment() }
             )
         )
     }
