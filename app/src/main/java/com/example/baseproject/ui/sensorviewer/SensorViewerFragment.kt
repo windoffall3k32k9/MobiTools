@@ -16,7 +16,7 @@ import com.example.baseproject.databinding.ItemSensorCardBinding
 import java.util.Locale
 
 /**
- * Công cụ hiển thị toàn bộ cảm biến phần cứng của thiết bị và các thông số đo thời gian thực.
+ * Công cụ hiển thị toàn bộ cảm biến phần cứng có thể nhận biết của thiết bị với tên tiếng Việt rõ ràng.
  */
 class SensorViewerFragment : BaseToolFragment<FragmentSensorViewerBinding>(), SensorEventListener {
 
@@ -28,15 +28,22 @@ class SensorViewerFragment : BaseToolFragment<FragmentSensorViewerBinding>(), Se
     private val sensorValueMap = mutableMapOf<Int, FloatArray>()
     private lateinit var sensorAdapter: SensorViewerAdapter
 
+    // Khởi tạo ViewBinding liên kết với giao diện trình xem cảm biến.
     override fun provideViewBinding(container: ViewGroup?): FragmentSensorViewerBinding {
         return FragmentSensorViewerBinding.inflate(layoutInflater, container, false)
     }
 
+    // Lọc danh sách cảm biến chuẩn có tên tiếng Việt và khởi tạo danh sách hiển thị.
     override fun initViews() {
         sensorManager = requireContext().getSystemService(Context.SENSOR_SERVICE) as? SensorManager
-        sensorList = sensorManager?.getSensorList(Sensor.TYPE_ALL) ?: emptyList()
+        val rawSensors = sensorManager?.getSensorList(Sensor.TYPE_ALL) ?: emptyList()
 
-        viewBinding.tvTotalSensorsCount.text = "Phát hiện ${sensorList.size} cảm biến phần cứng"
+        // Lọc các cảm biến có tên rõ ràng và loại bỏ cảm biến kiểm thử nội bộ không xác định
+        sensorList = rawSensors
+            .filter { getVietnameseSensorName(it.type) != null }
+            .distinctBy { it.type }
+
+        viewBinding.tvTotalSensorsCount.text = "Phát hiện ${sensorList.size} cảm biến tiêu chuẩn"
 
         sensorAdapter = SensorViewerAdapter(sensorList, sensorValueMap)
         viewBinding.rvSensors.apply {
@@ -57,6 +64,7 @@ class SensorViewerFragment : BaseToolFragment<FragmentSensorViewerBinding>(), Se
         sensorManager?.unregisterListener(this)
     }
 
+    // Nhận sự kiện thay đổi dữ liệu đo và cập nhật mục hiển thị tương ứng trong adapter.
     override fun onSensorChanged(event: SensorEvent?) {
         event ?: return
         val type = event.sensor.type
@@ -69,10 +77,35 @@ class SensorViewerFragment : BaseToolFragment<FragmentSensorViewerBinding>(), Se
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) = Unit
+
+    companion object {
+        // Ánh xạ mã định danh cảm biến Android thành tên tiếng Việt rõ ràng, trả về null nếu không xác định.
+        fun getVietnameseSensorName(type: Int): String? {
+            return when (type) {
+                Sensor.TYPE_PROXIMITY -> "Cảm biến tiệm cận"
+                Sensor.TYPE_ACCELEROMETER -> "Cảm biến gia tốc"
+                Sensor.TYPE_MAGNETIC_FIELD -> "Cảm biến từ kế"
+                Sensor.TYPE_GYROSCOPE -> "Cảm biến con quay hồi chuyển"
+                Sensor.TYPE_LIGHT -> "Cảm biến ánh sáng"
+                Sensor.TYPE_PRESSURE -> "Cảm biến áp suất khí quyển"
+                Sensor.TYPE_GRAVITY -> "Cảm biến trọng lực"
+                Sensor.TYPE_LINEAR_ACCELERATION -> "Cảm biến gia tốc tuyến tính"
+                Sensor.TYPE_ROTATION_VECTOR -> "Cảm biến vectơ xoay"
+                Sensor.TYPE_STEP_COUNTER -> "Cảm biến đếm bước chân"
+                Sensor.TYPE_STEP_DETECTOR -> "Cảm biến phát hiện bước"
+                Sensor.TYPE_SIGNIFICANT_MOTION -> "Cảm biến chuyển động tức thời"
+                Sensor.TYPE_AMBIENT_TEMPERATURE -> "Cảm biến nhiệt độ môi trường"
+                Sensor.TYPE_RELATIVE_HUMIDITY -> "Cảm biến độ ẩm không khí"
+                Sensor.TYPE_GAME_ROTATION_VECTOR -> "Cảm biến xoay định hướng"
+                Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR -> "Cảm biến vectơ địa từ"
+                else -> null
+            }
+        }
+    }
 }
 
 /**
- * Adapter danh sách cảm biến hiển thị chi tiết tên, nhà sản xuất và chỉ số đo theo thời gian thực.
+ * Adapter danh sách cảm biến hiển thị tên tiếng Việt màu xanh và thông số trước sau trái phải.
  */
 class SensorViewerAdapter(
     private val sensors: List<Sensor>,
@@ -95,47 +128,70 @@ class SensorViewerAdapter(
 
     override fun onBindViewHolder(holder: SensorViewHolder, position: Int) {
         val sensor = sensors[position]
-        holder.binding.tvSensorName.text = sensor.name
-        holder.binding.tvSensorType.text = getSensorTypeName(sensor.type)
-        holder.binding.tvSensorVendor.text = "${sensor.vendor} • v${sensor.version}"
+        val viName = SensorViewerFragment.getVietnameseSensorName(sensor.type) ?: sensor.name
+
+        holder.binding.tvSensorName.text = viName
+        holder.binding.tvSensorType.text = "Loại #${sensor.type}"
+        holder.binding.tvSensorVendor.text = "${sensor.vendor} • ${sensor.name}"
 
         val values = valueMap[sensor.type]
         if (values != null && values.isNotEmpty()) {
             val textBuilder = StringBuilder()
-            when (values.size) {
-                1 -> textBuilder.append(String.format(Locale.US, "Giá trị: %.2f", values[0]))
-                2 -> textBuilder.append(String.format(Locale.US, "X: %.2f, Y: %.2f", values[0], values[1]))
-                else -> textBuilder.append(
-                    String.format(Locale.US, "X: %.2f, Y: %.2f, Z: %.2f", values[0], values[1], values[2])
-                )
+            when (sensor.type) {
+                Sensor.TYPE_PROXIMITY -> {
+                    textBuilder.append(String.format(Locale.US, "Khoảng cách đo: %.1f cm", values[0]))
+                }
+                Sensor.TYPE_LIGHT -> {
+                    textBuilder.append(String.format(Locale.US, "Cường độ ánh sáng: %.1f lux", values[0]))
+                }
+                Sensor.TYPE_PRESSURE -> {
+                    textBuilder.append(String.format(Locale.US, "Áp suất khí quyển: %.1f hPa", values[0]))
+                }
+                Sensor.TYPE_STEP_COUNTER -> {
+                    textBuilder.append(String.format(Locale.US, "Tổng số bước đã đếm: %.0f bước", values[0]))
+                }
+                Sensor.TYPE_ACCELEROMETER,
+                Sensor.TYPE_GRAVITY,
+                Sensor.TYPE_LINEAR_ACCELERATION,
+                Sensor.TYPE_MAGNETIC_FIELD,
+                Sensor.TYPE_GYROSCOPE -> {
+                    if (values.size >= 3) {
+                        textBuilder.append(
+                            String.format(
+                                Locale.US,
+                                "Trái/Phải: %.2f | Trước/Sau: %.2f | Lên/Xuống: %.2f",
+                                values[0], values[1], values[2]
+                            )
+                        )
+                    } else {
+                        textBuilder.append(String.format(Locale.US, "Trái/Phải: %.2f", values[0]))
+                    }
+                }
+                else -> {
+                    when (values.size) {
+                        1 -> textBuilder.append(String.format(Locale.US, "Giá trị: %.2f", values[0]))
+                        2 -> textBuilder.append(String.format(Locale.US, "Trái/Phải: %.2f | Trước/Sau: %.2f", values[0], values[1]))
+                        else -> textBuilder.append(
+                            String.format(
+                                Locale.US,
+                                "Trái/Phải: %.2f | Trước/Sau: %.2f | Lên/Xuống: %.2f",
+                                values[0], values[1], values[2]
+                            )
+                        )
+                    }
+                }
             }
             holder.binding.tvSensorLiveValues.text = textBuilder.toString()
         } else {
-            holder.binding.tvSensorLiveValues.text = "Đang chờ dữ liệu đo…"
+            holder.binding.tvSensorLiveValues.text = "Đang chờ tín hiệu cảm biến…"
         }
 
         holder.binding.tvSensorSpecs.text = String.format(
             Locale.US,
-            "Tầm đo tối đa: %.1f • Độ phân giải: %.4f • Năng lượng: %.2f mA",
+            "Tầm đo tối đa: %.1f • Độ nhạy: %.4f • Dòng điện: %.2f mA",
             sensor.maximumRange,
             sensor.resolution,
             sensor.power
         )
-    }
-
-    // Chuyển mã loại cảm biến số nguyên thành tên trực quan.
-    private fun getSensorTypeName(type: Int): String {
-        return when (type) {
-            Sensor.TYPE_ACCELEROMETER -> "GIA TỐC (ACCELEROMETER)"
-            Sensor.TYPE_MAGNETIC_FIELD -> "TỪ KẾ (MAGNETOMETER)"
-            Sensor.TYPE_GYROSCOPE -> "CON QUAY (GYROSCOPE)"
-            Sensor.TYPE_LIGHT -> "ÁNH SÁNG (LIGHT)"
-            Sensor.TYPE_PRESSURE -> "ÁP SUẤT (BAROMETER)"
-            Sensor.TYPE_PROXIMITY -> "TIỆM CẬN (PROXIMITY)"
-            Sensor.TYPE_GRAVITY -> "TRỌNG LỰC (GRAVITY)"
-            Sensor.TYPE_ROTATION_VECTOR -> "VECTƠ XOAY (ROTATION)"
-            Sensor.TYPE_STEP_COUNTER -> "ĐẾM BƯỚC (STEP COUNTER)"
-            else -> "CẢM BIẾN #$type"
-        }
     }
 }

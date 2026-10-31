@@ -30,8 +30,8 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:textColor="@color/textPrimary"
-                android:textSize="15sp"
+                android:textColor="@color/colorPrimary"
+                android:textSize="16sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -43,16 +43,15 @@
                 android:paddingTop="2dp"
                 android:paddingEnd="8dp"
                 android:paddingBottom="2dp"
-                android:textColor="@color/colorPrimary"
-                android:textSize="11sp"
-                android:textStyle="bold" />
+                android:textColor="@color/textSecondary"
+                android:textSize="11sp" />
         </LinearLayout>
 
         <TextView
             android:id="@+id/tvSensorVendor"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
+            android:layout_marginTop="4dp"
             android:textColor="@color/textSecondary"
             android:textSize="12sp" />
 
@@ -63,15 +62,16 @@
             android:layout_marginBottom="10dp"
             android:background="@color/colorBorder" />
 
-        <!-- Giá trị thời gian thực -->
+        <!-- Giá trị thời gian thực với nhãn trước sau trái phải -->
         <TextView
             android:id="@+id/tvSensorLiveValues"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:fontFamily="monospace"
+            android:lineSpacingExtra="2dp"
             android:text="Đang chờ dữ liệu…"
             android:textColor="@color/textPrimary"
-            android:textSize="13sp" />
+            android:textSize="13sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/tvSensorSpecs"
