@@ -1,4 +1,5 @@
 package com.example.baseproject.base.activity
+
 import android.app.AlertDialog
 import android.app.Dialog
 import android.os.Bundle
@@ -15,20 +16,28 @@ import androidx.core.view.WindowCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import androidx.viewbinding.ViewBinding
+import com.example.baseproject.localization.AppLanguageManager
 
-
+/**
+ * Activity cơ sở quản lý vòng đời, đa ngôn ngữ, thanh điều hướng và hiển thị hộp thoại tải.
+ */
 abstract class BaseActivity<V : ViewBinding> : AppCompatActivity() {
 
     lateinit var viewBinding: V
         private set
 
-    /** Alias ngắn để các màn hình hiện tại có thể refactor mà không đổi logic. */
+    /** Alias ngắn để các màn hình hiện tại có thể truy cập ViewBinding trực tiếp. */
     protected val binding: V
         get() = viewBinding
 
     val handler = Handler(Looper.getMainLooper())
 
     var loadingDialog: Dialog? = null
+
+    // Bọc context của Activity với Locale ngôn ngữ đang được kích hoạt.
+    override fun attachBaseContext(newBase: android.content.Context) {
+        super.attachBaseContext(AppLanguageManager.wrapContext(newBase))
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,10 +59,16 @@ abstract class BaseActivity<V : ViewBinding> : AppCompatActivity() {
 
     open fun initObserver() = Unit
 
+    // Xử lý quay lại: nếu có Fragment trong backstack thì pop, ngược lại đóng Activity.
     open fun onBack() {
-        finish()
+        if (supportFragmentManager.backStackEntryCount > 0) {
+            supportFragmentManager.popBackStack()
+        } else {
+            finish()
+        }
     }
 
+    // Đăng ký callback xử lý phím quay lại hệ thống.
     open fun handleOnBackPressed() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
@@ -62,6 +77,7 @@ abstract class BaseActivity<V : ViewBinding> : AppCompatActivity() {
         })
     }
 
+    // Thay thế Fragment trong khung chứa và thêm vào ngăn xếp điều hướng (backstack).
     fun replaceFragment(containerId: Int, fragment: Fragment) {
         supportFragmentManager.commit {
             setReorderingAllowed(true)
@@ -70,6 +86,7 @@ abstract class BaseActivity<V : ViewBinding> : AppCompatActivity() {
         }
     }
 
+    // Thêm Fragment mới vào khung chứa và lưu vào ngăn xếp điều hướng.
     fun addFragment(containerId: Int, fragment: Fragment) {
         supportFragmentManager.commit {
             setReorderingAllowed(true)
@@ -78,18 +95,21 @@ abstract class BaseActivity<V : ViewBinding> : AppCompatActivity() {
         }
     }
 
+    // Ẩn tạm thời một Fragment đang hiển thị.
     fun hideFragment(fragment: Fragment) {
         supportFragmentManager.commit {
             hide(fragment)
         }
     }
 
+    // Hiển thị lại Fragment đã bị ẩn.
     fun showFragment(fragment: Fragment) {
         supportFragmentManager.commit {
             show(fragment)
         }
     }
 
+    // Khởi tạo hộp thoại loading xoay tròn mặc định.
     open fun createLoadingDialog(): Dialog {
         val progressBar = ProgressBar(this)
         val size = (64 * resources.displayMetrics.density).toInt()
@@ -107,6 +127,7 @@ abstract class BaseActivity<V : ViewBinding> : AppCompatActivity() {
             .create()
     }
 
+    // Hiển thị hộp thoại loading trên luồng giao diện chính.
     fun showLoading() {
         runOnUiThread {
             if (isFinishing || isDestroyed) return@runOnUiThread
@@ -117,18 +138,21 @@ abstract class BaseActivity<V : ViewBinding> : AppCompatActivity() {
         }
     }
 
+    // Đóng hộp thoại loading đang hiển thị.
     fun hideLoading() {
         runOnUiThread {
             loadingDialog?.dismiss()
         }
     }
 
+    // Hiển thị thông báo Toast nhanh gọn trên giao diện.
     fun showToast(message: String, duration: Int = Toast.LENGTH_SHORT) {
         runOnUiThread {
             Toast.makeText(this, message, duration).show()
         }
     }
 
+    // Cấu hình màu nền và kiểu icon cho thanh trạng thái hệ thống.
     fun setStatusBarColor(color: Int, lightStatus: Boolean) {
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
         window.statusBarColor = color
