@@ -1,3 +1,101 @@
 <resources>
-    <string name="app_name">BaseProject</string>
+    <string name="app_name">MobiTools</string>
+    <string name="app_subtitle">Bộ công cụ tiện ích thiết bị đa chức năng</string>
+
+    <!-- Nhóm công cụ -->
+    <string name="group_all">Tất cả</string>
+    <string name="group_favorites">Yêu thích</string>
+    <string name="group_recents">Gần đây</string>
+    <string name="group_measurement_sensor">Đo đạc &amp; Cảm biến</string>
+    <string name="group_calculation_time">Tính toán &amp; Thời gian</string>
+    <string name="group_device_utility">Tiện ích thiết bị</string>
+    <string name="group_text_conversion">Văn bản &amp; Chuyển đổi</string>
+    <string name="group_observation_data">Quan sát &amp; Dữ liệu</string>
+
+    <!-- Thao tác chung -->
+    <string name="search_placeholder">Tìm kiếm công cụ…</string>
+    <string name="no_tools_found">Không tìm thấy công cụ phù hợp</string>
+    <string name="no_favorites_yet">Chưa có công cụ yêu thích nào</string>
+    <string name="no_recents_yet">Chưa có công cụ nào sử dụng gần đây</string>
+    <string name="copied_to_clipboard">Đã sao chép vào bộ nhớ tạm</string>
+    <string name="share">Chia sẻ</string>
+    <string name="copy">Sao chép</string>
+    <string name="clear">Xóa</string>
+    <string name="reset">Đặt lại</string>
+    <string name="save">Lưu</string>
+    <string name="start">Bắt đầu</string>
+    <string name="pause">Tạm dừng</string>
+    <string name="resume">Tiếp tục</string>
+    <string name="lap">Ghi vòng</string>
+    <string name="hardware_not_supported">Thiết bị không hỗ trợ phần cứng này</string>
+    <string name="permission_required">Công cụ này yêu cầu quyền để hoạt động</string>
+    <string name="grant_permission">Cấp quyền</string>
+
+    <!-- 1. Máy tính -->
+    <string name="tool_calculator_title">Máy tính</string>
+    <string name="tool_calculator_desc">Thực hiện các phép toán số học cơ bản và phần trăm</string>
+
+    <!-- 2. Bấm giờ -->
+    <string name="tool_stopwatch_title">Đồng hồ bấm giờ</string>
+    <string name="tool_stopwatch_desc">Đo thời gian chính xác và ghi nhận các vòng bấm</string>
+
+    <!-- 3. Đếm ngược -->
+    <string name="tool_timer_title">Đồng hồ đếm ngược</string>
+    <string name="tool_timer_desc">Hẹn giờ đếm ngược kèm thông báo rung và âm thanh</string>
+
+    <!-- 4. Bộ đếm -->
+    <string name="tool_counter_title">Bộ đếm</string>
+    <string name="tool_counter_desc">Đếm số lần thao tác với bước nhảy tùy chỉnh</string>
+
+    <!-- 5. Đèn pin -->
+    <string name="tool_flashlight_title">Đèn pin</string>
+    <string name="tool_flashlight_desc">Bật tắt đèn flash camera với chỉ báo trực quan</string>
+    <string name="flash_not_available">Thiết bị không có đèn flash camera</string>
+
+    <!-- 6. Tạo mã QR -->
+    <string name="tool_qr_generator_title">Tạo mã QR</string>
+    <string name="tool_qr_generator_desc">Tạo mã QR từ văn bản hoặc liên kết và lưu hình ảnh</string>
+    <string name="enter_qr_content">Nhập nội dung cần tạo mã QR…</string>
+    <string name="generate_qr">Tạo mã QR</string>
+    <string name="qr_saved_successfully">Đã lưu ảnh mã QR thành công</string>
+
+    <!-- 7. Chuyển đổi đơn vị -->
+    <string name="tool_unit_converter_title">Chuyển đổi đơn vị</string>
+    <string name="tool_unit_converter_desc">Chuyển đổi chiều dài, khối lượng, nhiệt độ và dung lượng</string>
+
+    <!-- 8. La bàn -->
+    <string name="tool_compass_title">La bàn</string>
+    <string name="tool_compass_desc">Hiển thị góc phương vị và hướng la bàn theo từ trường</string>
+    <string name="compass_sensor_missing">Thiết bị thiếu cảm biến từ kế hoặc gia tốc kế</string>
+
+    <!-- 9. Thước thủy -->
+    <string name="tool_bubble_level_title">Thước thủy</string>
+    <string name="tool_bubble_level_desc">Kiểm tra mức thăng bằng trên các trục bằng gia tốc kế</string>
+    <string name="calibrate">Mốc 0 chuẩn</string>
+
+    <!-- 10. Công cụ văn bản -->
+    <string name="tool_text_tools_title">Công cụ văn bản</string>
+    <string name="tool_text_tools_desc">Xử lý chữ hoa thường, loại bỏ dòng thừa và thống kê ký tự</string>
+    <string name="enter_text_here">Nhập văn bản cần xử lý…</string>
+
+    <!-- 11. Đo độ nghiêng -->
+    <string name="tool_inclinometer_title">Đo độ nghiêng</string>
+    <string name="tool_inclinometer_desc">Đo góc nghiêng bề mặt với tính năng giữ giá trị</string>
+
+    <!-- 12. Đo độ ồn tương đối -->
+    <string name="tool_sound_meter_title">Đo độ ồn tương đối</string>
+    <string name="tool_sound_meter_desc">Đo mức âm thanh tương đối qua micro theo chuẩn dBFS</string>
+    <string name="sound_meter_disclaimer">Chỉ số mang tính tham khảo tương đối, không thay thế thiết bị âm học chuẩn</string>
+
+    <!-- 13. Quét mã QR & Vạch -->
+    <string name="tool_barcode_scanner_title">Quét mã QR &amp; Vạch</string>
+    <string name="tool_barcode_scanner_desc">Giải mã trực tiếp mã vạch và QR code qua camera</string>
+
+    <!-- 14. Trình xem cảm biến -->
+    <string name="tool_sensor_viewer_title">Trình xem cảm biến</string>
+    <string name="tool_sensor_viewer_desc">Xem thông số thời gian thực từ toàn bộ cảm biến thiết bị</string>
+
+    <!-- 15. Tính toán mở rộng -->
+    <string name="tool_daily_math_title">Tính toán mở rộng</string>
+    <string name="tool_daily_math_desc">Tính phần trăm tăng giảm, chia tiền hóa đơn và khoảng cách ngày</string>
 </resources>
