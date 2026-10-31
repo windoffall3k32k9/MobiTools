@@ -1,0 +1,26 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+    <!-- Nửa kim Bắc (Màu đỏ) -->
+    <path
+        android:fillColor="#EF4444"
+        android:pathData="M100,15 L115,100 L100,85 Z" />
+    <path
+        android:fillColor="#DC2626"
+        android:pathData="M100,15 L85,100 L100,85 Z" />
+
+    <!-- Nửa kim Nam (Màu xanh/xám) -->
+    <path
+        android:fillColor="#94A3B8"
+        android:pathData="M100,185 L115,100 L100,115 Z" />
+    <path
+        android:fillColor="#64748B"
+        android:pathData="M100,185 L85,100 L100,115 Z" />
+
+    <!-- Trục kim ở giữa -->
+    <path
+        android:fillColor="#0F172A"
+        android:pathData="M100,92 A8,8 0 1,0 100,108 A8,8 0 1,0 100,92 Z" />
+</vector>

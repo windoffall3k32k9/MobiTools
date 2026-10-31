@@ -5,9 +5,11 @@ import com.example.baseproject.R
 import com.example.baseproject.model.ToolDescriptor
 import com.example.baseproject.model.ToolGroup
 import com.example.baseproject.ui.calculator.CalculatorFragment
+import com.example.baseproject.ui.compass.CompassFragment
 import com.example.baseproject.ui.converter.UnitConverterFragment
 import com.example.baseproject.ui.counter.TallyCounterFragment
 import com.example.baseproject.ui.flashlight.FlashlightFragment
+import com.example.baseproject.ui.level.BubbleLevelFragment
 import com.example.baseproject.ui.qr.QrGeneratorFragment
 import com.example.baseproject.ui.stopwatch.StopwatchFragment
 import com.example.baseproject.ui.texttools.TextToolsFragment
@@ -119,6 +121,30 @@ object ToolRegistry {
                 iconResId = R.drawable.ic_text_format,
                 group = ToolGroup.TEXT_CONVERSION,
                 createFragment = { TextToolsFragment() }
+            )
+        )
+
+        // 9. La bàn
+        register(
+            ToolDescriptor(
+                id = "compass",
+                titleResId = R.string.tool_compass_title,
+                descriptionResId = R.string.tool_compass_desc,
+                iconResId = R.drawable.ic_compass,
+                group = ToolGroup.MEASUREMENT_SENSOR,
+                createFragment = { CompassFragment() }
+            )
+        )
+
+        // 10. Thước thủy
+        register(
+            ToolDescriptor(
+                id = "bubble_level",
+                titleResId = R.string.tool_bubble_level_title,
+                descriptionResId = R.string.tool_bubble_level_desc,
+                iconResId = R.drawable.ic_level,
+                group = ToolGroup.MEASUREMENT_SENSOR,
+                createFragment = { BubbleLevelFragment() }
             )
         )
     }
