@@ -8,15 +8,20 @@ import com.example.baseproject.ui.calculator.CalculatorFragment
 import com.example.baseproject.ui.compass.CompassFragment
 import com.example.baseproject.ui.converter.UnitConverterFragment
 import com.example.baseproject.ui.counter.TallyCounterFragment
+import com.example.baseproject.ui.dailymath.DailyMathFragment
 import com.example.baseproject.ui.flashlight.FlashlightFragment
+import com.example.baseproject.ui.inclinometer.InclinometerFragment
 import com.example.baseproject.ui.level.BubbleLevelFragment
 import com.example.baseproject.ui.qr.QrGeneratorFragment
+import com.example.baseproject.ui.scanner.BarcodeScannerFragment
+import com.example.baseproject.ui.sensorviewer.SensorViewerFragment
+import com.example.baseproject.ui.soundmeter.SoundMeterFragment
 import com.example.baseproject.ui.stopwatch.StopwatchFragment
 import com.example.baseproject.ui.texttools.TextToolsFragment
 import com.example.baseproject.ui.timer.CountdownTimerFragment
 
 /**
- * Đăng ký và quản trị danh mục công cụ tập trung cho MobiTools.
+ * Đăng ký và quản trị danh mục công cụ tập trung cho toàn bộ hệ thống MobiTools.
  */
 object ToolRegistry {
 
@@ -26,9 +31,9 @@ object ToolRegistry {
         initDefaultTools()
     }
 
-    // Đăng ký toàn bộ các công cụ mặc định vào hệ thống.
+    // Đăng ký toàn bộ 15 công cụ của MobiTools vào hệ thống.
     private fun initDefaultTools() {
-        // 1. Máy tính
+        // --- 1. Nhóm Tính toán & Thời gian ---
         register(
             ToolDescriptor(
                 id = "calculator",
@@ -40,7 +45,6 @@ object ToolRegistry {
             )
         )
 
-        // 2. Bấm giờ
         register(
             ToolDescriptor(
                 id = "stopwatch",
@@ -52,7 +56,6 @@ object ToolRegistry {
             )
         )
 
-        // 3. Đếm ngược
         register(
             ToolDescriptor(
                 id = "timer",
@@ -64,7 +67,6 @@ object ToolRegistry {
             )
         )
 
-        // 4. Bộ đếm
         register(
             ToolDescriptor(
                 id = "counter",
@@ -76,7 +78,18 @@ object ToolRegistry {
             )
         )
 
-        // 5. Đèn pin
+        register(
+            ToolDescriptor(
+                id = "daily_math",
+                titleResId = R.string.tool_daily_math_title,
+                descriptionResId = R.string.tool_daily_math_desc,
+                iconResId = R.drawable.ic_math,
+                group = ToolGroup.CALCULATION_TIME,
+                createFragment = { DailyMathFragment() }
+            )
+        )
+
+        // --- 2. Nhóm Tiện ích thiết bị ---
         register(
             ToolDescriptor(
                 id = "flashlight",
@@ -88,7 +101,6 @@ object ToolRegistry {
             )
         )
 
-        // 6. Tạo mã QR
         register(
             ToolDescriptor(
                 id = "qr_generator",
@@ -100,7 +112,18 @@ object ToolRegistry {
             )
         )
 
-        // 7. Chuyển đổi đơn vị
+        register(
+            ToolDescriptor(
+                id = "barcode_scanner",
+                titleResId = R.string.tool_barcode_scanner_title,
+                descriptionResId = R.string.tool_barcode_scanner_desc,
+                iconResId = R.drawable.ic_barcode_scanner,
+                group = ToolGroup.DEVICE_UTILITY,
+                createFragment = { BarcodeScannerFragment() }
+            )
+        )
+
+        // --- 3. Nhóm Văn bản & Chuyển đổi ---
         register(
             ToolDescriptor(
                 id = "unit_converter",
@@ -112,7 +135,6 @@ object ToolRegistry {
             )
         )
 
-        // 8. Công cụ văn bản
         register(
             ToolDescriptor(
                 id = "text_tools",
@@ -124,7 +146,7 @@ object ToolRegistry {
             )
         )
 
-        // 9. La bàn
+        // --- 4. Nhóm Đo đạc & Cảm biến ---
         register(
             ToolDescriptor(
                 id = "compass",
@@ -136,7 +158,6 @@ object ToolRegistry {
             )
         )
 
-        // 10. Thước thủy
         register(
             ToolDescriptor(
                 id = "bubble_level",
@@ -145,6 +166,40 @@ object ToolRegistry {
                 iconResId = R.drawable.ic_level,
                 group = ToolGroup.MEASUREMENT_SENSOR,
                 createFragment = { BubbleLevelFragment() }
+            )
+        )
+
+        register(
+            ToolDescriptor(
+                id = "inclinometer",
+                titleResId = R.string.tool_inclinometer_title,
+                descriptionResId = R.string.tool_inclinometer_desc,
+                iconResId = R.drawable.ic_inclinometer,
+                group = ToolGroup.MEASUREMENT_SENSOR,
+                createFragment = { InclinometerFragment() }
+            )
+        )
+
+        register(
+            ToolDescriptor(
+                id = "sound_meter",
+                titleResId = R.string.tool_sound_meter_title,
+                descriptionResId = R.string.tool_sound_meter_desc,
+                iconResId = R.drawable.ic_sound_meter,
+                group = ToolGroup.MEASUREMENT_SENSOR,
+                createFragment = { SoundMeterFragment() }
+            )
+        )
+
+        // --- 5. Nhóm Quan sát & Dữ liệu ---
+        register(
+            ToolDescriptor(
+                id = "sensor_viewer",
+                titleResId = R.string.tool_sensor_viewer_title,
+                descriptionResId = R.string.tool_sensor_viewer_desc,
+                iconResId = R.drawable.ic_sensors,
+                group = ToolGroup.OBSERVATION_DATA,
+                createFragment = { SensorViewerFragment() }
             )
         )
     }
