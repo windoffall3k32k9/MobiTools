@@ -1,8 +1,13 @@
 package com.example.baseproject.registry
 
 import android.content.Context
+import com.example.baseproject.R
 import com.example.baseproject.model.ToolDescriptor
 import com.example.baseproject.model.ToolGroup
+import com.example.baseproject.ui.calculator.CalculatorFragment
+import com.example.baseproject.ui.counter.TallyCounterFragment
+import com.example.baseproject.ui.stopwatch.StopwatchFragment
+import com.example.baseproject.ui.timer.CountdownTimerFragment
 
 /**
  * Đăng ký và quản trị danh mục công cụ tập trung cho MobiTools.
@@ -10,6 +15,61 @@ import com.example.baseproject.model.ToolGroup
 object ToolRegistry {
 
     private val tools = mutableListOf<ToolDescriptor>()
+
+    init {
+        initDefaultTools()
+    }
+
+    // Đăng ký toàn bộ các công cụ mặc định vào hệ thống.
+    private fun initDefaultTools() {
+        // 1. Máy tính
+        register(
+            ToolDescriptor(
+                id = "calculator",
+                titleResId = R.string.tool_calculator_title,
+                descriptionResId = R.string.tool_calculator_desc,
+                iconResId = R.drawable.ic_calculator,
+                group = ToolGroup.CALCULATION_TIME,
+                createFragment = { CalculatorFragment() }
+            )
+        )
+
+        // 2. Bấm giờ
+        register(
+            ToolDescriptor(
+                id = "stopwatch",
+                titleResId = R.string.tool_stopwatch_title,
+                descriptionResId = R.string.tool_stopwatch_desc,
+                iconResId = R.drawable.ic_stopwatch,
+                group = ToolGroup.CALCULATION_TIME,
+                createFragment = { StopwatchFragment() }
+            )
+        )
+
+        // 3. Đếm ngược
+        register(
+            ToolDescriptor(
+                id = "timer",
+                titleResId = R.string.tool_timer_title,
+                descriptionResId = R.string.tool_timer_desc,
+                iconResId = R.drawable.ic_timer,
+                group = ToolGroup.CALCULATION_TIME,
+                createFragment = { CountdownTimerFragment() }
+            )
+        )
+
+        // 4. Bộ đếm
+        register(
+            ToolDescriptor(
+                id = "counter",
+                titleResId = R.string.tool_counter_title,
+                descriptionResId = R.string.tool_counter_desc,
+                iconResId = R.drawable.ic_counter,
+                group = ToolGroup.CALCULATION_TIME,
+                createFragment = { TallyCounterFragment() }
+            )
+        )
+    }
 
     // Đăng ký một công cụ vào danh mục hệ thống nếu chưa tồn tại.
     @Synchronized
