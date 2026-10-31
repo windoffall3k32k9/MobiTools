@@ -3,7 +3,6 @@ package com.example.baseproject.di
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.preference.PreferenceManager
-import androidx.room.Room
 import com.example.baseproject.data.database.AppDatabase
 import com.example.baseproject.data.database.dao.ToolDao
 import dagger.Module
@@ -36,13 +35,7 @@ object AppModule {
     fun provideAppDatabase(
         @ApplicationContext context: Context
     ): AppDatabase {
-        return Room.databaseBuilder(
-            context,
-            AppDatabase::class.java,
-            AppDatabase.DATABASE_NAME
-        )
-            .fallbackToDestructiveMigration()
-            .build()
+        return AppDatabase.getInstance(context)
     }
 
     // Cung cấp ToolDao từ cơ sở dữ liệu Room.
