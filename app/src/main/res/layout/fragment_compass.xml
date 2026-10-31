@@ -3,12 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorBackground"
+    android:background="#0B0F19"
     android:orientation="vertical">
 
     <include layout="@layout/layout_tool_toolbar" />
 
-    <!-- Cảnh báo thiếu cảm biến -->
+    <!-- Cảnh báo khi thiết bị thiếu cảm biến -->
     <TextView
         android:id="@+id/tvCompassSensorWarning"
         android:layout_width="match_parent"
@@ -22,108 +22,145 @@
         android:textSize="13sp"
         android:visibility="gone" />
 
-    <!-- Khu vực hiển thị độ góc phương vị lớn -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:paddingTop="20dp"
-        android:paddingBottom="12dp">
-
-        <TextView
-            android:id="@+id/tvAzimuthDegree"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="0°"
-            android:textColor="@color/textPrimary"
-            android:textSize="52sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/tvDirectionName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="BẮC (N)"
-            android:textColor="@color/colorPrimary"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-    </LinearLayout>
-
-    <!-- Mặt la bàn xoay -->
+    <!-- KHUNG CHỨA MẶT LA BÀN VÀ KIM CHỈ CỐ ĐỊNH -->
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:gravity="center">
 
-        <!-- Khung tròn mặt la bàn -->
+        <!-- Mặt số la bàn xoay toàn bộ -->
         <FrameLayout
-            android:id="@+id/layoutDial"
-            android:layout_width="280dp"
-            android:layout_height="280dp"
-            android:layout_gravity="center"
-            android:background="@drawable/bg_compass_dial">
+            android:layout_width="320dp"
+            android:layout_height="320dp"
+            android:layout_gravity="center">
 
-            <!-- 4 Hướng chính Bắc - Đông - Nam - Tây -->
-            <TextView
+            <!-- Dial la bàn xoay theo góc phương vị -->
+            <com.example.baseproject.ui.compass.CompassDialView
+                android:id="@+id/compassDialView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <!-- Khối chữ số góc phương vị và hướng ở chính giữa -->
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="top|center_horizontal"
-                android:layout_marginTop="12dp"
-                android:text="N"
-                android:textColor="@color/colorDanger"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end|center_vertical"
-                android:layout_marginEnd="14dp"
-                android:text="E"
-                android:textColor="@color/textPrimary"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom|center_horizontal"
-                android:layout_marginBottom="12dp"
-                android:text="S"
-                android:textColor="@color/textPrimary"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="start|center_vertical"
-                android:layout_marginStart="14dp"
-                android:text="W"
-                android:textColor="@color/textPrimary"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-
-            <!-- Kim la bàn nằm ở tâm xoay -->
-            <ImageView
-                android:id="@+id/ivCompassNeedle"
-                android:layout_width="220dp"
-                android:layout_height="220dp"
                 android:layout_gravity="center"
-                android:src="@drawable/ic_compass_needle" />
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvCardinalDirection"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="B"
+                    android:textColor="#FFFFFF"
+                    android:textSize="38sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvAzimuthDegree"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="0°"
+                    android:textColor="#E2E8F0"
+                    android:textSize="26sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- Mũi tên chỉ hướng cố định góc 12 giờ -->
+            <com.example.baseproject.ui.compass.CompassPointerView
+                android:layout_width="40dp"
+                android:layout_height="32dp"
+                android:layout_gravity="top|center_horizontal" />
+
         </FrameLayout>
+
     </FrameLayout>
 
-    <TextView
-        android:layout_width="wrap_content"
+    <!-- KHU VỰC HIỂN THỊ TỌA ĐỘ VỊ TRÍ THIẾT BỊ -->
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
         android:layout_marginBottom="24dp"
-        android:text="Xoay thiết bị hình số 8 nếu la bàn cần hiệu chuẩn"
-        android:textColor="@color/textMuted"
-        android:textSize="12sp" />
+        app:cardBackgroundColor="#131B2E"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="0dp"
+        app:strokeColor="#1E293B"
+        app:strokeWidth="1dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Vị trí hiện tại của thiết bị"
+                    android:textColor="#94A3B8"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvAltitude"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Độ cao: -- m"
+                    android:textColor="#38BDF8"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- Tọa độ Kinh độ / Vĩ độ -->
+            <TextView
+                android:id="@+id/tvCoordinates"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="Đang xác định tọa độ GPS…"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <!-- Địa chỉ / Địa phương hành chính -->
+            <TextView
+                android:id="@+id/tvLocationAddress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:textColor="#94A3B8"
+                android:textSize="13sp" />
+
+            <!-- Nút xin cấp quyền vị trí nếu chưa có -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnGrantLocationPermission"
+                style="@style/Widget.Material3.Button"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:layout_marginTop="12dp"
+                android:backgroundTint="#2563EB"
+                android:text="Cấp quyền vị trí"
+                android:textColor="#FFFFFF"
+                android:textSize="13sp"
+                android:visibility="gone"
+                app:cornerRadius="12dp" />
+
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
 
 </LinearLayout>
