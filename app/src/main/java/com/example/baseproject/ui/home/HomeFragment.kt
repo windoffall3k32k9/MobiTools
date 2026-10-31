@@ -6,6 +6,7 @@ import android.text.TextWatcher
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.widget.PopupMenu
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -16,9 +17,14 @@ import com.example.baseproject.base.fragment.BaseFragment
 import com.example.baseproject.data.database.AppDatabase
 import com.example.baseproject.data.database.dao.ToolDao
 import com.example.baseproject.databinding.FragmentHomeBinding
+import com.example.baseproject.localization.AppLanguageManager
 import com.example.baseproject.model.ToolDescriptor
 import com.example.baseproject.model.ToolGroup
 import com.example.baseproject.registry.ToolRegistry
+import com.example.baseproject.ui.settings.GuideFragment
+import com.example.baseproject.ui.settings.PermissionsFragment
+import com.example.baseproject.ui.settings.PrivacyPolicyFragment
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -39,16 +45,20 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     private var favoriteToolIds: Set<String> = emptySet()
     private var recentToolIds: List<String> = emptyList()
 
+    // Khởi tạo ViewBinding liên kết với layout màn hình chính.
     override fun provideViewBinding(container: ViewGroup?): FragmentHomeBinding {
         return FragmentHomeBinding.inflate(layoutInflater, container, false)
     }
 
+    // Thiết lập danh mục, danh sách công cụ, thanh tìm kiếm và menu ba chấm.
     override fun initViews() {
         setupCategoriesRecyclerView()
         setupToolsRecyclerView()
         setupSearchListeners()
+        setupHeaderMenu()
     }
 
+    // Lắng nghe dữ liệu danh sách yêu thích và lịch sử gần đây từ Room.
     override fun initObserver() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -71,6 +81,68 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                 }
             }
         }
+    }
+
+    // Thiết lập sự kiện bấm nút ba chấm mở menu tiện ích mở rộng.
+    private fun setupHeaderMenu() {
+        viewBinding.btnMoreMenu.setOnClickListener { v ->
+            val context = context ?: return@setOnClickListener
+            val popup = PopupMenu(context, v)
+            popup.menuInflater.inflate(R.menu.menu_home_header, popup.menu)
+            popup.setOnMenuItemClickListener { menuItem ->
+                when (menuItem.itemId) {
+                    R.id.menu_guide -> {
+                        replaceFragment(R.id.fragment_container, GuideFragment())
+                        true
+                    }
+                    R.id.menu_language -> {
+                        showLanguageDialog()
+                        true
+                    }
+                    R.id.menu_permissions -> {
+                        replaceFragment(R.id.fragment_container, PermissionsFragment())
+                        true
+                    }
+                    R.id.menu_privacy -> {
+                        replaceFragment(R.id.fragment_container, PrivacyPolicyFragment())
+                        true
+                    }
+                    else -> false
+                }
+            }
+            popup.show()
+        }
+    }
+
+    // Hiển thị hộp thoại chọn ngôn ngữ ứng dụng độc lập tương tự MobiCheck.
+    private fun showLanguageDialog() {
+        val context = context ?: return
+        val modes = arrayOf(
+            AppLanguageManager.Mode.VIETNAMESE,
+            AppLanguageManager.Mode.ENGLISH,
+            AppLanguageManager.Mode.SYSTEM
+        )
+        val labels = arrayOf(
+            getString(R.string.language_vietnamese),
+            getString(R.string.language_english),
+            getString(R.string.language_system)
+        )
+        val currentMode = AppLanguageManager.currentMode(context)
+        var selectedMode = currentMode
+
+        MaterialAlertDialogBuilder(context)
+            .setTitle(R.string.language_dialog_title)
+            .setSingleChoiceItems(labels, modes.indexOf(currentMode)) { _, index ->
+                selectedMode = modes[index]
+            }
+            .setNegativeButton(R.string.common_cancel, null)
+            .setPositiveButton(R.string.common_save) { _, _ ->
+                if (selectedMode != currentMode) {
+                    AppLanguageManager.setMode(context, selectedMode)
+                    requireActivity().recreate()
+                }
+            }
+            .show()
     }
 
     // Thiết lập thanh danh mục cuộn ngang.

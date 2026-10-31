@@ -1,0 +1,119 @@
+<resources>
+    <string name="app_name">MobiTools</string>
+    <string name="app_subtitle">All-in-one multi-utility device toolkit</string>
+
+    <!-- Tool Groups -->
+    <string name="group_all">All</string>
+    <string name="group_favorites">Favorites</string>
+    <string name="group_recents">Recents</string>
+    <string name="group_measurement_sensor">Measure &amp; Sensors</string>
+    <string name="group_calculation_time">Calculation &amp; Time</string>
+    <string name="group_device_utility">Device Utilities</string>
+    <string name="group_text_conversion">Text &amp; Conversion</string>
+    <string name="group_observation_data">Observation &amp; Data</string>
+
+    <!-- Common Operations -->
+    <string name="search_placeholder">Search tools…</string>
+    <string name="no_tools_found">No matching tools found</string>
+    <string name="no_favorites_yet">No favorite tools yet</string>
+    <string name="no_recents_yet">No recently used tools</string>
+    <string name="copied_to_clipboard">Copied to clipboard</string>
+    <string name="share">Share</string>
+    <string name="copy">Copy</string>
+    <string name="clear">Clear</string>
+    <string name="reset">Reset</string>
+    <string name="save">Save</string>
+    <string name="start">Start</string>
+    <string name="pause">Pause</string>
+    <string name="resume">Resume</string>
+    <string name="lap">Lap</string>
+    <string name="hardware_not_supported">This device does not support this hardware</string>
+    <string name="permission_required">This tool requires permissions to function</string>
+    <string name="grant_permission">Grant Permission</string>
+
+    <!-- 1. Calculator -->
+    <string name="tool_calculator_title">Calculator</string>
+    <string name="tool_calculator_desc">Perform arithmetic operations, parentheses and percentage</string>
+
+    <!-- 2. Stopwatch -->
+    <string name="tool_stopwatch_title">Stopwatch</string>
+    <string name="tool_stopwatch_desc">High-precision stopwatch with lap recording</string>
+
+    <!-- 3. Timer -->
+    <string name="tool_timer_title">Countdown Timer</string>
+    <string name="tool_timer_desc">Countdown timer with circular progress and alerts</string>
+
+    <!-- 4. Counter -->
+    <string name="tool_counter_title">Tally Counter</string>
+    <string name="tool_counter_desc">Counting tool with custom steps and haptic feedback</string>
+
+    <!-- 5. Flashlight -->
+    <string name="tool_flashlight_title">Flashlight</string>
+    <string name="tool_flashlight_desc">Camera flash controller with SOS emergency signaling</string>
+    <string name="flash_not_available">Device has no camera flash</string>
+
+    <!-- 6. QR Generator -->
+    <string name="tool_qr_generator_title">QR Generator</string>
+    <string name="tool_qr_generator_desc">Generate QR codes from text/links offline and save/share</string>
+    <string name="enter_qr_content">Enter text or URL to generate QR…</string>
+    <string name="generate_qr">Generate QR</string>
+    <string name="qr_saved_successfully">QR code saved to gallery</string>
+
+    <!-- 7. Unit Converter -->
+    <string name="tool_unit_converter_title">Unit Converter</string>
+    <string name="tool_unit_converter_desc">Convert length, mass, temperature and digital storage</string>
+
+    <!-- 8. Compass -->
+    <string name="tool_compass_title">Compass</string>
+    <string name="tool_compass_desc">Magnetic compass with rotating dial and current coordinates</string>
+    <string name="compass_sensor_missing">Device is missing magnetometer or accelerometer</string>
+
+    <!-- 9. Bubble Level -->
+    <string name="tool_bubble_level_title">Bubble Level</string>
+    <string name="tool_bubble_level_desc">2D spirit level with calibration and front/back left/right tilt</string>
+    <string name="calibrate">Calibrate</string>
+
+    <!-- 10. Text Tools -->
+    <string name="tool_text_tools_title">Text Utilities</string>
+    <string name="tool_text_tools_desc">Case conversion, clean empty lines and word/character count</string>
+    <string name="enter_text_here">Enter text to format…</string>
+
+    <!-- 11. Inclinometer -->
+    <string name="tool_inclinometer_title">Inclinometer</string>
+    <string name="tool_inclinometer_desc">Surface tilt angle meter with hold function and slope %</string>
+
+    <!-- 12. Sound Meter -->
+    <string name="tool_sound_meter_title">Sound Meter</string>
+    <string name="tool_sound_meter_desc">Relative ambient noise level meter via microphone (dBFS)</string>
+    <string name="sound_meter_disclaimer">Relative reference value only, not a substitute for professional acoustic devices</string>
+
+    <!-- 13. Barcode Scanner -->
+    <string name="tool_barcode_scanner_title">Barcode &amp; QR Scanner</string>
+    <string name="tool_barcode_scanner_desc">Scan and decode barcodes and QR codes live via camera</string>
+
+    <!-- 14. Sensor Viewer -->
+    <string name="tool_sensor_viewer_title">Sensor Viewer</string>
+    <string name="tool_sensor_viewer_desc">Inspect all device sensors with real-time measurements</string>
+
+    <!-- 15. Daily Math -->
+    <string name="tool_daily_math_title">Daily Math</string>
+    <string name="tool_daily_math_desc">Tip &amp; bill split calculator, percentage change and date interval</string>
+
+    <!-- Menu & Settings -->
+    <string name="menu_guide">User Guide</string>
+    <string name="menu_language">Language</string>
+    <string name="menu_permissions">App Permissions</string>
+    <string name="menu_privacy">Privacy Policy</string>
+
+    <string name="language_vietnamese">Tiếng Việt</string>
+    <string name="language_english">English</string>
+    <string name="language_system">System Default</string>
+    <string name="language_dialog_title">Select Language</string>
+    <string name="common_cancel">Cancel</string>
+    <string name="common_save">Save</string>
+
+    <string name="grant_all_permissions">Grant All Permissions</string>
+    <string name="permissions_status_granted">Granted</string>
+    <string name="permissions_status_not_granted">Not Granted</string>
+    <string name="back_press_again_to_exit">Press back again to exit</string>
+</resources>

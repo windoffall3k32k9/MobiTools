@@ -1,63 +1,45 @@
 package com.example.baseproject
 
-import android.app.Activity
 import android.app.Application
 import android.content.Context
 import android.content.res.Configuration
-import android.os.Bundle
-import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.ViewModelProvider.NewInstanceFactory.Companion.instance
-import com.example.baseproject.utils.AppTheme
-import com.example.baseproject.utils.DataStatic
-import com.example.baseproject.utils.LocaleHelper
+import com.example.baseproject.localization.AppLanguageManager
 import dagger.hilt.android.HiltAndroidApp
-import java.util.Locale
 
+/**
+ * Lớp ứng dụng toàn cục quản lý vòng đời ứng dụng và đa ngôn ngữ.
+ */
 @HiltAndroidApp
-class App : Application(), Application.ActivityLifecycleCallbacks, DefaultLifecycleObserver {
-    companion object {
-        var instance: App? = null
-        private set
-    }
-    private var currentActivity: Activity? = null
+class App : Application() {
 
+    // Bọc context khởi tạo với cấu hình Locale đã lưu của ứng dụng.
+    override fun attachBaseContext(base: Context) {
+        super.attachBaseContext(AppLanguageManager.wrapContext(base))
+    }
+
+    // Khởi tạo Singleton toàn cục và áp dụng cấu hình ngôn ngữ khi ứng dụng khởi chạy.
     override fun onCreate() {
-        super<Application>.onCreate()
-        instance = this
-        //DataStatic.context = applicationContext
-        //AppTheme.applySaveMode()
+        super.onCreate()
+        instanceRef = this
+        AppLanguageManager.applySavedMode(this)
     }
 
-    override fun attachBaseContext(base: Context?) {
-        //val context = LocaleHelper.onAttach(base, Locale.getDefault().language)
-        super.attachBaseContext(base)
-    }
-
+    // Đảm bảo ngôn ngữ được giữ vững hoặc cập nhật chính xác khi cấu hình thiết bị thay đổi.
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
+        AppLanguageManager.applySavedMode(this)
     }
 
-    override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
+    companion object {
+        @Volatile
+        private var instanceRef: App? = null
+
+        /** Tham chiếu Singleton của App sau khi khởi tạo. */
+        val instance: App
+            get() = checkNotNull(instanceRef) { "App chưa được khởi tạo." }
+
+        /** Context ứng dụng an toàn cho toàn tiến trình. */
+        val context: Context
+            get() = instance.applicationContext
     }
-
-    override fun onActivityDestroyed(activity: Activity) {
-    }
-
-    override fun onActivityPaused(activity: Activity) {
-    }
-
-    override fun onActivityResumed(activity: Activity) {
-    }
-
-    override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {
-    }
-
-    override fun onActivityStarted(activity: Activity) {
-        currentActivity = activity
-    }
-
-    override fun onActivityStopped(activity: Activity) {
-    }
-
-
 }
