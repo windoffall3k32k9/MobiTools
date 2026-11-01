@@ -3,28 +3,30 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <!-- Theme Brand Colors -->
-    <color name="colorPrimary">#2563EB</color>
-    <color name="colorPrimaryDark">#1D4ED8</color>
-    <color name="colorAccent">#3B82F6</color>
-    <color name="colorBackground">#F8FAFC</color>
+    <!-- Theme Brand Colors (Chuẩn thiết kế MobiCheck) -->
+    <color name="colorPrimary">#157335</color>
+    <color name="colorPrimaryDark">#0E4F24</color>
+    <color name="colorAccent">#4A7A0C</color>
+    <color name="colorSignalLime">#C4F03A</color>
+    <color name="colorBackground">#F5F6F1</color>
     <color name="colorSurface">#FFFFFF</color>
     <color name="colorCardBackground">#FFFFFF</color>
-    <color name="colorBorder">#E2E8F0</color>
+    <color name="colorBorder">#E1E4DB</color>
+    <color name="colorPanelSecondary">#EEF0E9</color>
 
     <!-- Text Colors -->
-    <color name="textPrimary">#0F172A</color>
-    <color name="textSecondary">#64748B</color>
-    <color name="textMuted">#94A3B8</color>
+    <color name="textPrimary">#18221B</color>
+    <color name="textSecondary">#5F6873</color>
+    <color name="textMuted">#8A968D</color>
 
     <!-- Semantic Colors -->
-    <color name="colorSuccess">#10B981</color>
-    <color name="colorWarning">#F59E0B</color>
-    <color name="colorDanger">#EF4444</color>
+    <color name="colorSuccess">#059669</color>
+    <color name="colorWarning">#C2710C</color>
+    <color name="colorDanger">#DC2626</color>
     <color name="colorFavorite">#EAB308</color>
 
     <!-- Dark Palette variants -->
-    <color name="darkBackground">#0F172A</color>
-    <color name="darkSurface">#1E293B</color>
-    <color name="darkBorder">#334155</color>
+    <color name="darkBackground">#0B0F19</color>
+    <color name="darkSurface">#131B2E</color>
+    <color name="darkBorder">#1E293B</color>
 </resources>

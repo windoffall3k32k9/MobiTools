@@ -1,0 +1,21 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="32dp"
+    android:height="32dp"
+    android:viewportWidth="32"
+    android:viewportHeight="32">
+    <!-- Nền bo góc xanh công nghệ #157335 -->
+    <path
+        android:fillColor="#157335"
+        android:pathData="M10,0 L22,0 A10,10 0 0,1 32,10 L32,22 A10,10 0 0,1 22,32 L10,32 A10,10 0 0,1 0,22 L0,10 A10,10 0 0,1 10,0 Z" />
+    <!-- Biểu tượng điện thoại thông minh tiện ích màu trắng -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M11,7 H19 A2,2 0 0,1 21,9 V21 A2,2 0 0,1 19,23 H11 A2,2 0 0,1 9,21 V9 A2,2 0 0,1 11,7 Z M11,9 V21 H19 V9 Z M14,20 H16 V21 H14 Z" />
+    <!-- Huy hiệu vòng tròn công cụ -->
+    <path
+        android:fillColor="#C4F03A"
+        android:pathData="M23,17 A6,6 0 1,1 23,29 A6,6 0 1,1 23,17 Z" />
+    <path
+        android:fillColor="#157335"
+        android:pathData="M21,23 L22.5,24.5 L25.5,21.5 L26.5,22.5 L22.5,26.5 L20,24 Z" />
+</vector>

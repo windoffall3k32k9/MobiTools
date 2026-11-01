@@ -43,10 +43,16 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         }
     }
 
-    // Xử lý phím quay lại: quay lại màn hình trước đó, hoặc yêu cầu ấn 2 lần liên tiếp để thoát ứng dụng.
+    // Xử lý phím quay lại: đóng menu popup nếu mở, quay lại màn hình trước đó, hoặc ấn 2 lần để thoát.
     override fun handleOnBackPressed() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
+                val currentFragment = supportFragmentManager.findFragmentById(R.id.fragment_container)
+                if (currentFragment is HomeFragment && currentFragment.isDrawerOpen()) {
+                    currentFragment.closeDrawer()
+                    return
+                }
+
                 if (supportFragmentManager.backStackEntryCount > 0) {
                     supportFragmentManager.popBackStack()
                 } else {

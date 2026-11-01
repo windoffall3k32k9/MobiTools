@@ -50,12 +50,17 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         return FragmentHomeBinding.inflate(layoutInflater, container, false)
     }
 
-    // Thiết lập danh mục, danh sách công cụ, thanh tìm kiếm và menu ba chấm.
+    // Thiết lập danh mục, danh sách công cụ, thanh tìm kiếm và menu ba gạch chuẩn MobiCheck.
     override fun initViews() {
         setupCategoriesRecyclerView()
         setupToolsRecyclerView()
         setupSearchListeners()
-        setupHeaderMenu()
+        setupDrawerMenu()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        updateCurrentLanguageLabel()
     }
 
     // Lắng nghe dữ liệu danh sách yêu thích và lịch sử gần đây từ Room.
@@ -83,35 +88,68 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         }
     }
 
-    // Thiết lập sự kiện bấm nút ba chấm mở menu tiện ích mở rộng.
-    private fun setupHeaderMenu() {
-        viewBinding.btnMoreMenu.setOnClickListener { v ->
-            val context = context ?: return@setOnClickListener
-            val popup = PopupMenu(context, v)
-            popup.menuInflater.inflate(R.menu.menu_home_header, popup.menu)
-            popup.setOnMenuItemClickListener { menuItem ->
-                when (menuItem.itemId) {
-                    R.id.menu_guide -> {
-                        replaceFragment(R.id.fragment_container, GuideFragment())
-                        true
-                    }
-                    R.id.menu_language -> {
-                        showLanguageDialog()
-                        true
-                    }
-                    R.id.menu_permissions -> {
-                        replaceFragment(R.id.fragment_container, PermissionsFragment())
-                        true
-                    }
-                    R.id.menu_privacy -> {
-                        replaceFragment(R.id.fragment_container, PrivacyPolicyFragment())
-                        true
-                    }
-                    else -> false
-                }
-            }
-            popup.show()
+    // Cấu hình menu tiện ích chuẩn MobiCheck dạng popup mở rộng ở góc trên bên phải.
+    private fun setupDrawerMenu() {
+        viewBinding.btnOpenMenu.setOnClickListener { openDrawer() }
+        viewBinding.btnCloseMenu.setOnClickListener { closeDrawer() }
+        viewBinding.viewDrawerBackdrop.setOnClickListener { closeDrawer() }
+        updateCurrentLanguageLabel()
+
+        viewBinding.menuItemGuide.setOnClickListener {
+            closeDrawer()
+            replaceFragment(R.id.fragment_container, GuideFragment())
         }
+
+        viewBinding.menuItemLanguage.setOnClickListener {
+            closeDrawer()
+            showLanguageDialog()
+        }
+
+        viewBinding.menuItemPermissions.setOnClickListener {
+            closeDrawer()
+            replaceFragment(R.id.fragment_container, PermissionsFragment())
+        }
+
+        viewBinding.menuItemPrivacy.setOnClickListener {
+            closeDrawer()
+            replaceFragment(R.id.fragment_container, PrivacyPolicyFragment())
+        }
+    }
+
+    // Mở popup menu góc trên bên phải với hiệu ứng mở rộng mượt mà.
+    fun openDrawer() {
+        viewBinding.layoutDrawerMenu.visibility = View.VISIBLE
+        viewBinding.layoutDrawerMenu.alpha = 0f
+        viewBinding.cardMenuPopup.scaleX = 0.85f
+        viewBinding.cardMenuPopup.scaleY = 0.85f
+        viewBinding.cardMenuPopup.pivotX = 270f * resources.displayMetrics.density
+        viewBinding.cardMenuPopup.pivotY = 0f
+        viewBinding.layoutDrawerMenu.animate().alpha(1f).setDuration(160).start()
+        viewBinding.cardMenuPopup.animate().scaleX(1f).scaleY(1f).setDuration(160).start()
+    }
+
+    // Đóng popup menu với hiệu ứng thu nhỏ và mờ dần.
+    fun closeDrawer() {
+        viewBinding.cardMenuPopup.animate().scaleX(0.85f).scaleY(0.85f).setDuration(120).start()
+        viewBinding.layoutDrawerMenu.animate().alpha(0f).setDuration(120).withEndAction {
+            viewBinding.layoutDrawerMenu.visibility = View.GONE
+        }.start()
+    }
+
+    // Kiểm tra menu popup có đang mở hay không.
+    fun isDrawerOpen(): Boolean {
+        return viewBinding.layoutDrawerMenu.visibility == View.VISIBLE
+    }
+
+    // Cập nhật nhãn ngôn ngữ hiện tại hiển thị trên mục menu.
+    private fun updateCurrentLanguageLabel() {
+        val context = context ?: return
+        val current = when (AppLanguageManager.currentMode(context)) {
+            AppLanguageManager.Mode.VIETNAMESE -> getString(R.string.language_vietnamese)
+            AppLanguageManager.Mode.ENGLISH -> getString(R.string.language_english)
+            AppLanguageManager.Mode.SYSTEM -> getString(R.string.language_system)
+        }
+        viewBinding.tvCurrentLanguage.text = current
     }
 
     // Hiển thị hộp thoại chọn ngôn ngữ ứng dụng độc lập tương tự MobiCheck.
