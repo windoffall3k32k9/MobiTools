@@ -45,7 +45,10 @@ class SensorViewerFragment : BaseToolFragment<FragmentSensorViewerBinding>(), Se
 
         viewBinding.tvTotalSensorsCount.text = "Phát hiện ${sensorList.size} cảm biến tiêu chuẩn"
 
-        sensorAdapter = SensorViewerAdapter(sensorList, sensorValueMap)
+        sensorAdapter = SensorViewerAdapter(sensorList, sensorValueMap) { sensor ->
+            val sheet = SensorDetailBottomSheet.newInstance(sensor.type)
+            sheet.show(childFragmentManager, "sensor_detail_${sensor.type}")
+        }
         viewBinding.rvSensors.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = sensorAdapter
@@ -109,7 +112,8 @@ class SensorViewerFragment : BaseToolFragment<FragmentSensorViewerBinding>(), Se
  */
 class SensorViewerAdapter(
     private val sensors: List<Sensor>,
-    private val valueMap: Map<Int, FloatArray>
+    private val valueMap: Map<Int, FloatArray>,
+    private val onSensorClick: (Sensor) -> Unit
 ) : RecyclerView.Adapter<SensorViewerAdapter.SensorViewHolder>() {
 
     inner class SensorViewHolder(val binding: ItemSensorCardBinding) :
@@ -129,6 +133,10 @@ class SensorViewerAdapter(
     override fun onBindViewHolder(holder: SensorViewHolder, position: Int) {
         val sensor = sensors[position]
         val viName = SensorViewerFragment.getVietnameseSensorName(sensor.type) ?: sensor.name
+
+        holder.binding.root.setOnClickListener {
+            onSensorClick(sensor)
+        }
 
         holder.binding.tvSensorName.text = viName
         holder.binding.tvSensorType.text = "Loại #${sensor.type}"

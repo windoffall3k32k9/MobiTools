@@ -65,7 +65,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Nghiêng Trái / Phải"
+                    android:text="Trái / Phải"
                     android:textColor="@color/textSecondary"
                     android:textSize="13sp" />
 
@@ -102,7 +102,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Nghiêng Trước / Sau"
+                    android:text="Trước / Sau"
                     android:textColor="@color/textSecondary"
                     android:textSize="13sp" />
 

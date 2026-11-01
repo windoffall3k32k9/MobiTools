@@ -116,4 +116,5 @@
     <string name="permissions_status_granted">Granted</string>
     <string name="permissions_status_not_granted">Not Granted</string>
     <string name="back_press_again_to_exit">Press back again to exit</string>
+    <string name="close">Close</string>
 </resources>
