@@ -22,6 +22,40 @@
         android:textSize="13sp"
         android:visibility="gone" />
 
+    <!-- KHỐI HIỂN THỊ HƯỚNG VÀ SỐ ĐỘ NẰM PHÍA TRÊN LA BÀN -->
+    <LinearLayout
+        android:id="@+id/layoutHeadingHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="4dp"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <!-- Tên hướng địa lý viết rõ ràng đầy đủ tiếng Việt (không viết tắt) -->
+        <TextView
+            android:id="@+id/tvDirectionFullName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-medium"
+            android:text="Bắc"
+            android:textColor="#FFFFFF"
+            android:textSize="28sp"
+            android:textStyle="bold" />
+
+        <!-- Số độ phương vị hiển thị bên dưới tên hướng -->
+        <TextView
+            android:id="@+id/tvAzimuthDegree"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:fontFamily="sans-serif-medium"
+            android:text="0°"
+            android:textColor="#38BDF8"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
     <!-- KHUNG CHỨA MẶT LA BÀN LIỀN KHỐI VỚI KIM NAM CHÂM 2 ĐẦU N - S -->
     <FrameLayout
         android:layout_width="match_parent"
@@ -49,120 +83,62 @@
                 android:layout_marginTop="2dp"
                 android:background="@drawable/bg_compass_index_line" />
 
-            <!-- Khối chữ số góc phương vị và hướng ở tâm la bàn -->
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/tvCardinalDirection"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif-medium"
-                    android:text="B"
-                    android:textColor="#FFFFFF"
-                    android:textSize="26sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/tvAzimuthDegree"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="1dp"
-                    android:fontFamily="sans-serif-medium"
-                    android:text="0°"
-                    android:textColor="#38BDF8"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
         </FrameLayout>
 
     </FrameLayout>
 
-    <!-- KHU VỰC HIỂN THỊ TỌA ĐỘ VỊ TRÍ THIẾT BỊ -->
-    <com.google.android.material.card.MaterialCardView
+    <!-- KHU VỰC HIỂN THỊ VỊ TRÍ VÀ TỌA ĐỘ ĐỊNH DẠNG CHUẨN ĐỘ PHÚT GIÂY -->
+    <LinearLayout
+        android:id="@+id/layoutLocationInfo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="24dp"
-        app:cardBackgroundColor="#131B2E"
-        app:cardCornerRadius="20dp"
-        app:cardElevation="0dp"
-        app:strokeColor="#1E293B"
-        app:strokeWidth="1dp">
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="32dp"
+        android:gravity="center"
+        android:orientation="vertical">
 
-        <LinearLayout
+        <!-- Tên gọi địa danh chính xác nơi thiết bị đang đứng -->
+        <TextView
+            android:id="@+id/tvLocationAddress"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
+            android:ellipsize="end"
+            android:fontFamily="sans-serif"
+            android:gravity="center"
+            android:lineSpacingExtra="5dp"
+            android:maxLines="3"
+            android:text="Đang xác định vị trí…"
+            android:textColor="#E2E8F0"
+            android:textSize="18sp" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+        <!-- Tọa độ Kinh độ / Vĩ độ theo định dạng Độ Phút Giây -->
+        <TextView
+            android:id="@+id/tvCoordinates"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="center"
+            android:text="--°--'--&quot; B  --°--'--&quot; Đ"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp"
+            android:textStyle="bold" />
 
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Vị trí hiện tại của thiết bị"
-                    android:textColor="#94A3B8"
-                    android:textSize="13sp"
-                    android:textStyle="bold" />
+        <!-- Nút xin cấp quyền vị trí nếu chưa có -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnGrantLocationPermission"
+            style="@style/Widget.Material3.Button"
+            android:layout_width="wrap_content"
+            android:layout_height="44dp"
+            android:layout_marginTop="12dp"
+            android:backgroundTint="#2563EB"
+            android:text="Cấp quyền vị trí"
+            android:textColor="#FFFFFF"
+            android:textSize="13sp"
+            android:visibility="gone"
+            app:cornerRadius="12dp" />
 
-                <TextView
-                    android:id="@+id/tvAltitude"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Độ cao: -- m"
-                    android:textColor="#38BDF8"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-            <!-- Tọa độ Kinh độ / Vĩ độ -->
-            <TextView
-                android:id="@+id/tvCoordinates"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:fontFamily="sans-serif-medium"
-                android:text="Đang xác định tọa độ GPS…"
-                android:textColor="#FFFFFF"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-
-            <!-- Địa chỉ / Địa phương hành chính -->
-            <TextView
-                android:id="@+id/tvLocationAddress"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:textColor="#94A3B8"
-                android:textSize="13sp" />
-
-            <!-- Nút xin cấp quyền vị trí nếu chưa có -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnGrantLocationPermission"
-                style="@style/Widget.Material3.Button"
-                android:layout_width="match_parent"
-                android:layout_height="44dp"
-                android:layout_marginTop="12dp"
-                android:backgroundTint="#2563EB"
-                android:text="Cấp quyền vị trí"
-                android:textColor="#FFFFFF"
-                android:textSize="13sp"
-                android:visibility="gone"
-                app:cornerRadius="12dp" />
-
-        </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
+    </LinearLayout>
 
 </LinearLayout>

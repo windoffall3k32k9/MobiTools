@@ -156,25 +156,25 @@ class CompassFragment : BaseToolFragment<FragmentCompassBinding>(), SensorEventL
         currentFilteredAzimuth = (currentFilteredAzimuth + normalizedDiff * 0.25f + 360f) % 360f
 
         val roundedDegree = currentFilteredAzimuth.roundToInt() % 360
+        viewBinding.tvDirectionFullName.text = getDirectionFullName(roundedDegree)
         viewBinding.tvAzimuthDegree.text = "$roundedDegree°"
-        viewBinding.tvCardinalDirection.text = getDirectionShortText(roundedDegree)
 
         // Xoay toàn bộ mặt số la bàn ngược chiều góc phương vị
         viewBinding.compassDialView.rotation = -currentFilteredAzimuth
     }
 
-    // Lấy ký hiệu hướng địa lý tiếng Việt tương ứng với góc đo phương vị.
-    private fun getDirectionShortText(degree: Int): String {
+    // Lấy tên đầy đủ của hướng địa lý bằng tiếng Việt (không viết tắt).
+    private fun getDirectionFullName(degree: Int): String {
         return when (degree) {
-            in 0..22, in 338..360 -> "B"
-            in 23..67 -> "ĐB"
-            in 68..112 -> "Đ"
-            in 113..157 -> "ĐN"
-            in 158..202 -> "N"
-            in 203..247 -> "TN"
-            in 248..292 -> "T"
-            in 293..337 -> "TB"
-            else -> "B"
+            in 0..22, in 338..360 -> "Bắc"
+            in 23..67 -> "Đông Bắc"
+            in 68..112 -> "Đông"
+            in 113..157 -> "Đông Nam"
+            in 158..202 -> "Nam"
+            in 203..247 -> "Tây Nam"
+            in 248..292 -> "Tây"
+            in 293..337 -> "Tây Bắc"
+            else -> "Bắc"
         }
     }
 
@@ -188,7 +188,6 @@ class CompassFragment : BaseToolFragment<FragmentCompassBinding>(), SensorEventL
             viewBinding.btnGrantLocationPermission.visibility = View.VISIBLE
             viewBinding.tvCoordinates.text = "Chưa cấp quyền vị trí"
             viewBinding.tvLocationAddress.text = "Nhấn nút bên dưới để cấp quyền định vị hiển thị tọa độ"
-            viewBinding.tvAltitude.text = "Độ cao: --"
             return
         }
 
@@ -217,10 +216,7 @@ class CompassFragment : BaseToolFragment<FragmentCompassBinding>(), SensorEventL
     override fun onLocationChanged(location: Location) {
         val latDms = formatToDms(location.latitude, isLatitude = true)
         val lonDms = formatToDms(location.longitude, isLatitude = false)
-        viewBinding.tvCoordinates.text = "$latDms   $lonDms"
-
-        val alt = location.altitude.roundToInt()
-        viewBinding.tvAltitude.text = "Độ cao: ${alt}m"
+        viewBinding.tvCoordinates.text = "$latDms  $lonDms"
 
         // Phân giải địa chỉ ngoại tuyến / trực tuyến từ Geocoder
         resolveAddress(location.latitude, location.longitude)
@@ -266,16 +262,27 @@ class CompassFragment : BaseToolFragment<FragmentCompassBinding>(), SensorEventL
 
                 val address = addresses?.firstOrNull()
                 val displayAddress = address?.let {
-                    val parts = listOfNotNull(it.subLocality, it.locality, it.adminArea, it.countryName)
-                    parts.distinct().joinToString(", ")
-                } ?: "Tọa độ GPS xác thực chính xác"
+                    it.getAddressLine(0) ?: run {
+                        val parts = listOfNotNull(
+                            it.featureName,
+                            it.thoroughfare,
+                            it.subLocality,
+                            it.subAdminArea,
+                            it.adminArea,
+                            it.countryName
+                        )
+                        parts.distinct().joinToString(", ")
+                    }
+                } ?: "Đang xác định vị trí…"
 
                 withContext(Dispatchers.Main) {
                     viewBinding.tvLocationAddress.text = displayAddress
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
-                    viewBinding.tvLocationAddress.text = "Tọa độ GPS xác thực chính xác"
+                    if (viewBinding.tvLocationAddress.text.isNullOrEmpty() || viewBinding.tvLocationAddress.text == "Đang xác định vị trí…") {
+                        viewBinding.tvLocationAddress.text = "Vị trí GPS đã sẵn sàng"
+                    }
                 }
             }
         }

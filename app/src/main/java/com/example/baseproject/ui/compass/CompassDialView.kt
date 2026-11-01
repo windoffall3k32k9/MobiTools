@@ -11,8 +11,8 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 /**
- * View vẽ mặt số la bàn 360 độ tích hợp liền khối với kim nam châm 2 hướng N - S (Bắc - Nam).
- * Toàn bộ mặt la bàn và kim nam châm tạo thành 1 khối thống nhất cùng xoay theo góc phương vị.
+ * View vẽ mặt số la bàn 360 độ chuẩn quốc tế (N, E, S, W, NE, SE, SW, NW)
+ * tích hợp liền khối với kim nam châm 2 hướng N - S.
  */
 class CompassDialView @JvmOverloads constructor(
     context: Context,
@@ -69,7 +69,7 @@ class CompassDialView @JvmOverloads constructor(
         isFakeBoldText = true
     }
 
-    // Paint cho các hướng chính B, Đ, N, T bên trong
+    // Paint cho các hướng chính N, E, S, W chuẩn tiếng Anh
     private val cardinalTextPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = 0xFFFFFFFF.toInt()
         textSize = 15f * density
@@ -118,7 +118,7 @@ class CompassDialView @JvmOverloads constructor(
         style = Paint.Style.FILL
     }
 
-    // Trục tròn ở tâm bao quanh chữ số hiển thị
+    // Trục tròn ở tâm la bàn
     private val hubFillPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = 0xFF0B132B.toInt()
         style = Paint.Style.FILL
@@ -128,6 +128,11 @@ class CompassDialView @JvmOverloads constructor(
         color = 0xFF334155.toInt()
         style = Paint.Style.STROKE
         strokeWidth = 2f * density
+    }
+
+    private val hubCenterPinPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = 0xFF38BDF8.toInt()
+        style = Paint.Style.FILL
     }
 
     private val textBounds = Rect()
@@ -173,8 +178,8 @@ class CompassDialView @JvmOverloads constructor(
                     // Mũi tên tam giác đỏ nhỏ chỉ thẳng vào vạch 0 độ
                     drawNorthTriangle(canvas, cx, cy, radius)
 
-                    // Chữ B màu đỏ nằm phía trong
-                    drawRotatedText(canvas, "B", cx, cy, radius - (26f * density), degree.toFloat(), northCardinalTextPaint)
+                    // Chữ N màu đỏ nằm phía trong
+                    drawRotatedText(canvas, "N", cx, cy, radius - (26f * density), degree.toFloat(), northCardinalTextPaint)
                     // Số 0 nằm phía ngoài vạch
                     drawRotatedText(canvas, "0", cx, cy, radius + (12f * density), degree.toFloat(), degreeNumberPaint)
                 }
@@ -186,9 +191,9 @@ class CompassDialView @JvmOverloads constructor(
                     canvas.drawLine(startX, startY, endX, endY, majorTickPaint)
 
                     val label = when (degree) {
-                        90 -> "Đ"
-                        180 -> "N"
-                        270 -> "T"
+                        90 -> "E"
+                        180 -> "S"
+                        270 -> "W"
                         else -> ""
                     }
                     drawRotatedText(canvas, label, cx, cy, radius - (26f * density), degree.toFloat(), cardinalTextPaint)
@@ -220,57 +225,57 @@ class CompassDialView @JvmOverloads constructor(
             }
         }
 
-        // 4. Vẽ 4 hướng phụ ĐB, ĐN, TN, TB
-        drawRotatedText(canvas, "ĐB", cx, cy, radius - (26f * density), 45f, subCardinalTextPaint)
-        drawRotatedText(canvas, "ĐN", cx, cy, radius - (26f * density), 135f, subCardinalTextPaint)
-        drawRotatedText(canvas, "TN", cx, cy, radius - (26f * density), 225f, subCardinalTextPaint)
-        drawRotatedText(canvas, "TB", cx, cy, radius - (26f * density), 315f, subCardinalTextPaint)
+        // 4. Vẽ 4 hướng phụ chuẩn quốc tế NE, SE, SW, NW
+        drawRotatedText(canvas, "NE", cx, cy, radius - (26f * density), 45f, subCardinalTextPaint)
+        drawRotatedText(canvas, "SE", cx, cy, radius - (26f * density), 135f, subCardinalTextPaint)
+        drawRotatedText(canvas, "SW", cx, cy, radius - (26f * density), 225f, subCardinalTextPaint)
+        drawRotatedText(canvas, "NW", cx, cy, radius - (26f * density), 315f, subCardinalTextPaint)
     }
 
     // Vẽ mũi tên nam châm 2 đầu cố định gắn chặt theo trục N (Bắc) và S (Nam) của mặt la bàn.
     private fun drawMagneticNeedle(canvas: Canvas, cx: Float, cy: Float, radius: Float) {
-        val hubRadius = 46f * density
-        val halfNeedleWidth = 14f * density
-        // Đỉnh mũi tên chạm sát vào vạch chia của hướng B và N
+        val hubRadius = 16f * density
+        val halfNeedleWidth = 10f * density
         val needleTipRadius = radius - (16f * density)
 
-        // --- ĐẦU KIM BẮC (N) MÀU ĐỎ VUỐT NHỌN VỀ MỐC 0 ĐỘ TRÊN LA BÀN ---
+        // --- ĐẦU KIM BẮC (N) MÀU ĐỎ VUỐT NHỌN VỀ MỐC 0 ĐỘ (N) TRÊN LA BÀN ---
         // Nửa trái kim Bắc (đỏ tươi)
         needlePath.reset()
         needlePath.moveTo(cx, cy - needleTipRadius)
-        needlePath.lineTo(cx - halfNeedleWidth, cy - hubRadius + (6f * density))
-        needlePath.lineTo(cx, cy - hubRadius + (6f * density))
+        needlePath.lineTo(cx - halfNeedleWidth, cy)
+        needlePath.lineTo(cx, cy)
         needlePath.close()
         canvas.drawPath(needlePath, needleNorthLeftPaint)
 
         // Nửa phải kim Bắc (đỏ sẫm 3D)
         needlePath.reset()
         needlePath.moveTo(cx, cy - needleTipRadius)
-        needlePath.lineTo(cx, cy - hubRadius + (6f * density))
-        needlePath.lineTo(cx + halfNeedleWidth, cy - hubRadius + (6f * density))
+        needlePath.lineTo(cx, cy)
+        needlePath.lineTo(cx + halfNeedleWidth, cy)
         needlePath.close()
         canvas.drawPath(needlePath, needleNorthRightPaint)
 
-        // --- ĐẦU KIM NAM (S) MÀU BẠC VUỐT NHỌN VỀ MỐC 180 ĐỘ TRÊN LA BÀN ---
+        // --- ĐẦU KIM NAM (S) MÀU BẠC VUỐT NHỌN VỀ MỐC 180 ĐỘ (S) TRÊN LA BÀN ---
         // Nửa trái kim Nam (bạc sáng)
         needlePath.reset()
         needlePath.moveTo(cx, cy + needleTipRadius)
-        needlePath.lineTo(cx, cy + hubRadius - (6f * density))
-        needlePath.lineTo(cx - halfNeedleWidth, cy + hubRadius - (6f * density))
+        needlePath.lineTo(cx, cy)
+        needlePath.lineTo(cx - halfNeedleWidth, cy)
         needlePath.close()
         canvas.drawPath(needlePath, needleSouthLeftPaint)
 
         // Nửa phải kim Nam (xám đậm 3D)
         needlePath.reset()
         needlePath.moveTo(cx, cy + needleTipRadius)
-        needlePath.lineTo(cx + halfNeedleWidth, cy + hubRadius - (6f * density))
-        needlePath.lineTo(cx, cy + hubRadius - (6f * density))
+        needlePath.lineTo(cx + halfNeedleWidth, cy)
+        needlePath.lineTo(cx, cy)
         needlePath.close()
         canvas.drawPath(needlePath, needleSouthRightPaint)
 
         // --- TRỤC TRÒN TÂM LA BÀN NẰM ĐÈ LÊN GỐC KIM NAM CHÂM ---
         canvas.drawCircle(cx, cy, hubRadius, hubFillPaint)
         canvas.drawCircle(cx, cy, hubRadius, hubStrokePaint)
+        canvas.drawCircle(cx, cy, 4f * density, hubCenterPinPaint)
     }
 
     // Vẽ tam giác đỏ nhỏ hướng vào tâm tại mốc 0 độ trên mặt xoay.
