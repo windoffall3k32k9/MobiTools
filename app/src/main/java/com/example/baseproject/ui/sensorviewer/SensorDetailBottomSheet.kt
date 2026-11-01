@@ -223,20 +223,7 @@ class SensorDetailBottomSheet : BottomSheetDialogFragment(), SensorEventListener
 
     // Lấy đơn vị đo lường tương ứng của loại cảm biến.
     private fun getSensorUnit(type: Int): String {
-        return when (type) {
-            Sensor.TYPE_ACCELEROMETER,
-            Sensor.TYPE_GRAVITY,
-            Sensor.TYPE_LINEAR_ACCELERATION -> "m/s²"
-            Sensor.TYPE_GYROSCOPE -> "rad/s"
-            Sensor.TYPE_MAGNETIC_FIELD -> "µT"
-            Sensor.TYPE_LIGHT -> "lux"
-            Sensor.TYPE_PRESSURE -> "hPa"
-            Sensor.TYPE_PROXIMITY -> "cm"
-            Sensor.TYPE_AMBIENT_TEMPERATURE -> "°C"
-            Sensor.TYPE_RELATIVE_HUMIDITY -> "%"
-            Sensor.TYPE_STEP_COUNTER -> "bước"
-            else -> ""
-        }
+        return SensorViewerFragment.getSensorUnit(type)
     }
 
     companion object {

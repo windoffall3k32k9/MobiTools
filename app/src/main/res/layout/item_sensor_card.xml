@@ -72,12 +72,12 @@
             android:layout_marginBottom="10dp"
             android:background="@color/colorBorder" />
 
-        <!-- Giá trị thời gian thực với nhãn trước sau trái phải -->
+        <!-- Giá trị thời gian thực với mỗi trục hiển thị trên một dòng riêng biệt -->
         <TextView
             android:id="@+id/tvSensorLiveValues"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:lineSpacingExtra="2dp"
+            android:lineSpacingExtra="4dp"
             android:text="Đang chờ dữ liệu…"
             android:textColor="@color/textPrimary"
             android:textSize="13sp"
@@ -87,9 +87,11 @@
             android:id="@+id/tvSensorSpecs"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:textColor="@color/textMuted"
-            android:textSize="11sp" />
+            android:layout_marginTop="8dp"
+            android:text="Nhấn để xem thông số chi tiết →"
+            android:textColor="@color/colorPrimary"
+            android:textSize="12sp"
+            android:textStyle="bold" />
 
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

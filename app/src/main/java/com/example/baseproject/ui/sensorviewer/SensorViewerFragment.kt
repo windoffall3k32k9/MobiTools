@@ -104,6 +104,24 @@ class SensorViewerFragment : BaseToolFragment<FragmentSensorViewerBinding>(), Se
                 else -> null
             }
         }
+
+        // Lấy đơn vị đo lường tương ứng của loại cảm biến.
+        fun getSensorUnit(type: Int): String {
+            return when (type) {
+                Sensor.TYPE_ACCELEROMETER,
+                Sensor.TYPE_GRAVITY,
+                Sensor.TYPE_LINEAR_ACCELERATION -> "m/s²"
+                Sensor.TYPE_GYROSCOPE -> "rad/s"
+                Sensor.TYPE_MAGNETIC_FIELD -> "µT"
+                Sensor.TYPE_LIGHT -> "lux"
+                Sensor.TYPE_PRESSURE -> "hPa"
+                Sensor.TYPE_PROXIMITY -> "cm"
+                Sensor.TYPE_AMBIENT_TEMPERATURE -> "°C"
+                Sensor.TYPE_RELATIVE_HUMIDITY -> "%"
+                Sensor.TYPE_STEP_COUNTER -> "bước"
+                else -> ""
+            }
+        }
     }
 }
 
@@ -140,14 +158,16 @@ class SensorViewerAdapter(
 
         holder.binding.tvSensorName.text = viName
         holder.binding.tvSensorType.text = "Loại #${sensor.type}"
-        holder.binding.tvSensorVendor.text = "${sensor.vendor} • ${sensor.name}"
+        holder.binding.tvSensorVendor.text = "Nhà sản xuất: ${sensor.vendor}"
 
         val values = valueMap[sensor.type]
+        val unit = SensorViewerFragment.getSensorUnit(sensor.type)
         if (values != null && values.isNotEmpty()) {
             val textBuilder = StringBuilder()
             when (sensor.type) {
                 Sensor.TYPE_PROXIMITY -> {
-                    textBuilder.append(String.format(Locale.US, "Khoảng cách đo: %.1f cm", values[0]))
+                    val isNear = values[0] < sensor.maximumRange
+                    textBuilder.append(String.format(Locale.US, "Khoảng cách đo: %.1f cm (%s)", values[0], if (isNear) "GẦN" else "XA"))
                 }
                 Sensor.TYPE_LIGHT -> {
                     textBuilder.append(String.format(Locale.US, "Cường độ ánh sáng: %.1f lux", values[0]))
@@ -156,7 +176,7 @@ class SensorViewerAdapter(
                     textBuilder.append(String.format(Locale.US, "Áp suất khí quyển: %.1f hPa", values[0]))
                 }
                 Sensor.TYPE_STEP_COUNTER -> {
-                    textBuilder.append(String.format(Locale.US, "Tổng số bước đã đếm: %.0f bước", values[0]))
+                    textBuilder.append(String.format(Locale.US, "Tổng số bước chân: %.0f bước", values[0]))
                 }
                 Sensor.TYPE_ACCELEROMETER,
                 Sensor.TYPE_GRAVITY,
@@ -164,28 +184,25 @@ class SensorViewerAdapter(
                 Sensor.TYPE_MAGNETIC_FIELD,
                 Sensor.TYPE_GYROSCOPE -> {
                     if (values.size >= 3) {
-                        textBuilder.append(
-                            String.format(
-                                Locale.US,
-                                "Trái/Phải: %.2f | Trước/Sau: %.2f | Lên/Xuống: %.2f",
-                                values[0], values[1], values[2]
-                            )
-                        )
+                        textBuilder.append(String.format(Locale.US, "Trái / Phải:  %+.2f %s\n", values[0], unit))
+                        textBuilder.append(String.format(Locale.US, "Trước / Sau:  %+.2f %s\n", values[1], unit))
+                        textBuilder.append(String.format(Locale.US, "Lên / Xuống:  %+.2f %s", values[2], unit))
                     } else {
-                        textBuilder.append(String.format(Locale.US, "Trái/Phải: %.2f", values[0]))
+                        textBuilder.append(String.format(Locale.US, "Trái / Phải: %+.2f %s", values[0], unit))
                     }
                 }
                 else -> {
                     when (values.size) {
-                        1 -> textBuilder.append(String.format(Locale.US, "Giá trị: %.2f", values[0]))
-                        2 -> textBuilder.append(String.format(Locale.US, "Trái/Phải: %.2f | Trước/Sau: %.2f", values[0], values[1]))
-                        else -> textBuilder.append(
-                            String.format(
-                                Locale.US,
-                                "Trái/Phải: %.2f | Trước/Sau: %.2f | Lên/Xuống: %.2f",
-                                values[0], values[1], values[2]
-                            )
-                        )
+                        1 -> textBuilder.append(String.format(Locale.US, "Giá trị: %.2f %s", values[0], unit).trim())
+                        2 -> {
+                            textBuilder.append(String.format(Locale.US, "Trái / Phải: %+.2f %s\n", values[0], unit))
+                            textBuilder.append(String.format(Locale.US, "Trước / Sau: %+.2f %s", values[1], unit))
+                        }
+                        else -> {
+                            textBuilder.append(String.format(Locale.US, "Trái / Phải:  %+.2f %s\n", values[0], unit))
+                            textBuilder.append(String.format(Locale.US, "Trước / Sau:  %+.2f %s\n", values[1], unit))
+                            textBuilder.append(String.format(Locale.US, "Lên / Xuống:  %+.2f %s", values[2], unit))
+                        }
                     }
                 }
             }
@@ -194,12 +211,6 @@ class SensorViewerAdapter(
             holder.binding.tvSensorLiveValues.text = "Đang chờ tín hiệu cảm biến…"
         }
 
-        holder.binding.tvSensorSpecs.text = String.format(
-            Locale.US,
-            "Tầm đo tối đa: %.1f • Độ nhạy: %.4f • Dòng điện: %.2f mA",
-            sensor.maximumRange,
-            sensor.resolution,
-            sensor.power
-        )
+        holder.binding.tvSensorSpecs.text = "Nhấn để xem thông số chi tiết →"
     }
 }
