@@ -94,7 +94,6 @@ class SensorDetailBottomSheet : BottomSheetDialogFragment(), SensorEventListener
 
         binding.tvSpecVendor.text = sensor.vendor.ifEmpty { "Không rõ" }
         binding.tvSpecModel.text = sensor.name
-        binding.tvSpecTypeId.text = "Loại #${sensor.type}"
         binding.tvSpecStringType.text = sensor.stringType.ifEmpty { "android.sensor.custom" }
         binding.tvSpecVersion.text = "Phiên bản ${sensor.version}"
 

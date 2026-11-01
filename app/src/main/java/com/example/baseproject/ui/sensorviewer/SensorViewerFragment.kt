@@ -157,7 +157,6 @@ class SensorViewerAdapter(
         }
 
         holder.binding.tvSensorName.text = viName
-        holder.binding.tvSensorType.text = "Loại #${sensor.type}"
         holder.binding.tvSensorVendor.text = "Nhà sản xuất: ${sensor.vendor}"
 
         val values = valueMap[sensor.type]

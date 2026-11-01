@@ -87,42 +87,27 @@
 
     </FrameLayout>
 
-    <!-- KHU VỰC HIỂN THỊ VỊ TRÍ VÀ TỌA ĐỘ ĐỊNH DẠNG CHUẨN ĐỘ PHÚT GIÂY -->
+    <!-- KHU VỰC HIỂN THỊ TỌA ĐỘ ĐỊNH DẠNG ĐỘ PHÚT GIÂY -->
     <LinearLayout
         android:id="@+id/layoutLocationInfo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
         android:layout_marginEnd="24dp"
-        android:layout_marginBottom="32dp"
+        android:layout_marginBottom="36dp"
         android:gravity="center"
         android:orientation="vertical">
-
-        <!-- Tên gọi địa danh chính xác nơi thiết bị đang đứng -->
-        <TextView
-            android:id="@+id/tvLocationAddress"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:fontFamily="sans-serif"
-            android:gravity="center"
-            android:lineSpacingExtra="5dp"
-            android:maxLines="3"
-            android:text="Đang xác định vị trí…"
-            android:textColor="#E2E8F0"
-            android:textSize="18sp" />
 
         <!-- Tọa độ Kinh độ / Vĩ độ theo định dạng Độ Phút Giây -->
         <TextView
             android:id="@+id/tvCoordinates"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
             android:fontFamily="sans-serif-medium"
             android:gravity="center"
             android:text="--°--'--&quot; B  --°--'--&quot; Đ"
             android:textColor="#FFFFFF"
-            android:textSize="20sp"
+            android:textSize="21sp"
             android:textStyle="bold" />
 
         <!-- Nút xin cấp quyền vị trí nếu chưa có -->

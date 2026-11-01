@@ -7,30 +7,24 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
-import android.location.Geocoder
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
-import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.lifecycleScope
 import com.example.baseproject.R
 import com.example.baseproject.base.BaseToolFragment
 import com.example.baseproject.databinding.FragmentCompassBinding
 import com.example.baseproject.utils.AppPermissionManager
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.util.Locale
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
 /**
- * Công cụ la bàn điện tử xoay toàn bộ mặt số chi tiết 360 độ và hiển thị vị trí thiết bị.
+ * Công cụ la bàn điện tử xoay toàn bộ mặt số chi tiết 360 độ và hiển thị tọa độ thiết bị theo chuẩn Độ Phút Giây.
  */
 class CompassFragment : BaseToolFragment<FragmentCompassBinding>(), SensorEventListener, LocationListener {
 
@@ -186,8 +180,7 @@ class CompassFragment : BaseToolFragment<FragmentCompassBinding>(), SensorEventL
 
         if (!hasFine && !hasCoarse) {
             viewBinding.btnGrantLocationPermission.visibility = View.VISIBLE
-            viewBinding.tvCoordinates.text = "Chưa cấp quyền vị trí"
-            viewBinding.tvLocationAddress.text = "Nhấn nút bên dưới để cấp quyền định vị hiển thị tọa độ"
+            viewBinding.tvCoordinates.text = "--°--'--\" B  --°--'--\" Đ"
             return
         }
 
@@ -212,14 +205,11 @@ class CompassFragment : BaseToolFragment<FragmentCompassBinding>(), SensorEventL
         }
     }
 
-    // Nhận thông tin tọa độ mới và hiển thị định dạng độ phút giây kèm địa phương.
+    // Nhận thông tin tọa độ mới và hiển thị định dạng độ phút giây trực quan.
     override fun onLocationChanged(location: Location) {
         val latDms = formatToDms(location.latitude, isLatitude = true)
         val lonDms = formatToDms(location.longitude, isLatitude = false)
         viewBinding.tvCoordinates.text = "$latDms  $lonDms"
-
-        // Phân giải địa chỉ ngoại tuyến / trực tuyến từ Geocoder
-        resolveAddress(location.latitude, location.longitude)
     }
 
     override fun onProviderEnabled(provider: String) = Unit
@@ -242,49 +232,5 @@ class CompassFragment : BaseToolFragment<FragmentCompassBinding>(), SensorEventL
         }
 
         return String.format(Locale.US, "%d°%02d'%02d\" %s", degrees, minutes, seconds, hemisphere)
-    }
-
-    // Tra cứu tên phường xã thành phố từ tọa độ bằng Geocoder trên luồng nền IO.
-    private fun resolveAddress(latitude: Double, longitude: Double) {
-        lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                val geocoder = Geocoder(requireContext(), Locale.getDefault())
-                val addresses = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    var resultList: List<android.location.Address>? = null
-                    geocoder.getFromLocation(latitude, longitude, 1) { addresses ->
-                        resultList = addresses
-                    }
-                    resultList
-                } else {
-                    @Suppress("DEPRECATION")
-                    geocoder.getFromLocation(latitude, longitude, 1)
-                }
-
-                val address = addresses?.firstOrNull()
-                val displayAddress = address?.let {
-                    it.getAddressLine(0) ?: run {
-                        val parts = listOfNotNull(
-                            it.featureName,
-                            it.thoroughfare,
-                            it.subLocality,
-                            it.subAdminArea,
-                            it.adminArea,
-                            it.countryName
-                        )
-                        parts.distinct().joinToString(", ")
-                    }
-                } ?: "Đang xác định vị trí…"
-
-                withContext(Dispatchers.Main) {
-                    viewBinding.tvLocationAddress.text = displayAddress
-                }
-            } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    if (viewBinding.tvLocationAddress.text.isNullOrEmpty() || viewBinding.tvLocationAddress.text == "Đang xác định vị trí…") {
-                        viewBinding.tvLocationAddress.text = "Vị trí GPS đã sẵn sàng"
-                    }
-                }
-            }
-        }
     }
 }
