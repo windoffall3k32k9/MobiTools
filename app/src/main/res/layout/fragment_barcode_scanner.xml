@@ -11,6 +11,31 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <!-- Khung ngắm quét mã trong suốt với góc định vị và tia quét -->
+    <com.example.baseproject.ui.scanner.ScannerOverlayView
+        android:id="@+id/scannerOverlayView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- Lời nhắc hướng dẫn quét mã -->
+    <TextView
+        android:id="@+id/tvScannerHint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_scanner_hint_pill"
+        android:paddingStart="16dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="8dp"
+        android:text="Đặt mã QR hoặc mã vạch vào trong khung"
+        android:textColor="@color/white"
+        android:textSize="13sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.72" />
+
     <!-- Thanh công cụ phía trên -->
     <LinearLayout
         android:id="@+id/scannerTopBar"
@@ -55,17 +80,6 @@
             android:src="@drawable/ic_flashlight"
             app:tint="@color/white" />
     </LinearLayout>
-
-    <!-- Khung ngắm quét mã ở giữa -->
-    <View
-        android:id="@+id/viewFinder"
-        android:layout_width="260dp"
-        android:layout_height="260dp"
-        android:background="@drawable/bg_search_bar"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
     <!-- Lời nhắc quyền Camera nếu chưa cấp -->
     <LinearLayout

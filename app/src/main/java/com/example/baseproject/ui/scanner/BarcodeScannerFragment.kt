@@ -47,9 +47,13 @@ class BarcodeScannerFragment : BaseToolFragment<FragmentBarcodeScannerBinding>()
     ) { isGranted ->
         if (isGranted) {
             viewBinding.layoutCameraPermission.visibility = View.GONE
+            viewBinding.scannerOverlayView.visibility = View.VISIBLE
+            viewBinding.tvScannerHint.visibility = View.VISIBLE
             startCamera()
         } else {
             viewBinding.layoutCameraPermission.visibility = View.VISIBLE
+            viewBinding.scannerOverlayView.visibility = View.GONE
+            viewBinding.tvScannerHint.visibility = View.GONE
         }
     }
 
@@ -65,6 +69,7 @@ class BarcodeScannerFragment : BaseToolFragment<FragmentBarcodeScannerBinding>()
 
     override fun onDestroyView() {
         super.onDestroyView()
+        viewBinding.scannerOverlayView.stopLaserAnimation()
         cameraExecutor.shutdown()
     }
 
@@ -88,6 +93,8 @@ class BarcodeScannerFragment : BaseToolFragment<FragmentBarcodeScannerBinding>()
     private fun setupResultActions() {
         viewBinding.btnCloseResult.setOnClickListener {
             viewBinding.cardScanResult.visibility = View.GONE
+            viewBinding.tvScannerHint.visibility = View.VISIBLE
+            viewBinding.scannerOverlayView.startLaserAnimation()
             isScanningActive = true
         }
 
@@ -114,9 +121,13 @@ class BarcodeScannerFragment : BaseToolFragment<FragmentBarcodeScannerBinding>()
             == PackageManager.PERMISSION_GRANTED
         ) {
             viewBinding.layoutCameraPermission.visibility = View.GONE
+            viewBinding.scannerOverlayView.visibility = View.VISIBLE
+            viewBinding.tvScannerHint.visibility = View.VISIBLE
             startCamera()
         } else {
             viewBinding.layoutCameraPermission.visibility = View.VISIBLE
+            viewBinding.scannerOverlayView.visibility = View.GONE
+            viewBinding.tvScannerHint.visibility = View.GONE
             cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
         }
     }
@@ -190,6 +201,8 @@ class BarcodeScannerFragment : BaseToolFragment<FragmentBarcodeScannerBinding>()
         val formatName = getBarcodeFormatName(barcode.format)
 
         activity?.runOnUiThread {
+            viewBinding.scannerOverlayView.stopLaserAnimation()
+            viewBinding.tvScannerHint.visibility = View.GONE
             viewBinding.tvBarcodeFormat.text = formatName
             viewBinding.tvBarcodeContent.text = rawValue
             viewBinding.cardScanResult.visibility = View.VISIBLE
