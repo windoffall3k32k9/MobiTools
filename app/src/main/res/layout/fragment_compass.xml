@@ -22,32 +22,34 @@
         android:textSize="13sp"
         android:visibility="gone" />
 
-    <!-- KHUNG CHỨA MẶT LA BÀN VÀ KIM NAM CHÂM 2 HƯỚNG CỐ ĐỊNH -->
+    <!-- KHUNG CHỨA MẶT LA BÀN LIỀN KHỐI VỚI KIM NAM CHÂM 2 ĐẦU N - S -->
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:gravity="center">
 
-        <!-- Mặt số la bàn và kim nam châm -->
+        <!-- Mặt số la bàn và kim nam châm xoay đồng nhất -->
         <FrameLayout
             android:layout_width="320dp"
             android:layout_height="320dp"
             android:layout_gravity="center">
 
-            <!-- Dial la bàn xoay toàn bộ theo góc phương vị -->
+            <!-- Dial la bàn và kim nam châm 2 đầu N-S liền thành 1 khối cùng xoay theo góc phương vị -->
             <com.example.baseproject.ui.compass.CompassDialView
                 android:id="@+id/compassDialView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
 
-            <!-- Mũi tên nam châm 2 hướng cố định ở trục dọc -->
-            <com.example.baseproject.ui.compass.CompassNeedleView
-                android:id="@+id/compassNeedleView"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+            <!-- Vạch chuẩn góc 12 giờ cố định chỉ hướng nhìn hiện tại -->
+            <View
+                android:layout_width="3.5dp"
+                android:layout_height="24dp"
+                android:layout_gravity="top|center_horizontal"
+                android:layout_marginTop="2dp"
+                android:background="@drawable/bg_compass_index_line" />
 
-            <!-- Khối chữ số góc phương vị và hướng ở tâm kim nam châm -->
+            <!-- Khối chữ số góc phương vị và hướng ở tâm la bàn -->
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
