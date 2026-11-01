@@ -22,26 +22,32 @@
         android:textSize="13sp"
         android:visibility="gone" />
 
-    <!-- KHUNG CHỨA MẶT LA BÀN VÀ KIM CHỈ CỐ ĐỊNH -->
+    <!-- KHUNG CHỨA MẶT LA BÀN VÀ KIM NAM CHÂM 2 HƯỚNG CỐ ĐỊNH -->
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:gravity="center">
 
-        <!-- Mặt số la bàn xoay toàn bộ -->
+        <!-- Mặt số la bàn và kim nam châm -->
         <FrameLayout
             android:layout_width="320dp"
             android:layout_height="320dp"
             android:layout_gravity="center">
 
-            <!-- Dial la bàn xoay theo góc phương vị -->
+            <!-- Dial la bàn xoay toàn bộ theo góc phương vị -->
             <com.example.baseproject.ui.compass.CompassDialView
                 android:id="@+id/compassDialView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
 
-            <!-- Khối chữ số góc phương vị và hướng ở chính giữa -->
+            <!-- Mũi tên nam châm 2 hướng cố định ở trục dọc -->
+            <com.example.baseproject.ui.compass.CompassNeedleView
+                android:id="@+id/compassNeedleView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <!-- Khối chữ số góc phương vị và hướng ở tâm kim nam châm -->
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -56,26 +62,20 @@
                     android:fontFamily="sans-serif-medium"
                     android:text="B"
                     android:textColor="#FFFFFF"
-                    android:textSize="38sp"
+                    android:textSize="26sp"
                     android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/tvAzimuthDegree"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
+                    android:layout_marginTop="1dp"
                     android:fontFamily="sans-serif-medium"
                     android:text="0°"
-                    android:textColor="#E2E8F0"
-                    android:textSize="26sp"
+                    android:textColor="#38BDF8"
+                    android:textSize="20sp"
                     android:textStyle="bold" />
             </LinearLayout>
-
-            <!-- Mũi tên chỉ hướng cố định góc 12 giờ -->
-            <com.example.baseproject.ui.compass.CompassPointerView
-                android:layout_width="40dp"
-                android:layout_height="32dp"
-                android:layout_gravity="top|center_horizontal" />
 
         </FrameLayout>
 

@@ -2,8 +2,8 @@ package com.example.baseproject.ui.compass
 
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.Paint
+import android.graphics.Path
 import android.graphics.Rect
 import android.util.AttributeSet
 import android.view.View
@@ -11,7 +11,7 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 /**
- * View vẽ mặt số la bàn chi tiết 360 độ gồm các vạch chia nhỏ, số độ và các hướng B, Đ, N, T.
+ * View vẽ mặt số la bàn chi tiết 360 độ gồm các vạch chia nhỏ, số độ bên ngoài và các hướng B, Đ, N, T bên trong.
  */
 class CompassDialView @JvmOverloads constructor(
     context: Context,
@@ -55,42 +55,57 @@ class CompassDialView @JvmOverloads constructor(
         strokeCap = Paint.Cap.ROUND
     }
 
-    private val degreeTextPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = 0xFF94A3B8.toInt()
-        textSize = 10f * density
+    private val degreeNumberPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = 0xFFE2E8F0.toInt()
+        textSize = 11f * density
         textAlign = Paint.Align.CENTER
+        isFakeBoldText = true
     }
 
     private val cardinalTextPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = 0xFFFFFFFF.toInt()
-        textSize = 14f * density
+        textSize = 15f * density
         textAlign = Paint.Align.CENTER
         isFakeBoldText = true
     }
 
     private val northCardinalTextPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = 0xFFFF4D4F.toInt()
-        textSize = 15f * density
+        textSize = 16f * density
         textAlign = Paint.Align.CENTER
         isFakeBoldText = true
     }
 
-    private val textBounds = Rect()
+    private val subCardinalTextPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = 0xFF94A3B8.toInt()
+        textSize = 11f * density
+        textAlign = Paint.Align.CENTER
+        isFakeBoldText = true
+    }
 
-    // Vẽ toàn bộ mặt đồng hồ la bàn 360 độ bao gồm vạch chia, chữ số và hướng địa lý.
+    private val northArrowPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = 0xFFFF4D4F.toInt()
+        style = Paint.Style.FILL
+    }
+
+    private val textBounds = Rect()
+    private val northTrianglePath = Path()
+
+    // Vẽ toàn bộ mặt đồng hồ la bàn 360 độ gồm vạch chia, số độ bên ngoài và chữ hướng bên trong.
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
         val cx = width / 2f
         val cy = height / 2f
-        val radius = (minOf(width, height) / 2f) - (6f * density)
+        // Chừa khoảng trống bên ngoài để vẽ các chữ số 0, 30, 60... 330
+        val radius = (minOf(width, height) / 2f) - (20f * density)
 
-        if (radius <= 30f * density) return
+        if (radius <= 40f * density) return
 
-        // Vòng tròn bao ngoài cùng
+        // Vòng tròn bao ngoài cùng của vạch chia
         canvas.drawCircle(cx, cy, radius, outerRingPaint)
         // Vòng tròn mờ bên trong
-        canvas.drawCircle(cx, cy, radius - (32f * density), outerRingPaint)
+        canvas.drawCircle(cx, cy, radius - (16f * density), outerRingPaint)
 
         val majorLen = 14f * density
         val medLen = 9f * density
@@ -104,15 +119,20 @@ class CompassDialView @JvmOverloads constructor(
 
             when {
                 degree == 0 -> {
-                    // Hướng Bắc (B)
+                    // Vạch hướng Bắc (đỏ)
                     val startX = cx + (radius - majorLen) * cosA
                     val startY = cy + (radius - majorLen) * sinA
                     val endX = cx + radius * cosA
                     val endY = cy + radius * sinA
                     canvas.drawLine(startX, startY, endX, endY, northTickPaint)
 
-                    // Chữ B và số 0
-                    drawRotatedText(canvas, "B", cx, cy, radius - (20f * density), degree.toFloat(), northCardinalTextPaint)
+                    // Tam giác đỏ chỉ hướng Bắc ngay sát vạch 0 độ
+                    drawNorthTriangle(canvas, cx, cy, radius)
+
+                    // Chữ B màu đỏ nằm phía trong
+                    drawRotatedText(canvas, "B", cx, cy, radius - (26f * density), degree.toFloat(), northCardinalTextPaint)
+                    // Số 0 nằm phía ngoài
+                    drawRotatedText(canvas, "0", cx, cy, radius + (12f * density), degree.toFloat(), degreeNumberPaint)
                 }
                 degree % 90 == 0 -> {
                     val startX = cx + (radius - majorLen) * cosA
@@ -127,7 +147,8 @@ class CompassDialView @JvmOverloads constructor(
                         270 -> "T"
                         else -> ""
                     }
-                    drawRotatedText(canvas, label, cx, cy, radius - (20f * density), degree.toFloat(), cardinalTextPaint)
+                    drawRotatedText(canvas, label, cx, cy, radius - (26f * density), degree.toFloat(), cardinalTextPaint)
+                    drawRotatedText(canvas, "$degree", cx, cy, radius + (12f * density), degree.toFloat(), degreeNumberPaint)
                 }
                 degree % 30 == 0 -> {
                     val startX = cx + (radius - majorLen) * cosA
@@ -136,14 +157,7 @@ class CompassDialView @JvmOverloads constructor(
                     val endY = cy + radius * sinA
                     canvas.drawLine(startX, startY, endX, endY, majorTickPaint)
 
-                    val label = when (degree) {
-                        45 -> "ĐB"
-                        135 -> "ĐN"
-                        225 -> "TN"
-                        315 -> "TB"
-                        else -> "$degree"
-                    }
-                    drawRotatedText(canvas, label, cx, cy, radius - (20f * density), degree.toFloat(), degreeTextPaint)
+                    drawRotatedText(canvas, "$degree", cx, cy, radius + (12f * density), degree.toFloat(), degreeNumberPaint)
                 }
                 degree % 10 == 0 -> {
                     val startX = cx + (radius - medLen) * cosA
@@ -160,7 +174,35 @@ class CompassDialView @JvmOverloads constructor(
                     canvas.drawLine(startX, startY, endX, endY, minorTickPaint)
                 }
             }
+
+            // Vẽ các hướng phụ ĐB (45°), ĐN (135°), TN (225°), TB (315°)
+            if (degree % 90 == 45 || degree == 44 || degree == 46) {
+                if (degree == 44 || degree == 46 || degree == 134 || degree == 136 || degree == 224 || degree == 226 || degree == 314 || degree == 316) {
+                    // Bỏ qua tránh trùng
+                }
+            }
         }
+
+        // Vẽ 4 hướng phụ ở góc 45, 135, 225, 315 độ
+        drawRotatedText(canvas, "ĐB", cx, cy, radius - (26f * density), 45f, subCardinalTextPaint)
+        drawRotatedText(canvas, "ĐN", cx, cy, radius - (26f * density), 135f, subCardinalTextPaint)
+        drawRotatedText(canvas, "TN", cx, cy, radius - (26f * density), 225f, subCardinalTextPaint)
+        drawRotatedText(canvas, "TB", cx, cy, radius - (26f * density), 315f, subCardinalTextPaint)
+    }
+
+    // Vẽ tam giác đỏ nhỏ hướng vào tâm tại mốc 0 độ trên mặt xoay.
+    private fun drawNorthTriangle(canvas: Canvas, cx: Float, cy: Float, radius: Float) {
+        val triWidth = 8f * density
+        val triHeight = 7f * density
+        val triY = cy - radius + (2f * density)
+
+        northTrianglePath.reset()
+        northTrianglePath.moveTo(cx, triY)
+        northTrianglePath.lineTo(cx - triWidth / 2f, triY - triHeight)
+        northTrianglePath.lineTo(cx + triWidth / 2f, triY - triHeight)
+        northTrianglePath.close()
+
+        canvas.drawPath(northTrianglePath, northArrowPaint)
     }
 
     // Vẽ nhãn chữ xoay theo hướng tâm để đảm bảo chữ số luôn hướng ra viền la bàn.
@@ -169,7 +211,7 @@ class CompassDialView @JvmOverloads constructor(
         val tx = cx + distFromCenter * cos(angleRad).toFloat()
         val ty = cy + distFromCenter * sin(angleRad).toFloat()
 
-        paint.getTextBounds(text, 0, text.size(), textBounds)
+        paint.getTextBounds(text, 0, text.length, textBounds)
         val yOffset = textBounds.height() / 2f
 
         canvas.save()
@@ -177,6 +219,4 @@ class CompassDialView @JvmOverloads constructor(
         canvas.drawText(text, tx, ty + yOffset, paint)
         canvas.restore()
     }
-
-    private fun String.size() = length
 }
