@@ -109,7 +109,22 @@
     <string name="calibrate">Mốc 0 chuẩn</string>
 
     <!-- 10. Công cụ văn bản -->
-    <string name="tool_text_tools_title">Công cụ văn bản</string>
+    <string name="tool_text_tools_title">Xử lý văn bản</string>
+    <string name="text_tools_input_title">Văn bản đầu vào</string>
+    <string name="text_tools_output_title">Kết quả</string>
+    <string name="text_tools_copy">Sao chép</string>
+    <string name="text_tools_action_uppercase">VIẾT HOA TOÀN BỘ</string>
+    <string name="text_tools_action_lowercase">viết thường toàn bộ</string>
+    <string name="text_tools_action_titlecase">Viết Hoa Chữ Cái Đầu</string>
+    <string name="text_tools_action_sentencecase">Viết hoa ký tự đầu tiên</string>
+    <string name="text_tools_action_trim_spaces">Xóa dấu cách</string>
+    <string name="text_tools_action_remove_lines">Xóa xuống dòng</string>
+    <string name="text_tools_stat_chars">Ký tự</string>
+    <string name="text_tools_stat_words">Từ</string>
+    <string name="text_tools_stat_lines">Dòng</string>
+    <string name="text_tools_copied">Đã sao chép kết quả vào khay nhớ tạm</string>
+    <string name="text_tools_history_title">Lịch sử xử lý văn bản</string>
+    <string name="text_tools_history_empty">Chưa có lịch sử xử lý văn bản nào</string>
     <string name="tool_text_tools_desc">Xử lý chữ hoa thường, loại bỏ dòng thừa và thống kê ký tự</string>
     <string name="enter_text_here">Nhập văn bản cần xử lý…</string>
 

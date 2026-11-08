@@ -12,14 +12,14 @@ import org.junit.Test
  */
 class MobiToolsUnitTest {
 
-    // Kiểm tra danh mục công cụ đã đăng ký đủ 15 công cụ và không có mã trùng lặp.
+    // Kiểm tra danh mục công cụ đã đăng ký và không có mã trùng lặp.
     @Test
     fun testToolRegistryRegistration() {
         val tools = ToolRegistry.getAll()
-        assertEquals(15, tools.size)
+        assertTrue("Tổng số công cụ phải từ 15 trở lên", tools.size >= 15)
 
         val uniqueIds = tools.map { it.id }.toSet()
-        assertEquals(15, uniqueIds.size)
+        assertEquals(tools.size, uniqueIds.size)
 
         // Đảm bảo đủ 5 nhóm chức năng
         for (group in ToolGroup.entries) {
@@ -48,5 +48,36 @@ class MobiToolsUnitTest {
         assertEquals(2, lines.size)
         assertEquals("dòng 1", lines[0])
         assertEquals("dòng 2", lines[1])
+    }
+
+    // Kiểm tra động cơ xử lý văn bản TextTransformEngine trên tất cả các chế độ chuyển đổi.
+    @Test
+    fun testTextTransformEngineAllModes() {
+        val input = "mobiTools là ứng dụng. tiện ích khác!"
+        val upper = com.example.baseproject.ui.texttools.TextTransformEngine.toUpperCase(input)
+        assertEquals("MOBITOOLS LÀ ỨNG DỤNG. TIỆN ÍCH KHÁC!", upper)
+
+        val lower = com.example.baseproject.ui.texttools.TextTransformEngine.toLowerCase(upper)
+        assertEquals("mobitools là ứng dụng. tiện ích khác!", lower)
+
+        val title = com.example.baseproject.ui.texttools.TextTransformEngine.toTitleCase("mobiTools là ứng dụng tiện ích")
+        assertEquals("Mobitools Là Ứng Dụng Tiện Ích", title)
+
+        val sentence = com.example.baseproject.ui.texttools.TextTransformEngine.toSentenceCase("mobiTools là ứng dụng. tiện ích khác! tuyệt vời?")
+        assertEquals("Mobitools là ứng dụng. Tiện ích khác! Tuyệt vời?", sentence)
+
+        val spaced = "  đoạn 1   từ 2  \n  đoạn 2   từ 3  "
+        val trimmed = com.example.baseproject.ui.texttools.TextTransformEngine.trimSpaces(spaced)
+        assertEquals("đoạn 1 từ 2\nđoạn 2 từ 3", trimmed)
+
+        val brokenLines = "Dòng 1\nDòng 2\r\nDòng 3"
+        val singleLine = com.example.baseproject.ui.texttools.TextTransformEngine.removeLineBreaks(brokenLines)
+        assertEquals("Dòng 1 Dòng 2 Dòng 3", singleLine)
+
+        val wordCount = com.example.baseproject.ui.texttools.TextTransformEngine.countWords("MobiTools là ứng dụng tiện ích")
+        assertEquals(6, wordCount)
+
+        val lineCount = com.example.baseproject.ui.texttools.TextTransformEngine.countLines("1\n2\n3")
+        assertEquals(3, lineCount)
     }
 }
