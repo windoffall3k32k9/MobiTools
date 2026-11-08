@@ -6,23 +6,16 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
-import android.view.Gravity
 import android.view.HapticFeedbackConstants
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import androidx.fragment.app.commit
 import com.example.baseproject.R
 import com.example.baseproject.base.BaseToolFragment
 import com.example.baseproject.databinding.FragmentCalculatorBinding
-import org.json.JSONArray
-import org.json.JSONObject
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.util.Locale
@@ -41,7 +34,8 @@ import kotlin.math.sqrt
 import kotlin.math.tan
 
 /**
- * Công cụ máy tính thông minh hỗ trợ chế độ Tiêu chuẩn và Khoa học mở rộng với theme sáng tối ưu.
+ * Công cụ máy tính thông minh hỗ trợ chế độ Tiêu chuẩn (4x5) và Khoa học (5x7)
+ * với giao diện phẳng sáng tối ưu, kết nối tới trang Lịch sử tính toán riêng biệt.
  */
 class CalculatorFragment : BaseToolFragment<FragmentCalculatorBinding>() {
 
@@ -55,15 +49,7 @@ class CalculatorFragment : BaseToolFragment<FragmentCalculatorBinding>() {
     private var is2ndActive: Boolean = false
     private var isDegreeMode: Boolean = true
 
-    // Danh sách lưu trữ lịch sử các phép tính
-    data class CalculationHistory(val expression: String, val result: String)
-    private val calculationHistory = mutableListOf<CalculationHistory>()
-
-    private val prefs by lazy {
-        requireContext().getSharedPreferences("calculator_prefs", Context.MODE_PRIVATE)
-    }
-
-    // Định dạng số hiển thị theo chuẩn Việt Nam: dấu chấm ngăn cách nghìn, dấu phẩy ngăn cách thập phân
+    // Định dạng số hiển thị theo chuẩn Việt Nam: dấu chấm phân tách nghìn, dấu phẩy phân tách thập phân
     private val displayFormatSymbols = DecimalFormatSymbols(Locale.US).apply {
         groupingSeparator = '.'
         decimalSeparator = ','
@@ -78,59 +64,48 @@ class CalculatorFragment : BaseToolFragment<FragmentCalculatorBinding>() {
         return FragmentCalculatorBinding.inflate(layoutInflater, container, false)
     }
 
-    // Khởi tạo các thành phần giao diện, phục hồi lịch sử tính toán và gắn sự kiện phím bấm.
+    // Khởi tạo các thành phần giao diện, phím bấm và đăng ký nhận kết quả từ trang lịch sử.
     override fun initViews() {
-        loadHistoryFromPrefs()
-        setupToolbarActions()
+        setupTopBar()
         setupStandardKeypad()
         setupScientificKeypad()
+        setupHistoryResultListener()
         updateModeDisplay()
-        renderHistoryList()
         updateDisplay()
     }
 
-    // Cấu hình các nút chức năng trên thanh công cụ: Lịch sử tính toán và Menu mở rộng.
-    private fun setupToolbarActions() {
-        val btnAction = view?.findViewById<ImageView>(R.id.btnToolbarAction)
-        btnAction?.let { btn ->
-            btn.visibility = View.VISIBLE
-            btn.setImageResource(R.drawable.ic_history)
-            btn.setOnClickListener { showHistoryDialog() }
+    // Thiết lập thanh tiêu đề với nút quay lại và nút mở trang Lịch sử tính toán riêng biệt.
+    private fun setupTopBar() {
+        viewBinding.btnCalcBack.setOnClickListener {
+            vibrateKey()
+            parentFragmentManager.popBackStack()
         }
 
-        val btnMore = view?.findViewById<ImageView>(R.id.btnToolbarMore)
-        btnMore?.let { btn ->
-            btn.visibility = View.VISIBLE
-            btn.setOnClickListener { anchor -> showOptionsMenu(anchor) }
+        viewBinding.btnCalcHistory.setOnClickListener {
+            vibrateKey()
+            parentFragmentManager.commit {
+                setReorderingAllowed(true)
+                replace(R.id.fragment_container, CalculatorHistoryFragment.newInstance())
+                addToBackStack(null)
+            }
         }
     }
 
-    // Hiển thị popup menu tùy chọn với các lệnh xóa lịch sử và đổi đơn vị góc.
-    private fun showOptionsMenu(anchor: View) {
-        val popup = PopupMenu(requireContext(), anchor)
-        popup.menu.add(0, 1, 0, R.string.calc_history_title)
-        val angleTitle = if (isDegreeMode) R.string.calc_angle_deg else R.string.calc_angle_rad
-        popup.menu.add(0, 2, 1, angleTitle)
-        popup.menu.add(0, 3, 2, R.string.calc_clear_history)
-
-        popup.setOnMenuItemClickListener { item ->
-            when (item.itemId) {
-                1 -> {
-                    showHistoryDialog()
-                    true
-                }
-                2 -> {
-                    toggleAngleMode()
-                    true
-                }
-                3 -> {
-                    clearAllHistory()
-                    true
-                }
-                else -> false
+    // Đăng ký lắng nghe khi người dùng chọn một phép tính từ trang Lịch sử để nạp lại vào máy tính.
+    private fun setupHistoryResultListener() {
+        parentFragmentManager.setFragmentResultListener(
+            CalculatorHistoryFragment.REQUEST_KEY_HISTORY_SELECT,
+            viewLifecycleOwner
+        ) { _, bundle ->
+            val exp = bundle.getString(CalculatorHistoryFragment.EXTRA_EXPRESSION)
+            val res = bundle.getString(CalculatorHistoryFragment.EXTRA_RESULT)
+            if (!exp.isNullOrEmpty() && !res.isNullOrEmpty()) {
+                rawExpression = res.replace(".", "").replace(",", ".")
+                isResultCalculated = true
+                viewBinding.tvExpression.text = exp
+                viewBinding.tvPreviewResult.text = "= $res"
             }
         }
-        popup.show()
     }
 
     // Thiết lập sự kiện cho toàn bộ bàn phím chế độ Tiêu chuẩn (4 x 5).
@@ -210,8 +185,8 @@ class CalculatorFragment : BaseToolFragment<FragmentCalculatorBinding>() {
         binding.btnSciOpenParen.setOnClickListener { appendToken("("); vibrateKey() }
         binding.btnSciCloseParen.setOnClickListener { appendToken(")"); vibrateKey() }
         binding.btnSciPower.setOnClickListener { appendOperator("^"); vibrateKey() }
-        binding.btnSciFactorial.setOnClickListener { appendOperator("!"); vibrateKey() }
-        binding.btnSciReciprocal.setOnClickListener { appendReciprocal(); vibrateKey() }
+        binding.btnSciFact.setOnClickListener { appendOperator("!"); vibrateKey() }
+        binding.btnSciInverse.setOnClickListener { appendReciprocal(); vibrateKey() }
         binding.btnSciPi.setOnClickListener { appendConstant("π"); vibrateKey() }
         binding.btnSciE.setOnClickListener { appendConstant("e"); vibrateKey() }
 
@@ -224,7 +199,7 @@ class CalculatorFragment : BaseToolFragment<FragmentCalculatorBinding>() {
         binding.btnSciCos.setOnClickListener { handleTrigOrInverse("cos", "cos⁻¹"); vibrateKey() }
         binding.btnSciTan.setOnClickListener { handleTrigOrInverse("tan", "tan⁻¹"); vibrateKey() }
         binding.btnSciLn.setOnClickListener { handleLnOrExp(); vibrateKey() }
-        binding.btnSciLog.setOnClickListener { handleLogOrTenPow(); vibrateKey() }
+        binding.btnSciLg.setOnClickListener { handleLogOrTenPow(); vibrateKey() }
         binding.btnSciSqrt.setOnClickListener { handleSqrtOrSquare(); vibrateKey() }
 
         // Xóa, lùi, bằng và toggle thu nhỏ
@@ -254,14 +229,14 @@ class CalculatorFragment : BaseToolFragment<FragmentCalculatorBinding>() {
         val normalBg = ContextCompat.getColor(requireContext(), R.color.calcButtonBg)
 
         viewBinding.btnSci2nd.setTextColor(if (is2ndActive) activeColor else normalColor)
-        viewBinding.btnSci2nd.setCardBackgroundColorCompat(if (is2ndActive) activeBg else normalBg)
+        viewBinding.btnSci2nd.backgroundTintList = ColorStateList.valueOf(if (is2ndActive) activeBg else normalBg)
 
         // Đổi nhãn các phím lượng giác và hàm tương ứng
         viewBinding.btnSciSin.text = if (is2ndActive) "sin⁻¹" else "sin"
         viewBinding.btnSciCos.text = if (is2ndActive) "cos⁻¹" else "cos"
         viewBinding.btnSciTan.text = if (is2ndActive) "tan⁻¹" else "tan"
         viewBinding.btnSciLn.text = if (is2ndActive) "eˣ" else "ln"
-        viewBinding.btnSciLog.text = if (is2ndActive) "10ˣ" else "lg"
+        viewBinding.btnSciLg.text = if (is2ndActive) "10ˣ" else "lg"
         viewBinding.btnSciSqrt.text = if (is2ndActive) "x²" else "√x"
     }
 
@@ -355,59 +330,107 @@ class CalculatorFragment : BaseToolFragment<FragmentCalculatorBinding>() {
         previewResult()
     }
 
-    // Xử lý chèn hàm nghịch đảo 1/x dạng biểu thức phân số.
+    // Thêm hàm nghịch đảo 1/x hoặc bao quanh số trước đó.
     private fun appendReciprocal() {
-        if (isResultCalculated) {
-            rawExpression = "1/($rawExpression)"
-            isResultCalculated = false
+        if (rawExpression.isNotEmpty()) {
+            val lastNum = extractLastNumber(rawExpression)
+            if (lastNum.isNotEmpty()) {
+                rawExpression = rawExpression.dropLast(lastNum.length) + "1 ÷ ($lastNum)"
+            } else {
+                rawExpression += "1 ÷ ("
+            }
         } else {
-            rawExpression += "1/("
+            rawExpression = "1 ÷ ("
         }
+        isResultCalculated = false
         updateDisplay()
         previewResult()
     }
 
-    // Xử lý các hàm lượng giác chuẩn hoặc lượng giác nghịch đảo dựa trên phím 2nd.
-    private fun handleTrigOrInverse(normal: String, inverse: String) {
+    // Xử lý các hàm lượng giác chuẩn hoặc lượng giác nghịch đảo khi phím 2nd bật.
+    private fun handleTrigOrInverse(normalFunc: String, inverseFunc: String) {
+        val func = if (is2ndActive) inverseFunc else normalFunc
+        appendFunctionWithParen(func)
+    }
+
+    // Xử lý hàm logarit tự nhiên ln hoặc hàm mũ e^x khi phím 2nd bật.
+    private fun handleLnOrExp() {
+        if (is2ndActive) {
+            appendConstant("e")
+            appendOperator("^")
+        } else {
+            appendFunctionWithParen("ln")
+        }
+    }
+
+    // Xử lý hàm logarit cơ số 10 hoặc lũy thừa 10^x khi phím 2nd bật.
+    private fun handleLogOrTenPow() {
+        if (is2ndActive) {
+            rawExpression += "10 ^ "
+            isResultCalculated = false
+            updateDisplay()
+        } else {
+            appendFunctionWithParen("lg")
+        }
+    }
+
+    // Xử lý hàm căn bậc hai hoặc hàm bình phương x^2 khi phím 2nd bật.
+    private fun handleSqrtOrSquare() {
+        if (is2ndActive) {
+            appendOperator("^")
+            rawExpression += "2"
+            updateDisplay()
+            previewResult()
+        } else {
+            appendFunctionWithParen("√")
+        }
+    }
+
+    // Chèn tên hàm toán học kèm mở ngoặc và tự động chèn dấu nhân nếu đứng sau số.
+    private fun appendFunctionWithParen(funcName: String) {
         if (isResultCalculated) {
             rawExpression = ""
             isResultCalculated = false
         }
-        val func = if (is2ndActive) inverse else normal
-        rawExpression += "$func("
+        if (rawExpression.isNotEmpty() && (rawExpression.last().isDigit() || rawExpression.endsWith(")"))) {
+            rawExpression += " × "
+        }
+        rawExpression += "$funcName("
         updateDisplay()
         previewResult()
     }
 
-    // Xử lý chèn hàm ln hoặc lũy thừa e^x.
-    private fun handleLnOrExp() {
-        if (isResultCalculated) isResultCalculated = false
-        rawExpression += if (is2ndActive) "e^(" else "ln("
-        updateDisplay()
-        previewResult()
-    }
+    // Xóa ký tự cuối cùng khỏi biểu thức khi bấm phím Backspace.
+    private fun performBackspace() {
+        if (isResultCalculated) {
+            clearExpression()
+            return
+        }
+        if (rawExpression.isEmpty()) return
 
-    // Xử lý chèn hàm logarit cơ số 10 hoặc lũy thừa 10^x.
-    private fun handleLogOrTenPow() {
-        if (isResultCalculated) isResultCalculated = false
-        rawExpression += if (is2ndActive) "10^(" else "lg("
-        updateDisplay()
-        previewResult()
-    }
+        val functions = listOf("sin⁻¹(", "cos⁻¹(", "tan⁻¹(", "sin(", "cos(", "tan(", "ln(", "lg(", "√(")
+        for (f in functions) {
+            if (rawExpression.endsWith(f)) {
+                rawExpression = rawExpression.dropLast(f.length)
+                updateDisplay()
+                previewResult()
+                return
+            }
+        }
 
-    // Xử lý căn bậc hai hoặc bình phương dựa trên phím 2nd.
-    private fun handleSqrtOrSquare() {
-        if (is2ndActive) {
-            rawExpression += "^2"
+        if (rawExpression.endsWith(" ")) {
+            rawExpression = rawExpression.trimEnd()
+            if (rawExpression.endsWith("+") || rawExpression.endsWith("−") || rawExpression.endsWith("×") || rawExpression.endsWith("÷") || rawExpression.endsWith("^")) {
+                rawExpression = rawExpression.dropLast(1).trimEnd()
+            }
         } else {
-            if (isResultCalculated) isResultCalculated = false
-            rawExpression += "√("
+            rawExpression = rawExpression.dropLast(1)
         }
         updateDisplay()
         previewResult()
     }
 
-    // Xóa toàn bộ biểu thức đang nhập và đặt lại màn hình.
+    // Xóa toàn bộ biểu thức đang nhập và làm sạch dòng xem trước.
     private fun clearExpression() {
         rawExpression = ""
         isResultCalculated = false
@@ -415,34 +438,51 @@ class CalculatorFragment : BaseToolFragment<FragmentCalculatorBinding>() {
         viewBinding.tvPreviewResult.text = ""
     }
 
-    // Thực hiện xóa lùi ký tự cuối cùng của chuỗi biểu thức.
-    private fun performBackspace() {
-        if (rawExpression.isNotEmpty()) {
-            val trimmed = rawExpression.trimEnd()
-            when {
-                trimmed.endsWith("sin⁻¹(") || trimmed.endsWith("cos⁻¹(") || trimmed.endsWith("tan⁻¹(") -> {
-                    rawExpression = trimmed.dropLast(7)
-                }
-                trimmed.endsWith("sin(") || trimmed.endsWith("cos(") || trimmed.endsWith("tan(") || trimmed.endsWith("1/(") -> {
-                    rawExpression = trimmed.dropLast(4)
-                }
-                trimmed.endsWith("ln(") || trimmed.endsWith("lg(") || trimmed.endsWith("√(") -> {
-                    rawExpression = trimmed.dropLast(3)
-                }
-                trimmed.endsWith("+") || trimmed.endsWith("−") || trimmed.endsWith("×") || trimmed.endsWith("÷") || trimmed.endsWith("^") -> {
-                    rawExpression = trimmed.dropLast(1).trimEnd()
-                }
-                else -> {
-                    rawExpression = rawExpression.dropLast(1)
-                }
-            }
-            isResultCalculated = false
-            updateDisplay()
-            previewResult()
+    // Thực hiện tính toán kết quả cuối cùng khi người dùng bấm phím bằng (=).
+    private fun executeCalculate() {
+        if (rawExpression.isEmpty()) return
+
+        val cleanExpr = rawExpression.trim()
+        val evaluated = evaluateExpression(cleanExpr)
+
+        if (evaluated != null) {
+            val formattedResult = formatResultNumber(evaluated)
+            val formattedExpr = formatExpressionForDisplay(cleanExpr)
+
+            // Lưu phép tính vào lịch sử theo ngày
+            CalculatorHistoryManager.addRecord(requireContext(), formattedExpr, formattedResult)
+
+            viewBinding.tvExpression.text = formattedExpr
+            viewBinding.tvPreviewResult.text = "= $formattedResult"
+            isResultCalculated = true
+        } else {
+            viewBinding.tvPreviewResult.text = getString(R.string.calc_error_syntax)
         }
     }
 
-    // Cập nhật chuỗi biểu thức hiển thị lên giao diện kèm định dạng dấu chấm ngăn cách nghìn.
+    // Tính toán trước kết quả và cập nhật hiển thị mờ bên dưới trong khi người dùng đang nhập.
+    private fun previewResult() {
+        if (rawExpression.isEmpty() || isResultCalculated) {
+            viewBinding.tvPreviewResult.text = ""
+            return
+        }
+        val cleanExpr = rawExpression.trim()
+        if (cleanExpr.endsWith("+") || cleanExpr.endsWith("−") || cleanExpr.endsWith("×") ||
+            cleanExpr.endsWith("÷") || cleanExpr.endsWith("(") || cleanExpr.endsWith("^")
+        ) {
+            viewBinding.tvPreviewResult.text = ""
+            return
+        }
+        val evaluated = evaluateExpression(cleanExpr)
+        if (evaluated != null && !evaluated.isNaN() && !evaluated.isInfinite()) {
+            val formatted = formatResultNumber(evaluated)
+            viewBinding.tvPreviewResult.text = "= $formatted"
+        } else {
+            viewBinding.tvPreviewResult.text = ""
+        }
+    }
+
+    // Cập nhật chuỗi biểu thức hiển thị lên TextView và tự động cuộn về phía cuối.
     private fun updateDisplay() {
         val formatted = formatExpressionForDisplay(rawExpression)
         viewBinding.tvExpression.text = formatted
@@ -451,371 +491,101 @@ class CalculatorFragment : BaseToolFragment<FragmentCalculatorBinding>() {
         }
     }
 
-    // Tính toán trước kết quả và hiển thị mờ bên dưới dòng biểu thức chính.
-    private fun previewResult() {
-        if (rawExpression.isBlank()) {
-            viewBinding.tvPreviewResult.text = ""
-            return
-        }
-        try {
-            val eval = evaluateMath(rawExpression)
-            if (!eval.isNaN() && !eval.isInfinite()) {
-                val formatted = resultDecimalFormat.format(eval)
-                viewBinding.tvPreviewResult.text = "= $formatted"
-                viewBinding.scrollPreview.post {
-                    viewBinding.scrollPreview.fullScroll(View.FOCUS_RIGHT)
-                }
-            } else {
-                viewBinding.tvPreviewResult.text = ""
-            }
-        } catch (_: Exception) {
-            viewBinding.tvPreviewResult.text = ""
+    // Chuẩn hóa định dạng hiển thị cho biểu thức: gom nhóm chữ số với dấu chấm ngăn cách.
+    private fun formatExpressionForDisplay(expr: String): String {
+        val regex = Regex("(\\d[\\d,.]*)")
+        return regex.replace(expr) { matchResult ->
+            val numStr = matchResult.value
+            formatNumberString(numStr)
         }
     }
 
-    // Tính toán kết quả chính thức khi nhấn phím =, đưa vào lịch sử và cuộn màn hình.
-    private fun executeCalculate() {
-        if (rawExpression.isBlank()) return
-        try {
-            val eval = evaluateMath(rawExpression)
-            if (eval.isInfinite()) {
-                viewBinding.tvPreviewResult.text = getString(R.string.calc_error_divide_zero)
-                return
-            }
-            if (eval.isNaN()) {
-                viewBinding.tvPreviewResult.text = getString(R.string.calc_error_syntax)
-                return
-            }
+    // Định dạng chuỗi số với dấu chấm ngăn cách hàng nghìn và dấu phẩy phân tách thập phân.
+    private fun formatNumberString(str: String): String {
+        val parts = str.split(",")
+        val intPart = parts[0].replace(".", "")
+        if (intPart.isEmpty()) return str
 
-            val formattedExpr = formatExpressionForDisplay(rawExpression)
-            val formattedRes = resultDecimalFormat.format(eval)
-
-            // Lưu vào danh sách lịch sử tính toán
-            val historyItem = CalculationHistory(formattedExpr, formattedRes)
-            calculationHistory.add(historyItem)
-            saveHistoryToPrefs()
-
-            // Thêm dòng hiển thị lên khu vực lịch sử
-            addHistoryRow(historyItem)
-
-            // Đặt lại biểu thức chính về kết quả vừa tính
-            rawExpression = formattedRes.replace(".", "")
-            isResultCalculated = true
-
-            updateDisplay()
-            viewBinding.tvPreviewResult.text = ""
-        } catch (_: Exception) {
-            viewBinding.tvPreviewResult.text = getString(R.string.calc_error_syntax)
-        }
-    }
-
-    // Thêm một dòng phép tính hoàn chỉnh vào khung xem lịch sử phía trên.
-    private fun addHistoryRow(item: CalculationHistory) {
-        val context = requireContext()
-        val tv = TextView(context).apply {
-            text = "${item.expression} = ${item.result}"
-            setTextColor(Color.parseColor("#8E95A2"))
-            textSize = 16f
-            gravity = Gravity.END
-            setPadding(0, dpToPx(3), 0, dpToPx(3))
-            setOnClickListener {
-                rawExpression = item.result.replace(".", "")
-                isResultCalculated = true
-                updateDisplay()
-                view?.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
-            }
-            setOnLongClickListener {
-                copyToClipboard(item.result)
-                true
-            }
-        }
-        viewBinding.layoutHistoryList.addView(tv)
-        viewBinding.scrollHistory.post {
-            viewBinding.scrollHistory.fullScroll(View.FOCUS_DOWN)
-        }
-    }
-
-    // Vẽ toàn bộ các bản ghi lịch sử hiện có lên danh sách cuộn.
-    private fun renderHistoryList() {
-        viewBinding.layoutHistoryList.removeAllViews()
-        for (item in calculationHistory) {
-            addHistoryRow(item)
-        }
-    }
-
-    // Mở hộp thoại BottomSheet/Dialog hiển thị toàn bộ lịch sử kèm nút xóa sạch.
-    private fun showHistoryDialog() {
-        val context = requireContext()
-        if (calculationHistory.isEmpty()) {
-            Toast.makeText(context, R.string.calc_history_empty, Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        val items = calculationHistory.map { "${it.expression} = ${it.result}" }.toTypedArray()
-        AlertDialog.Builder(context)
-            .setTitle(R.string.calc_history_title)
-            .setItems(items) { _, which ->
-                val selected = calculationHistory[which]
-                rawExpression = selected.result.replace(".", "")
-                isResultCalculated = true
-                updateDisplay()
-                previewResult()
-            }
-            .setNeutralButton(R.string.calc_clear_history) { _, _ ->
-                clearAllHistory()
-            }
-            .setPositiveButton(R.string.close, null)
-            .show()
-    }
-
-    // Xóa sạch toàn bộ lịch sử phép tính đã lưu trong bộ nhớ và cơ sở dữ liệu.
-    private fun clearAllHistory() {
-        calculationHistory.clear()
-        saveHistoryToPrefs()
-        viewBinding.layoutHistoryList.removeAllViews()
-        Toast.makeText(requireContext(), R.string.calc_clear_history, Toast.LENGTH_SHORT).show()
-    }
-
-    // Sao chép kết quả số vừa chọn vào bộ nhớ tạm hệ thống.
-    private fun copyToClipboard(text: String) {
-        val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager
-        val clip = ClipData.newPlainText("Calculator Result", text)
-        clipboard?.setPrimaryClip(clip)
-        Toast.makeText(requireContext(), R.string.calc_copied, Toast.LENGTH_SHORT).show()
-    }
-
-    // Lưu danh sách lịch sử phép tính vào SharedPreferences dạng JSON.
-    private fun saveHistoryToPrefs() {
-        val array = JSONArray()
-        for (item in calculationHistory) {
-            val obj = JSONObject()
-            obj.put("expr", item.expression)
-            obj.put("res", item.result)
-            array.put(obj)
-        }
-        prefs.edit().putString("calc_history_json", array.toString()).apply()
-    }
-
-    // Khôi phục danh sách lịch sử phép tính từ SharedPreferences.
-    private fun loadHistoryFromPrefs() {
-        calculationHistory.clear()
-        val json = prefs.getString("calc_history_json", null) ?: return
-        try {
-            val array = JSONArray(json)
-            for (i in 0 until array.length()) {
-                val obj = array.getJSONObject(i)
-                calculationHistory.add(CalculationHistory(obj.getString("expr"), obj.getString("res")))
-            }
+        val formattedInt = try {
+            val d = intPart.toDouble()
+            val df = DecimalFormat("#,##0", displayFormatSymbols).apply { isGroupingUsed = true }
+            df.format(d)
         } catch (e: Exception) {
-            e.printStackTrace()
+            intPart
+        }
+
+        return if (parts.size > 1) {
+            "$formattedInt,${parts[1]}"
+        } else {
+            formattedInt
         }
     }
 
-    // Định dạng chuỗi biểu thức với dấu chấm phân tách phần nghìn cho từng nhóm số.
-    private fun formatExpressionForDisplay(raw: String): String {
-        val sb = StringBuilder()
-        var i = 0
-        while (i < raw.length) {
-            val c = raw[i]
-            if (c.isDigit()) {
-                val numStart = i
-                while (i < raw.length && (raw[i].isDigit() || raw[i] == ',')) {
-                    i++
-                }
-                val numStr = raw.substring(numStart, i)
-                sb.append(formatNumberToken(numStr))
-            } else {
-                sb.append(c)
-                i++
-            }
+    // Định dạng kết quả số học sang chuỗi hiển thị gọn gàng theo chuẩn Việt Nam.
+    private fun formatResultNumber(value: Double): String {
+        if (value.isNaN() || value.isInfinite()) return "0"
+        return if (abs(value) >= 1e12 || (abs(value) > 0 && abs(value) < 1e-6)) {
+            val sciFormat = DecimalFormat("0.######E0", displayFormatSymbols)
+            sciFormat.format(value).replace("E", " × 10^")
+        } else {
+            resultDecimalFormat.format(value)
         }
-        return sb.toString()
     }
 
-    // Định dạng riêng lẻ từng token số nguyên hoặc số thập phân.
-    private fun formatNumberToken(numStr: String): String {
-        if (!numStr.contains(",")) {
-            val intPart = numStr.toLongOrNull() ?: return numStr
-            return DecimalFormat("#,###", displayFormatSymbols).format(intPart)
-        }
-        val parts = numStr.split(",")
-        val intPart = parts[0].toLongOrNull()
-        val formattedInt = if (intPart != null) DecimalFormat("#,###", displayFormatSymbols).format(intPart) else parts[0]
-        return if (parts.size > 1) "$formattedInt,${parts[1]}" else "$formattedInt,"
-    }
-
-    // Trích xuất token số cuối cùng đang được người dùng nhập dở.
+    // Trích xuất số cuối cùng đang được gõ ở cuối biểu thức.
     private fun extractLastNumber(expr: String): String {
-        val tokens = expr.split(' ', '+', '−', '×', '÷', '%', '^', '(', ')')
-        return tokens.lastOrNull() ?: ""
-    }
-
-    // Phân tích cú pháp và thực hiện tính toán biểu thức khoa học thông qua thuật toán Shunting-Yard.
-    private fun evaluateMath(expression: String): Double {
-        val prepared = prepareExpressionForEvaluation(expression)
-        return evaluateRPN(shuntingYard(prepared))
-    }
-
-    // Chuẩn hóa biểu thức ký hiệu hiển thị sang các token toán học nội bộ.
-    private fun prepareExpressionForEvaluation(expr: String): String {
-        return expr
-            .replace(".", "")
-            .replace(",", ".")
-            .replace("−", "-")
-            .replace("×", "*")
-            .replace("÷", "/")
-            .replace("sin⁻¹", "asin")
-            .replace("cos⁻¹", "acos")
-            .replace("tan⁻¹", "atan")
-            .replace("lg", "log")
-            .replace("√", "sqrt")
-    }
-
-    // Thuật toán Shunting-Yard biến đổi biểu thức trung tố thành biểu thức hậu tố RPN.
-    private fun shuntingYard(expr: String): List<String> {
-        val output = mutableListOf<String>()
-        val ops = Stack<String>()
-        val tokens = tokenizeExpression(expr)
-
-        for (token in tokens) {
-            when {
-                token.toDoubleOrNull() != null -> output.add(token)
-                token == "π" -> output.add(Math.PI.toString())
-                token == "e" -> output.add(Math.E.toString())
-                isFunctionName(token) -> ops.push(token)
-                token == "(" -> ops.push(token)
-                token == ")" -> {
-                    while (ops.isNotEmpty() && ops.peek() != "(") {
-                        output.add(ops.pop())
-                    }
-                    if (ops.isNotEmpty() && ops.peek() == "(") {
-                        ops.pop()
-                    }
-                    if (ops.isNotEmpty() && isFunctionName(ops.peek())) {
-                        output.add(ops.pop())
-                    }
-                }
-                isOperator(token) -> {
-                    while (ops.isNotEmpty() && isOperator(ops.peek()) &&
-                        (getPrecedence(ops.peek()) > getPrecedence(token) ||
-                                (getPrecedence(ops.peek()) == getPrecedence(token) && token != "^"))
-                    ) {
-                        output.add(ops.pop())
-                    }
-                    ops.push(token)
-                }
-            }
+        var i = expr.length - 1
+        while (i >= 0 && (expr[i].isDigit() || expr[i] == ',' || expr[i] == '.')) {
+            i--
         }
-
-        while (ops.isNotEmpty()) {
-            output.add(ops.pop())
-        }
-        return output
+        return expr.substring(i + 1)
     }
 
-    // Tính toán giá trị số thực từ biểu thức ký pháp nghịch đảo Ba Lan (RPN).
-    private fun evaluateRPN(tokens: List<String>): Double {
-        val stack = Stack<Double>()
-
-        for (token in tokens) {
-            val num = token.toDoubleOrNull()
-            if (num != null) {
-                stack.push(num)
-            } else if (isFunctionName(token)) {
-                if (stack.isEmpty()) return Double.NaN
-                val a = stack.pop()
-                val res = when (token) {
-                    "sin" -> if (isDegreeMode) sin(Math.toRadians(a)) else sin(a)
-                    "cos" -> if (isDegreeMode) cos(Math.toRadians(a)) else cos(a)
-                    "tan" -> if (isDegreeMode) tan(Math.toRadians(a)) else tan(a)
-                    "asin" -> if (isDegreeMode) Math.toDegrees(asin(a)) else asin(a)
-                    "acos" -> if (isDegreeMode) Math.toDegrees(acos(a)) else acos(a)
-                    "atan" -> if (isDegreeMode) Math.toDegrees(atan(a)) else atan(a)
-                    "ln" -> ln(a)
-                    "log" -> log10(a)
-                    "sqrt" -> sqrt(a)
-                    else -> Double.NaN
-                }
-                stack.push(res)
-            } else if (token == "!") {
-                if (stack.isEmpty()) return Double.NaN
-                val a = stack.pop()
-                stack.push(computeFactorial(a))
-            } else if (isOperator(token)) {
-                if (stack.size < 2) {
-                    if (token == "-" && stack.size == 1) {
-                        stack.push(-stack.pop())
-                        continue
-                    }
-                    return Double.NaN
-                }
-                val b = stack.pop()
-                val a = stack.pop()
-                val res = when (token) {
-                    "+" -> a + b
-                    "-" -> a - b
-                    "*" -> a * b
-                    "/" -> if (b == 0.0) Double.POSITIVE_INFINITY else a / b
-                    "%" -> (a * b) / 100.0
-                    "^" -> a.pow(b)
-                    else -> Double.NaN
-                }
-                stack.push(res)
-            }
+    // Đánh giá biểu thức toán học và trả về kết quả số thực dạng Double.
+    private fun evaluateExpression(expression: String): Double? {
+        return try {
+            val tokens = tokenizeExpression(expression)
+            val rpn = infixToRPN(tokens)
+            evaluateRPN(rpn)
+        } catch (e: Exception) {
+            null
         }
-        return if (stack.isNotEmpty()) stack.pop() else Double.NaN
     }
 
-    // Tính giá trị giai thừa n! của một số thực nguyên dương.
-    private fun computeFactorial(n: Double): Double {
-        if (n < 0 || n != kotlin.math.floor(n)) return Double.NaN
-        if (n > 170) return Double.POSITIVE_INFINITY
-        var result = 1.0
-        val count = n.toInt()
-        for (i in 2..count) {
-            result *= i
-        }
-        return result
-    }
-
-    // Tách chuỗi biểu thức thành danh sách token số học, hàm và toán tử.
+    // Tách chuỗi biểu thức thành danh sách các token toán học riêng rẽ.
     private fun tokenizeExpression(expr: String): List<String> {
         val tokens = mutableListOf<String>()
         var i = 0
-        while (i < expr.length) {
-            val c = expr[i]
-            when {
-                c.isWhitespace() -> i++
-                c.isDigit() || c == '.' -> {
-                    val start = i
-                    while (i < expr.length && (expr[i].isDigit() || expr[i] == '.')) {
-                        i++
-                    }
-                    tokens.add(expr.substring(start, i))
-                }
-                c == '-' && (tokens.isEmpty() || tokens.last() in listOf("+", "-", "*", "/", "%", "^", "(")) -> {
-                    // Xử lý dấu âm đơn nguyên
+        val s = expr.replace(" ", "")
+
+        while (i < s.length) {
+            val c = s[i]
+
+            val matchedFunc = listOf("sin⁻¹", "cos⁻¹", "tan⁻¹", "sin", "cos", "tan", "ln", "lg").firstOrNull { s.startsWith(it, i) }
+            if (matchedFunc != null) {
+                tokens.add(matchedFunc)
+                i += matchedFunc.length
+                continue
+            }
+
+            if (c.isDigit() || c == ',' || (c == '-' && (tokens.isEmpty() || tokens.last() in listOf("+", "−", "×", "÷", "(", "^")))) {
+                val sb = StringBuilder()
+                if (c == '-') {
+                    sb.append('-')
                     i++
-                    val start = i
-                    while (i < expr.length && (expr[i].isDigit() || expr[i] == '.')) {
-                        i++
-                    }
-                    if (start < i) {
-                        tokens.add("-" + expr.substring(start, i))
-                    } else {
-                        tokens.add("-")
-                    }
                 }
-                c in listOf('+', '-', '*', '/', '%', '^', '(', ')', '!', 'π', 'e') -> {
+                while (i < s.length && (s[i].isDigit() || s[i] == ',' || s[i] == '.')) {
+                    if (s[i] == ',') sb.append('.') else if (s[i] != '.') sb.append(s[i])
+                    i++
+                }
+                tokens.add(sb.toString())
+                continue
+            }
+
+            when (c) {
+                '+', '−', '-', '×', '*', '÷', '/', '%', '^', '!', '(', ')', '√', 'π', 'e' -> {
                     tokens.add(c.toString())
                     i++
-                }
-                c.isLetter() -> {
-                    val start = i
-                    while (i < expr.length && expr[i].isLetter()) {
-                        i++
-                    }
-                    tokens.add(expr.substring(start, i))
                 }
                 else -> i++
             }
@@ -823,46 +593,172 @@ class CalculatorFragment : BaseToolFragment<FragmentCalculatorBinding>() {
         return tokens
     }
 
-    // Kiểm tra token có phải là tên một hàm khoa học hay không.
-    private fun isFunctionName(token: String): Boolean {
-        return token in listOf("sin", "cos", "tan", "asin", "acos", "atan", "ln", "log", "sqrt")
-    }
+    // Chuyển đổi biểu thức từ dạng trung tố (Infix) sang hậu tố (RPN) theo thuật toán Shunting-Yard.
+    private fun infixToRPN(tokens: List<String>): List<String> {
+        val output = mutableListOf<String>()
+        val opStack = Stack<String>()
 
-    // Kiểm tra token có phải là toán tử số học hay không.
-    private fun isOperator(token: String): Boolean {
-        return token in listOf("+", "-", "*", "/", "%", "^", "!")
-    }
-
-    // Xác định mức độ ưu tiên toán tử trong thuật toán phân tích cú pháp.
-    private fun getPrecedence(op: String): Int {
-        return when (op) {
-            "!" -> 5
-            "^" -> 4
-            "*", "/", "%" -> 3
-            "+", "-" -> 2
+        fun precedence(op: String): Int = when (op) {
+            "+", "−", "-" -> 1
+            "×", "*", "÷", "/", "%" -> 2
+            "^" -> 3
+            "!", "√", "sin", "cos", "tan", "sin⁻¹", "cos⁻¹", "tan⁻¹", "ln", "lg" -> 4
             else -> 0
         }
+
+        fun isRightAssociative(op: String): Boolean = op == "^"
+
+        for (token in tokens) {
+            if (token.toDoubleOrNull() != null) {
+                output.add(token)
+            } else if (token == "π") {
+                output.add(Math.PI.toString())
+            } else if (token == "e") {
+                output.add(Math.E.toString())
+            } else if (token in listOf("sin", "cos", "tan", "sin⁻¹", "cos⁻¹", "tan⁻¹", "ln", "lg", "√")) {
+                opStack.push(token)
+            } else if (token == "(") {
+                opStack.push(token)
+            } else if (token == ")") {
+                while (opStack.isNotEmpty() && opStack.peek() != "(") {
+                    output.add(opStack.pop())
+                }
+                if (opStack.isNotEmpty() && opStack.peek() == "(") {
+                    opStack.pop()
+                }
+                if (opStack.isNotEmpty() && opStack.peek() in listOf("sin", "cos", "tan", "sin⁻¹", "cos⁻¹", "tan⁻¹", "ln", "lg", "√")) {
+                    output.add(opStack.pop())
+                }
+            } else {
+                while (opStack.isNotEmpty() && opStack.peek() != "(" &&
+                    (precedence(opStack.peek()) > precedence(token) ||
+                            (precedence(opStack.peek()) == precedence(token) && !isRightAssociative(token)))
+                ) {
+                    output.add(opStack.pop())
+                }
+                opStack.push(token)
+            }
+        }
+
+        while (opStack.isNotEmpty()) {
+            val top = opStack.pop()
+            if (top != "(" && top != ")") {
+                output.add(top)
+            }
+        }
+        return output
     }
 
-    // Kích hoạt rung phản hồi nhẹ khi chạm phím máy tính.
+    // Đánh giá danh sách token hậu tố RPN và trả về kết quả số thực.
+    private fun evaluateRPN(tokens: List<String>): Double {
+        val stack = Stack<Double>()
+
+        for (token in tokens) {
+            val num = token.toDoubleOrNull()
+            if (num != null) {
+                stack.push(num)
+                continue
+            }
+
+            when (token) {
+                "+" -> {
+                    val b = stack.pop()
+                    val a = stack.pop()
+                    stack.push(a + b)
+                }
+                "−", "-" -> {
+                    val b = stack.pop()
+                    val a = stack.pop()
+                    stack.push(a - b)
+                }
+                "×", "*" -> {
+                    val b = stack.pop()
+                    val a = stack.pop()
+                    stack.push(a * b)
+                }
+                "÷", "/" -> {
+                    val b = stack.pop()
+                    val a = stack.pop()
+                    if (b == 0.0) throw ArithmeticException("Divide by zero")
+                    stack.push(a / b)
+                }
+                "%" -> {
+                    val a = stack.pop()
+                    stack.push(a / 100.0)
+                }
+                "^" -> {
+                    val b = stack.pop()
+                    val a = stack.pop()
+                    stack.push(a.pow(b))
+                }
+                "!" -> {
+                    val a = stack.pop()
+                    stack.push(factorial(a.toInt()).toDouble())
+                }
+                "√" -> {
+                    val a = stack.pop()
+                    stack.push(sqrt(a))
+                }
+                "sin" -> {
+                    val a = stack.pop()
+                    val rad = if (isDegreeMode) Math.toRadians(a) else a
+                    stack.push(sin(rad))
+                }
+                "cos" -> {
+                    val a = stack.pop()
+                    val rad = if (isDegreeMode) Math.toRadians(a) else a
+                    stack.push(cos(rad))
+                }
+                "tan" -> {
+                    val a = stack.pop()
+                    val rad = if (isDegreeMode) Math.toRadians(a) else a
+                    stack.push(tan(rad))
+                }
+                "sin⁻¹" -> {
+                    val a = stack.pop()
+                    val rad = asin(a)
+                    stack.push(if (isDegreeMode) Math.toDegrees(rad) else rad)
+                }
+                "cos⁻¹" -> {
+                    val a = stack.pop()
+                    val rad = acos(a)
+                    stack.push(if (isDegreeMode) Math.toDegrees(rad) else rad)
+                }
+                "tan⁻¹" -> {
+                    val a = stack.pop()
+                    val rad = atan(a)
+                    stack.push(if (isDegreeMode) Math.toDegrees(rad) else rad)
+                }
+                "ln" -> {
+                    val a = stack.pop()
+                    stack.push(ln(a))
+                }
+                "lg" -> {
+                    val a = stack.pop()
+                    stack.push(log10(a))
+                }
+            }
+        }
+        return if (stack.isNotEmpty()) stack.pop() else 0.0
+    }
+
+    // Tính giai thừa số nguyên dương n!
+    private fun factorial(n: Int): Long {
+        if (n < 0) return 0
+        var res = 1L
+        for (i in 2..n.coerceAtMost(20)) {
+            res *= i
+        }
+        return res
+    }
+
+    // Phát rung xúc giác nhẹ khi bấm các phím số và toán tử.
     private fun vibrateKey() {
         view?.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
     }
 
-    // Kích hoạt rung phản hồi xác nhận khi tính toán xong kết quả.
+    // Phát rung phản hồi mạnh hơn khi hoàn thành phép tính bằng dấu =.
     private fun vibrateConfirm() {
         view?.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
-    }
-
-    // Đổi màu nền MaterialButton tương thích ngược.
-    private fun View.setCardBackgroundColorCompat(color: Int) {
-        if (this is com.google.android.material.button.MaterialButton) {
-            this.backgroundTintList = ColorStateList.valueOf(color)
-        }
-    }
-
-    // Chuyển đổi đơn vị dp sang px cho padding hiển thị lịch sử.
-    private fun dpToPx(dp: Int): Int {
-        return (dp * resources.displayMetrics.density).toInt()
     }
 }

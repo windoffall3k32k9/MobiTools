@@ -177,7 +177,11 @@
     <!-- Máy tính nâng cao -->
     <string name="calc_history_title">Lịch sử tính toán</string>
     <string name="calc_clear_history">Xóa lịch sử</string>
+    <string name="calc_clear_history_confirm">Bạn có chắc chắn muốn xóa toàn bộ lịch sử tính toán không?</string>
     <string name="calc_history_empty">Chưa có lịch sử tính toán nào</string>
+    <string name="calc_history_empty_desc">Các phép tính bạn thực hiện sẽ được lưu tại đây theo từng ngày</string>
+    <string name="calc_history_today">Hôm nay</string>
+    <string name="calc_history_yesterday">Hôm qua</string>
     <string name="calc_copied">Đã sao chép kết quả vào bộ nhớ tạm</string>
     <string name="calc_angle_deg">Góc: Độ (DEG)</string>
     <string name="calc_angle_rad">Góc: Radian (RAD)</string>

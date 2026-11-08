@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorBackground"
+    android:orientation="vertical">
+
+    <!-- Thanh tiêu đề chuẩn sáng của trang Lịch sử tính toán -->
+    <LinearLayout
+        android:id="@+id/historyTopBar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp">
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/btnHistoryBack"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:clickable="true"
+            android:focusable="true"
+            app:cardBackgroundColor="@color/colorCardBackground"
+            app:cardCornerRadius="14dp"
+            app:cardElevation="0dp"
+            app:strokeColor="@color/colorBorder"
+            app:strokeWidth="1dp">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_arrow_back"
+                app:tint="@color/textPrimary" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <TextView
+            android:id="@+id/tvHistoryTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="14dp"
+            android:layout_weight="1"
+            android:text="@string/calc_history_title"
+            android:textColor="@color/textPrimary"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <!-- Nút xóa lịch sử -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/btnHistoryClear"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:clickable="true"
+            android:focusable="true"
+            app:cardBackgroundColor="@color/colorCardBackground"
+            app:cardCornerRadius="14dp"
+            app:cardElevation="0dp"
+            app:strokeColor="@color/colorBorder"
+            app:strokeWidth="1dp">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_trash"
+                app:tint="@color/colorDanger" />
+        </com.google.android.material.card.MaterialCardView>
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <!-- Danh sách RecyclerView phân tách theo từng ngày -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvHistory"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingTop="6dp"
+            android:paddingBottom="24dp"
+            tools:listitem="@layout/item_calculator_history" />
+
+        <!-- Trạng thái trống khi chưa có lịch sử tính toán -->
+        <LinearLayout
+            android:id="@+id/layoutHistoryEmpty"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="32dp"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:src="@drawable/ic_history"
+                app:tint="@color/textMuted" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/calc_history_empty"
+                android:textColor="@color/textPrimary"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:gravity="center"
+                android:text="@string/calc_history_empty_desc"
+                android:textColor="@color/textSecondary"
+                android:textSize="13sp" />
+        </LinearLayout>
+    </FrameLayout>
+
+</LinearLayout>
