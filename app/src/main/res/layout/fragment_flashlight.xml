@@ -1,96 +1,319 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorBackground"
     android:orientation="vertical">
 
-    <include layout="@layout/layout_tool_toolbar" />
-
-    <!-- Khu vực hiển thị bóng đèn / công tắc lớn -->
+    <!-- Thanh tiêu đề công cụ chuẩn sáng -->
     <LinearLayout
+        android:id="@+id/flashlightTopBar"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:padding="24dp">
+        android:layout_height="?attr/actionBarSize"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp">
 
+        <!-- Nút quay lại bo góc mềm -->
         <com.google.android.material.card.MaterialCardView
-            android:id="@+id/btnToggleFlashlight"
-            android:layout_width="160dp"
-            android:layout_height="160dp"
+            android:id="@+id/btnFlashlightBackCard"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
             android:clickable="true"
             android:focusable="true"
             app:cardBackgroundColor="@color/colorCardBackground"
-            app:cardCornerRadius="80dp"
-            app:cardElevation="6dp"
+            app:cardCornerRadius="14dp"
+            app:cardElevation="0dp"
             app:strokeColor="@color/colorBorder"
-            app:strokeWidth="2dp">
+            app:strokeWidth="1dp">
 
             <ImageView
-                android:id="@+id/ivFlashlightIcon"
-                android:layout_width="72dp"
-                android:layout_height="72dp"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
                 android:layout_gravity="center"
-                android:src="@drawable/ic_flashlight"
-                app:tint="@color/textSecondary" />
+                android:src="@drawable/ic_arrow_back"
+                app:tint="@color/textPrimary" />
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- Tiêu đề công cụ chính giữa -->
         <TextView
-            android:id="@+id/tvFlashlightStatus"
-            android:layout_width="wrap_content"
+            android:id="@+id/tvFlashlightTitle"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="28dp"
-            android:text="Đèn pin đang TẮT"
-            android:textColor="@color/textSecondary"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/tool_flashlight_title"
+            android:textColor="@color/textPrimary"
             android:textSize="18sp"
             android:textStyle="bold" />
 
+        <!-- Nút cài đặt đèn pin -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/btnFlashlightSettingsCard"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:clickable="true"
+            android:focusable="true"
+            app:cardBackgroundColor="@color/colorCardBackground"
+            app:cardCornerRadius="14dp"
+            app:cardElevation="0dp"
+            app:strokeColor="@color/colorBorder"
+            app:strokeWidth="1dp">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_settings_gear"
+                app:tint="@color/textPrimary" />
+        </com.google.android.material.card.MaterialCardView>
+    </LinearLayout>
+
+    <!-- Khu vực hiển thị trực quan đèn pin phần cứng -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <com.example.baseproject.ui.flashlight.FlashlightVisualView
+            android:id="@+id/flashlightVisualView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <!-- Cảnh báo khi thiết bị không có đèn flash -->
         <TextView
             android:id="@+id/tvFlashlightWarning"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="top|center_horizontal"
             android:layout_marginTop="8dp"
+            android:background="@drawable/bg_scanner_hint_pill"
+            android:paddingStart="16dp"
+            android:paddingTop="6dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="6dp"
             android:textColor="@color/colorDanger"
             android:textSize="13sp"
-            android:visibility="gone" />
-    </LinearLayout>
+            android:visibility="gone"
+            tools:text="Thiết bị không có đèn flash" />
+    </FrameLayout>
 
-    <!-- Tùy chọn chế độ nhấp nháy SOS -->
+    <!-- Thẻ điều chỉnh thanh độ sáng -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardBrightness"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="12dp"
+        app:cardBackgroundColor="@color/colorCardBackground"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="0dp"
+        app:strokeColor="@color/colorBorder"
+        app:strokeWidth="1dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="18dp"
+            android:paddingTop="14dp"
+            android:paddingEnd="18dp"
+            android:paddingBottom="14dp">
+
+            <!-- Hàng tiêu đề độ sáng và phần trăm -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/ivBrightnessSun"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:src="@drawable/ic_brightness_sun"
+                    app:tint="@color/textPrimary" />
+
+                <TextView
+                    android:id="@+id/tvBrightnessLabel"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_weight="1"
+                    android:text="@string/flashlight_brightness"
+                    android:textColor="@color/textPrimary"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvBrightnessPercent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="100%"
+                    android:textColor="@color/flashlightBlue"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- Thanh trượt mức sáng -->
+            <SeekBar
+                android:id="@+id/seekBrightness"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:max="100"
+                android:paddingStart="6dp"
+                android:paddingEnd="6dp"
+                android:progress="100"
+                android:progressBackgroundTint="#DCE7F7"
+                android:progressTint="@color/flashlightBlue"
+                android:splitTrack="false"
+                android:thumbTint="@color/flashlightBlue" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Danh sách các chế độ đèn pin ở đáy màn hình -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="22dp"
         android:gravity="center"
-        android:orientation="horizontal"
-        android:padding="24dp">
+        android:orientation="horizontal">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnSosMode"
-            style="@style/Widget.Material3.Button.TonalButton"
+        <!-- 1. Chế độ sáng liên tục -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardModeContinuous"
             android:layout_width="0dp"
-            android:layout_height="56dp"
-            android:layout_marginEnd="8dp"
+            android:layout_height="94dp"
+            android:layout_marginEnd="6dp"
             android:layout_weight="1"
-            android:text="Tín hiệu SOS"
-            android:textColor="@color/textPrimary"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            app:cornerRadius="16dp" />
+            android:clickable="true"
+            android:focusable="true"
+            app:cardBackgroundColor="@color/flashlightBlueSoft"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="0dp"
+            app:strokeColor="@color/flashlightBlue"
+            app:strokeWidth="1.8dp">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnScreenLight"
-            style="@style/Widget.Material3.Button.TonalButton"
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="8dp">
+
+                <ImageView
+                    android:id="@+id/ivModeContinuousIcon"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:src="@drawable/ic_mode_bulb"
+                    app:tint="@color/flashlightBlue" />
+
+                <TextView
+                    android:id="@+id/tvModeContinuousText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:gravity="center"
+                    android:text="@string/flashlight_mode_continuous"
+                    android:textColor="@color/flashlightBlue"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- 2. Chế độ nhấp nháy -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardModeStrobe"
             android:layout_width="0dp"
-            android:layout_height="56dp"
-            android:layout_marginStart="8dp"
+            android:layout_height="94dp"
+            android:layout_marginStart="3dp"
+            android:layout_marginEnd="3dp"
             android:layout_weight="1"
-            android:text="Sáng màn hình"
-            android:textColor="@color/textPrimary"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            app:cornerRadius="16dp" />
+            android:clickable="true"
+            android:focusable="true"
+            app:cardBackgroundColor="@color/colorCardBackground"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="0dp"
+            app:strokeColor="@color/colorBorder"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="8dp">
+
+                <ImageView
+                    android:id="@+id/ivModeStrobeIcon"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:src="@drawable/ic_mode_strobe"
+                    app:tint="@color/flashlightBlue" />
+
+                <TextView
+                    android:id="@+id/tvModeStrobeText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:gravity="center"
+                    android:text="@string/flashlight_mode_strobe"
+                    android:textColor="@color/textPrimary"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- 3. Chế độ phát tín hiệu SOS -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardModeSos"
+            android:layout_width="0dp"
+            android:layout_height="94dp"
+            android:layout_marginStart="6dp"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
+            app:cardBackgroundColor="@color/colorCardBackground"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="0dp"
+            app:strokeColor="@color/colorBorder"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="8dp">
+
+                <ImageView
+                    android:id="@+id/ivModeSosIcon"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:src="@drawable/ic_mode_sos"
+                    app:tint="@color/flashlightBlue" />
+
+                <TextView
+                    android:id="@+id/tvModeSosText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:gravity="center"
+                    android:text="@string/flashlight_mode_sos"
+                    android:textColor="@color/textPrimary"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
     </LinearLayout>
 
 </LinearLayout>

@@ -51,6 +51,17 @@
     <string name="tool_flashlight_title">Đèn pin</string>
     <string name="tool_flashlight_desc">Bật tắt đèn flash camera với chỉ báo trực quan</string>
     <string name="flash_not_available">Thiết bị không có đèn flash camera</string>
+    <string name="flashlight_brightness">Độ sáng</string>
+    <string name="flashlight_mode_continuous">Sáng liên tục</string>
+    <string name="flashlight_mode_strobe">Nhấp nháy</string>
+    <string name="flashlight_mode_sos">SOS</string>
+    <string name="flashlight_settings_title">Cài đặt đèn pin</string>
+    <string name="flashlight_auto_off">Tự động tắt sau</string>
+    <string name="flashlight_auto_off_never">Không bao giờ</string>
+    <string name="flashlight_auto_off_1m">1 phút</string>
+    <string name="flashlight_auto_off_5m">5 phút</string>
+    <string name="flashlight_auto_off_10m">10 phút</string>
+    <string name="flashlight_haptic">Rung phản hồi khi nhấn nút</string>
 
     <!-- 6. Tạo mã QR -->
     <string name="tool_qr_generator_title">Tạo mã QR</string>

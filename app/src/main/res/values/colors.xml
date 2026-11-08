@@ -40,4 +40,11 @@
     <color name="scanElectricBlue">#0066FF</color>
     <color name="scanLightBlue">#E1EFFF</color>
     <color name="scanPillBg">#F1F3F6</color>
+
+    <!-- Flashlight Colors -->
+    <color name="flashlightBlue">#0066FF</color>
+    <color name="flashlightBlueSoft">#EBF3FF</color>
+    <color name="flashlightBlueBorder">#0066FF</color>
+    <color name="flashlightBeamWarm">#FFD54F</color>
+    <color name="flashlightBeamSoft">#FFF8E1</color>
 </resources>
