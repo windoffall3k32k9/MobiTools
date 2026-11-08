@@ -1,14 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorBackground"
+    android:background="@color/colorSurface"
     android:orientation="vertical">
 
-    <include layout="@layout/layout_tool_toolbar" />
+    <!-- Thanh tiêu đề công cụ chuẩn -->
+    <include
+        android:id="@+id/toolbarLayout"
+        layout="@layout/layout_tool_toolbar" />
 
-    <!-- Khu vực hiển thị biểu thức và kết quả -->
+    <!-- Khu vực hiển thị lịch sử tính toán, biểu thức và kết quả trực tiếp -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -16,318 +20,1030 @@
         android:gravity="bottom|end"
         android:orientation="vertical"
         android:paddingStart="24dp"
+        android:paddingTop="8dp"
         android:paddingEnd="24dp"
-        android:paddingBottom="16dp">
+        android:paddingBottom="12dp">
 
+        <!-- Danh sách lịch sử tính toán cuộn tự động phía trên -->
+        <ScrollView
+            android:id="@+id/scrollHistory"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:fadeScrollbars="true"
+            android:fillViewport="true"
+            android:scrollbars="vertical">
+
+            <LinearLayout
+                android:id="@+id/layoutHistoryList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="bottom|end"
+                android:orientation="vertical" />
+        </ScrollView>
+
+        <!-- Dòng biểu thức chính đang gõ -->
         <HorizontalScrollView
-            android:layout_width="wrap_content"
+            android:id="@+id/scrollExpression"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="end"
+            android:layout_marginTop="8dp"
             android:scrollbars="none">
 
             <TextView
                 android:id="@+id/tvExpression"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/textSecondary"
-                android:textSize="22sp" />
+                android:layout_gravity="end"
+                android:ellipsize="none"
+                android:maxLines="1"
+                android:text=""
+                android:textColor="@color/textPrimary"
+                android:textSize="36sp"
+                android:textStyle="bold"
+                tools:text="46.464 + 56.464" />
         </HorizontalScrollView>
 
+        <!-- Dòng xem trước kết quả trực tiếp -->
         <HorizontalScrollView
-            android:layout_width="wrap_content"
+            android:id="@+id/scrollPreview"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="4dp"
             android:scrollbars="none">
 
             <TextView
-                android:id="@+id/tvResult"
+                android:id="@+id/tvPreviewResult"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="0"
-                android:textColor="@color/textPrimary"
-                android:textSize="44sp"
-                android:textStyle="bold" />
+                android:layout_gravity="end"
+                android:maxLines="1"
+                android:text=""
+                android:textColor="@color/textSecondary"
+                android:textSize="22sp"
+                tools:text="= 102.928" />
         </HorizontalScrollView>
+
     </LinearLayout>
 
+    <!-- Đường phân cách thanh mảnh -->
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
+        android:layout_marginHorizontal="16dp"
         android:background="@color/colorBorder" />
 
-    <!-- Bàn phím số và toán tử -->
-    <GridLayout
+    <!-- Khung chứa 2 chế độ bàn phím: Tiêu chuẩn (4x5) và Nâng cao (5x7) -->
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:columnCount="4"
-        android:padding="12dp"
-        android:rowCount="5">
+        android:paddingStart="12dp"
+        android:paddingTop="10dp"
+        android:paddingEnd="12dp"
+        android:paddingBottom="16dp">
 
-        <!-- Hàng 1 -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnAllClear"
-            style="@style/Widget.Material3.Button.TonalButton"
-            android:layout_width="0dp"
-            android:layout_height="64dp"
-            android:layout_columnWeight="1"
-            android:layout_margin="4dp"
-            android:text="AC"
-            android:textColor="@color/colorDanger"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            app:cornerRadius="16dp" />
+        <!-- ============================================== -->
+        <!-- BÀN PHÍM 1: TIÊU CHUẨN (STANDARD 4 x 5)       -->
+        <!-- ============================================== -->
+        <GridLayout
+            android:id="@+id/layoutStandardKeypad"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:columnCount="4"
+            android:rowCount="5"
+            android:visibility="visible">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnParentheses"
-            style="@style/Widget.Material3.Button.TonalButton"
-            android:layout_width="0dp"
-            android:layout_height="64dp"
-            android:layout_columnWeight="1"
-            android:layout_margin="4dp"
-            android:text="( )"
-            android:textColor="@color/colorPrimary"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            app:cornerRadius="16dp" />
+            <!-- Hàng 1: C, ⌫, %, ÷ -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnStdC"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="0dp"
+                android:layout_height="64dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="4dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="C"
+                android:textColor="@color/calcOrange"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                app:backgroundTint="@color/calcButtonBg"
+                app:cornerRadius="20dp"
+                app:elevation="0dp" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnPercent"
-            style="@style/Widget.Material3.Button.TonalButton"
-            android:layout_width="0dp"
-            android:layout_height="64dp"
-            android:layout_columnWeight="1"
-            android:layout_margin="4dp"
-            android:text="%"
-            android:textColor="@color/colorPrimary"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            app:cornerRadius="16dp" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnStdBackspace"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="0dp"
+                android:layout_height="64dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="4dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                app:backgroundTint="@color/calcButtonBg"
+                app:cornerRadius="20dp"
+                app:elevation="0dp"
+                app:icon="@drawable/ic_calc_backspace"
+                app:iconGravity="textStart"
+                app:iconPadding="0dp"
+                app:iconSize="22dp"
+                app:iconTint="@color/calcOrange" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnDivide"
-            style="@style/Widget.Material3.Button"
-            android:layout_width="0dp"
-            android:layout_height="64dp"
-            android:layout_columnWeight="1"
-            android:layout_margin="4dp"
-            android:backgroundTint="@color/colorPrimary"
-            android:text="÷"
-            android:textSize="22sp"
-            android:textStyle="bold"
-            app:cornerRadius="16dp" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnStdPercent"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="0dp"
+                android:layout_height="64dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="4dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="%"
+                android:textColor="@color/calcOrange"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                app:backgroundTint="@color/calcButtonBg"
+                app:cornerRadius="20dp"
+                app:elevation="0dp" />
 
-        <!-- Hàng 2 -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn7"
-            style="@style/Widget.Material3.Button.OutlinedButton"
-            android:layout_width="0dp"
-            android:layout_height="64dp"
-            android:layout_columnWeight="1"
-            android:layout_margin="4dp"
-            android:text="7"
-            android:textColor="@color/textPrimary"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            app:cornerRadius="16dp" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnStdDivide"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="0dp"
+                android:layout_height="64dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="4dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="÷"
+                android:textColor="@color/calcOrange"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                app:backgroundTint="@color/calcButtonBg"
+                app:cornerRadius="20dp"
+                app:elevation="0dp" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn8"
-            style="@style/Widget.Material3.Button.OutlinedButton"
-            android:layout_width="0dp"
-            android:layout_height="64dp"
-            android:layout_columnWeight="1"
-            android:layout_margin="4dp"
-            android:text="8"
-            android:textColor="@color/textPrimary"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            app:cornerRadius="16dp" />
+            <!-- Hàng 2: 7, 8, 9, × -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnStd7"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="0dp"
+                android:layout_height="64dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="4dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="7"
+                android:textColor="@color/textPrimary"
+                android:textSize="22sp"
+                app:backgroundTint="@color/calcButtonBg"
+                app:cornerRadius="20dp"
+                app:elevation="0dp" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn9"
-            style="@style/Widget.Material3.Button.OutlinedButton"
-            android:layout_width="0dp"
-            android:layout_height="64dp"
-            android:layout_columnWeight="1"
-            android:layout_margin="4dp"
-            android:text="9"
-            android:textColor="@color/textPrimary"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            app:cornerRadius="16dp" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnStd8"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="0dp"
+                android:layout_height="64dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="4dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="8"
+                android:textColor="@color/textPrimary"
+                android:textSize="22sp"
+                app:backgroundTint="@color/calcButtonBg"
+                app:cornerRadius="20dp"
+                app:elevation="0dp" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnMultiply"
-            style="@style/Widget.Material3.Button"
-            android:layout_width="0dp"
-            android:layout_height="64dp"
-            android:layout_columnWeight="1"
-            android:layout_margin="4dp"
-            android:backgroundTint="@color/colorPrimary"
-            android:text="×"
-            android:textSize="22sp"
-            android:textStyle="bold"
-            app:cornerRadius="16dp" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnStd9"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="0dp"
+                android:layout_height="64dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="4dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="9"
+                android:textColor="@color/textPrimary"
+                android:textSize="22sp"
+                app:backgroundTint="@color/calcButtonBg"
+                app:cornerRadius="20dp"
+                app:elevation="0dp" />
 
-        <!-- Hàng 3 -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn4"
-            style="@style/Widget.Material3.Button.OutlinedButton"
-            android:layout_width="0dp"
-            android:layout_height="64dp"
-            android:layout_columnWeight="1"
-            android:layout_margin="4dp"
-            android:text="4"
-            android:textColor="@color/textPrimary"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            app:cornerRadius="16dp" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnStdMultiply"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="0dp"
+                android:layout_height="64dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="4dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="×"
+                android:textColor="@color/calcOrange"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                app:backgroundTint="@color/calcButtonBg"
+                app:cornerRadius="20dp"
+                app:elevation="0dp" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn5"
-            style="@style/Widget.Material3.Button.OutlinedButton"
-            android:layout_width="0dp"
-            android:layout_height="64dp"
-            android:layout_columnWeight="1"
-            android:layout_margin="4dp"
-            android:text="5"
-            android:textColor="@color/textPrimary"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            app:cornerRadius="16dp" />
+            <!-- Hàng 3: 4, 5, 6, − -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnStd4"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="0dp"
+                android:layout_height="64dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="4dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="4"
+                android:textColor="@color/textPrimary"
+                android:textSize="22sp"
+                app:backgroundTint="@color/calcButtonBg"
+                app:cornerRadius="20dp"
+                app:elevation="0dp" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn6"
-            style="@style/Widget.Material3.Button.OutlinedButton"
-            android:layout_width="0dp"
-            android:layout_height="64dp"
-            android:layout_columnWeight="1"
-            android:layout_margin="4dp"
-            android:text="6"
-            android:textColor="@color/textPrimary"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            app:cornerRadius="16dp" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnStd5"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="0dp"
+                android:layout_height="64dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="4dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="5"
+                android:textColor="@color/textPrimary"
+                android:textSize="22sp"
+                app:backgroundTint="@color/calcButtonBg"
+                app:cornerRadius="20dp"
+                app:elevation="0dp" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnSubtract"
-            style="@style/Widget.Material3.Button"
-            android:layout_width="0dp"
-            android:layout_height="64dp"
-            android:layout_columnWeight="1"
-            android:layout_margin="4dp"
-            android:backgroundTint="@color/colorPrimary"
-            android:text="−"
-            android:textSize="22sp"
-            android:textStyle="bold"
-            app:cornerRadius="16dp" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnStd6"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="0dp"
+                android:layout_height="64dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="4dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="6"
+                android:textColor="@color/textPrimary"
+                android:textSize="22sp"
+                app:backgroundTint="@color/calcButtonBg"
+                app:cornerRadius="20dp"
+                app:elevation="0dp" />
 
-        <!-- Hàng 4 -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn1"
-            style="@style/Widget.Material3.Button.OutlinedButton"
-            android:layout_width="0dp"
-            android:layout_height="64dp"
-            android:layout_columnWeight="1"
-            android:layout_margin="4dp"
-            android:text="1"
-            android:textColor="@color/textPrimary"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            app:cornerRadius="16dp" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnStdSubtract"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="0dp"
+                android:layout_height="64dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="4dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="−"
+                android:textColor="@color/calcOrange"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                app:backgroundTint="@color/calcButtonBg"
+                app:cornerRadius="20dp"
+                app:elevation="0dp" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn2"
-            style="@style/Widget.Material3.Button.OutlinedButton"
-            android:layout_width="0dp"
-            android:layout_height="64dp"
-            android:layout_columnWeight="1"
-            android:layout_margin="4dp"
-            android:text="2"
-            android:textColor="@color/textPrimary"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            app:cornerRadius="16dp" />
+            <!-- Hàng 4: 1, 2, 3, + -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnStd1"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="0dp"
+                android:layout_height="64dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="4dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="1"
+                android:textColor="@color/textPrimary"
+                android:textSize="22sp"
+                app:backgroundTint="@color/calcButtonBg"
+                app:cornerRadius="20dp"
+                app:elevation="0dp" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn3"
-            style="@style/Widget.Material3.Button.OutlinedButton"
-            android:layout_width="0dp"
-            android:layout_height="64dp"
-            android:layout_columnWeight="1"
-            android:layout_margin="4dp"
-            android:text="3"
-            android:textColor="@color/textPrimary"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            app:cornerRadius="16dp" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnStd2"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="0dp"
+                android:layout_height="64dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="4dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="2"
+                android:textColor="@color/textPrimary"
+                android:textSize="22sp"
+                app:backgroundTint="@color/calcButtonBg"
+                app:cornerRadius="20dp"
+                app:elevation="0dp" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnAdd"
-            style="@style/Widget.Material3.Button"
-            android:layout_width="0dp"
-            android:layout_height="64dp"
-            android:layout_columnWeight="1"
-            android:layout_margin="4dp"
-            android:backgroundTint="@color/colorPrimary"
-            android:text="+"
-            android:textSize="22sp"
-            android:textStyle="bold"
-            app:cornerRadius="16dp" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnStd3"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="0dp"
+                android:layout_height="64dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="4dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="3"
+                android:textColor="@color/textPrimary"
+                android:textSize="22sp"
+                app:backgroundTint="@color/calcButtonBg"
+                app:cornerRadius="20dp"
+                app:elevation="0dp" />
 
-        <!-- Hàng 5 -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn0"
-            style="@style/Widget.Material3.Button.OutlinedButton"
-            android:layout_width="0dp"
-            android:layout_height="64dp"
-            android:layout_columnWeight="1"
-            android:layout_margin="4dp"
-            android:text="0"
-            android:textColor="@color/textPrimary"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            app:cornerRadius="16dp" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnStdAdd"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="0dp"
+                android:layout_height="64dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="4dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="+"
+                android:textColor="@color/calcOrange"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                app:backgroundTint="@color/calcButtonBg"
+                app:cornerRadius="20dp"
+                app:elevation="0dp" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnDot"
-            style="@style/Widget.Material3.Button.OutlinedButton"
-            android:layout_width="0dp"
-            android:layout_height="64dp"
-            android:layout_columnWeight="1"
-            android:layout_margin="4dp"
-            android:text="."
-            android:textColor="@color/textPrimary"
-            android:textSize="22sp"
-            android:textStyle="bold"
-            app:cornerRadius="16dp" />
+            <!-- Hàng 5: Toggle nâng cao, 0, ,, = -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnStdToggleMode"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="0dp"
+                android:layout_height="64dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="4dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                app:backgroundTint="@color/calcButtonBg"
+                app:cornerRadius="20dp"
+                app:elevation="0dp"
+                app:icon="@drawable/ic_calc_mode_toggle"
+                app:iconGravity="textStart"
+                app:iconPadding="0dp"
+                app:iconSize="22dp"
+                app:iconTint="@color/calcOrange" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnBackspace"
-            style="@style/Widget.Material3.Button.TonalButton"
-            android:layout_width="0dp"
-            android:layout_height="64dp"
-            android:layout_columnWeight="1"
-            android:layout_margin="4dp"
-            android:text="⌫"
-            android:textColor="@color/textSecondary"
-            android:textSize="20sp"
-            app:cornerRadius="16dp" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnStd0"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="0dp"
+                android:layout_height="64dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="4dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="0"
+                android:textColor="@color/textPrimary"
+                android:textSize="22sp"
+                app:backgroundTint="@color/calcButtonBg"
+                app:cornerRadius="20dp"
+                app:elevation="0dp" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnEquals"
-            style="@style/Widget.Material3.Button"
-            android:layout_width="0dp"
-            android:layout_height="64dp"
-            android:layout_columnWeight="1"
-            android:layout_margin="4dp"
-            android:backgroundTint="@color/colorSuccess"
-            android:text="="
-            android:textSize="24sp"
-            android:textStyle="bold"
-            app:cornerRadius="16dp" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnStdComma"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="0dp"
+                android:layout_height="64dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="4dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text=","
+                android:textColor="@color/textPrimary"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                app:backgroundTint="@color/calcButtonBg"
+                app:cornerRadius="20dp"
+                app:elevation="0dp" />
 
-    </GridLayout>
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnStdEquals"
+                style="@style/Widget.Material3.Button"
+                android:layout_width="0dp"
+                android:layout_height="64dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="4dp"
+                android:backgroundTint="@color/calcOrange"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="="
+                android:textColor="@color/white"
+                android:textSize="26sp"
+                android:textStyle="bold"
+                app:cornerRadius="20dp"
+                app:elevation="0dp" />
+
+        </GridLayout>
+
+        <!-- ============================================== -->
+        <!-- BÀN PHÍM 2: KHOA HỌC MỞ RỘNG (SCIENTIFIC 5 x 7) -->
+        <!-- ============================================== -->
+        <GridLayout
+            android:id="@+id/layoutScientificKeypad"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:columnCount="5"
+            android:rowCount="7"
+            android:visibility="gone">
+
+            <!-- Hàng 1: 2nd, deg, sin, cos, tan -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSci2nd"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="2dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="2nd"
+                android:textColor="@color/textPrimary"
+                android:textSize="14sp"
+                app:backgroundTint="@color/calcButtonBg"
+                app:cornerRadius="16dp"
+                app:elevation="0dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSciAngleMode"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="2dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="deg"
+                android:textColor="@color/textPrimary"
+                android:textSize="14sp"
+                app:backgroundTint="@color/calcButtonBg"
+                app:cornerRadius="16dp"
+                app:elevation="0dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSciSin"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="2dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="sin"
+                android:textColor="@color/textPrimary"
+                android:textSize="14sp"
+                app:backgroundTint="@color/calcButtonBg"
+                app:cornerRadius="16dp"
+                app:elevation="0dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSciCos"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="2dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="cos"
+                android:textColor="@color/textPrimary"
+                android:textSize="14sp"
+                app:backgroundTint="@color/calcButtonBg"
+                app:cornerRadius="16dp"
+                app:elevation="0dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSciTan"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="2dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="tan"
+                android:textColor="@color/textPrimary"
+                android:textSize="14sp"
+                app:backgroundTint="@color/calcButtonBg"
+                app:cornerRadius="16dp"
+                app:elevation="0dp" />
+
+            <!-- Hàng 2: xʸ, lg, ln, (, ) -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSciPower"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="2dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="xʸ"
+                android:textColor="@color/textPrimary"
+                android:textSize="14sp"
+                app:backgroundTint="@color/calcButtonBg"
+                app:cornerRadius="16dp"
+                app:elevation="0dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSciLog"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="2dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="lg"
+                android:textColor="@color/textPrimary"
+                android:textSize="14sp"
+                app:backgroundTint="@color/calcButtonBg"
+                app:cornerRadius="16dp"
+                app:elevation="0dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSciLn"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="2dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="ln"
+                android:textColor="@color/textPrimary"
+                android:textSize="14sp"
+                app:backgroundTint="@color/calcButtonBg"
+                app:cornerRadius="16dp"
+                app:elevation="0dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSciOpenParen"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="2dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="("
+                android:textColor="@color/textPrimary"
+                android:textSize="17sp"
+                app:backgroundTint="@color/calcButtonBg"
+                app:cornerRadius="16dp"
+                app:elevation="0dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSciCloseParen"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="2dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text=")"
+                android:textColor="@color/textPrimary"
+                android:textSize="17sp"
+                app:backgroundTint="@color/calcButtonBg"
+                app:cornerRadius="16dp"
+                app:elevation="0dp" />
+
+            <!-- Hàng 3: √x, C, ⌫, %, ÷ -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSciSqrt"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="2dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="√x"
+                android:textColor="@color/textPrimary"
+                android:textSize="15sp"
+                app:backgroundTint="@color/calcButtonBg"
+                app:cornerRadius="16dp"
+                app:elevation="0dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSciC"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="2dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="C"
+                android:textColor="@color/calcOrange"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:backgroundTint="@color/calcButtonBg"
+                app:cornerRadius="16dp"
+                app:elevation="0dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSciBackspace"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="2dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                app:backgroundTint="@color/calcButtonBg"
+                app:cornerRadius="16dp"
+                app:elevation="0dp"
+                app:icon="@drawable/ic_calc_backspace"
+                app:iconGravity="textStart"
+                app:iconPadding="0dp"
+                app:iconSize="18dp"
+                app:iconTint="@color/calcOrange" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSciPercent"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="2dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="%"
+                android:textColor="@color/calcOrange"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:backgroundTint="@color/calcButtonBg"
+                app:cornerRadius="16dp"
+                app:elevation="0dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSciDivide"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="2dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="÷"
+                android:textColor="@color/calcOrange"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:backgroundTint="@color/calcButtonBg"
+                app:cornerRadius="16dp"
+                app:elevation="0dp" />
+
+            <!-- Hàng 4: x!, 7, 8, 9, × -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSciFactorial"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="2dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="x!"
+                android:textColor="@color/textPrimary"
+                android:textSize="15sp"
+                app:backgroundTint="@color/calcButtonBg"
+                app:cornerRadius="16dp"
+                app:elevation="0dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSci7"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="2dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="7"
+                android:textColor="@color/textPrimary"
+                android:textSize="18sp"
+                app:backgroundTint="@color/calcButtonBg"
+                app:cornerRadius="16dp"
+                app:elevation="0dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSci8"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="2dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="8"
+                android:textColor="@color/textPrimary"
+                android:textSize="18sp"
+                app:backgroundTint="@color/calcButtonBg"
+                app:cornerRadius="16dp"
+                app:elevation="0dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSci9"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="2dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="9"
+                android:textColor="@color/textPrimary"
+                android:textSize="18sp"
+                app:backgroundTint="@color/calcButtonBg"
+                app:cornerRadius="16dp"
+                app:elevation="0dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSciMultiply"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="2dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="×"
+                android:textColor="@color/calcOrange"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:backgroundTint="@color/calcButtonBg"
+                app:cornerRadius="16dp"
+                app:elevation="0dp" />
+
+            <!-- Hàng 5: 1/x, 4, 5, 6, − -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSciReciprocal"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="2dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="1/x"
+                android:textColor="@color/textPrimary"
+                android:textSize="14sp"
+                app:backgroundTint="@color/calcButtonBg"
+                app:cornerRadius="16dp"
+                app:elevation="0dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSci4"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="2dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="4"
+                android:textColor="@color/textPrimary"
+                android:textSize="18sp"
+                app:backgroundTint="@color/calcButtonBg"
+                app:cornerRadius="16dp"
+                app:elevation="0dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSci5"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="2dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="5"
+                android:textColor="@color/textPrimary"
+                android:textSize="18sp"
+                app:backgroundTint="@color/calcButtonBg"
+                app:cornerRadius="16dp"
+                app:elevation="0dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSci6"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="2dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="6"
+                android:textColor="@color/textPrimary"
+                android:textSize="18sp"
+                app:backgroundTint="@color/calcButtonBg"
+                app:cornerRadius="16dp"
+                app:elevation="0dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSciSubtract"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="2dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="−"
+                android:textColor="@color/calcOrange"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:backgroundTint="@color/calcButtonBg"
+                app:cornerRadius="16dp"
+                app:elevation="0dp" />
+
+            <!-- Hàng 6: π, 1, 2, 3, + -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSciPi"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="2dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="π"
+                android:textColor="@color/textPrimary"
+                android:textSize="16sp"
+                app:backgroundTint="@color/calcButtonBg"
+                app:cornerRadius="16dp"
+                app:elevation="0dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSci1"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="2dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="1"
+                android:textColor="@color/textPrimary"
+                android:textSize="18sp"
+                app:backgroundTint="@color/calcButtonBg"
+                app:cornerRadius="16dp"
+                app:elevation="0dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSci2"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="2dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="2"
+                android:textColor="@color/textPrimary"
+                android:textSize="18sp"
+                app:backgroundTint="@color/calcButtonBg"
+                app:cornerRadius="16dp"
+                app:elevation="0dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSci3"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="2dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="3"
+                android:textColor="@color/textPrimary"
+                android:textSize="18sp"
+                app:backgroundTint="@color/calcButtonBg"
+                app:cornerRadius="16dp"
+                app:elevation="0dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSciAdd"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="2dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="+"
+                android:textColor="@color/calcOrange"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:backgroundTint="@color/calcButtonBg"
+                app:cornerRadius="16dp"
+                app:elevation="0dp" />
+
+            <!-- Hàng 7: Toggle, e, 0, ,, = -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSciToggleMode"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="2dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                app:backgroundTint="@color/calcButtonBg"
+                app:cornerRadius="16dp"
+                app:elevation="0dp"
+                app:icon="@drawable/ic_calc_mode_toggle"
+                app:iconGravity="textStart"
+                app:iconPadding="0dp"
+                app:iconSize="18dp"
+                app:iconTint="@color/calcOrange" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSciE"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="2dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="e"
+                android:textColor="@color/textPrimary"
+                android:textSize="16sp"
+                app:backgroundTint="@color/calcButtonBg"
+                app:cornerRadius="16dp"
+                app:elevation="0dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSci0"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="2dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="0"
+                android:textColor="@color/textPrimary"
+                android:textSize="18sp"
+                app:backgroundTint="@color/calcButtonBg"
+                app:cornerRadius="16dp"
+                app:elevation="0dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSciComma"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="2dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text=","
+                android:textColor="@color/textPrimary"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:backgroundTint="@color/calcButtonBg"
+                app:cornerRadius="16dp"
+                app:elevation="0dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSciEquals"
+                style="@style/Widget.Material3.Button"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="2dp"
+                android:backgroundTint="@color/calcOrange"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="="
+                android:textColor="@color/white"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                app:cornerRadius="16dp"
+                app:elevation="0dp" />
+
+        </GridLayout>
+
+    </FrameLayout>
 
 </LinearLayout>

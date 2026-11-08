@@ -29,4 +29,10 @@
     <color name="darkBackground">#0B0F19</color>
     <color name="darkSurface">#131B2E</color>
     <color name="darkBorder">#1E293B</color>
+
+    <!-- Calculator Colors -->
+    <color name="calcOrange">#FF7A00</color>
+    <color name="calcOrangeLight">#FFEDD5</color>
+    <color name="calcButtonBg">#F2F4F7</color>
+    <color name="calcButtonBgPressed">#E2E8F0</color>
 </resources>
