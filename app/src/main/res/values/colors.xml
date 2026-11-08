@@ -47,4 +47,9 @@
     <color name="flashlightBlueBorder">#0066FF</color>
     <color name="flashlightBeamWarm">#FFD54F</color>
     <color name="flashlightBeamSoft">#FFF8E1</color>
+
+    <!-- QR Generator Colors -->
+    <color name="qrBlue">#0066FF</color>
+    <color name="qrBlueLight">#EBF3FF</color>
+    <color name="qrInputBg">#F1F3F7</color>
 </resources>

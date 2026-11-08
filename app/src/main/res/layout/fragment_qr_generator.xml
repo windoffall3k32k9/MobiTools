@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorBackground"
@@ -11,113 +12,631 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <include layout="@layout/layout_tool_toolbar" />
-
+        <!-- Thanh tiêu đề công cụ chuẩn sáng -->
         <LinearLayout
+            android:id="@+id/qrTopBar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="20dp">
+            android:layout_height="?attr/actionBarSize"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp">
 
-            <!-- Ô nhập nội dung văn bản / link -->
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/enter_qr_content"
-                app:boxCornerRadiusBottomEnd="16dp"
-                app:boxCornerRadiusBottomStart="16dp"
-                app:boxCornerRadiusTopEnd="16dp"
-                app:boxCornerRadiusTopStart="16dp">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etQrInput"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="top|start"
-                    android:inputType="textMultiLine"
-                    android:minLines="3"
-                    android:textColor="@color/textPrimary"
-                    android:textSize="14sp" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnGenerate"
-                style="@style/Widget.Material3.Button"
-                android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:layout_marginTop="12dp"
-                android:backgroundTint="@color/colorPrimary"
-                android:text="@string/generate_qr"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                app:cornerRadius="14dp" />
-
-            <!-- Khung xem trước mã QR -->
+            <!-- Nút quay lại bo góc mềm -->
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardQrPreview"
-                android:layout_width="260dp"
-                android:layout_height="260dp"
-                android:layout_gravity="center"
-                android:layout_marginTop="24dp"
-                android:visibility="gone"
-                app:cardBackgroundColor="@color/white"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="2dp"
+                android:id="@+id/btnQrBackCard"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:clickable="true"
+                android:focusable="true"
+                app:cardBackgroundColor="@color/colorCardBackground"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="0dp"
                 app:strokeColor="@color/colorBorder"
                 app:strokeWidth="1dp">
 
                 <ImageView
-                    android:id="@+id/ivQrCode"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_margin="16dp"
-                    android:scaleType="fitCenter" />
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_arrow_back"
+                    app:tint="@color/textPrimary" />
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Nút thao tác sau khi tạo mã -->
+            <!-- Tiêu đề công cụ -->
+            <TextView
+                android:id="@+id/tvQrTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="14dp"
+                android:layout_weight="1"
+                android:text="@string/tool_qr_generator_title"
+                android:textColor="@color/textPrimary"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <!-- Nút xem lịch sử mã QR -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/btnQrHistoryCard"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:clickable="true"
+                android:focusable="true"
+                app:cardBackgroundColor="@color/colorCardBackground"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/colorBorder"
+                app:strokeWidth="1dp">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_history"
+                    app:tint="@color/textPrimary" />
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
+
+        <!-- Thanh chuyển đổi danh mục: Văn bản / URL / Wi-Fi -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:orientation="horizontal">
+
+            <!-- 1. Tab Văn bản -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/tabQrText"
+                android:layout_width="0dp"
+                android:layout_height="68dp"
+                android:layout_marginEnd="6dp"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:focusable="true"
+                app:cardBackgroundColor="@color/qrBlue"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/qrBlue"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/ivTabTextIcon"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_qr_type_text"
+                        app:tint="@color/white" />
+
+                    <TextView
+                        android:id="@+id/tvTabTextTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="@string/qr_tab_text"
+                        android:textColor="@color/white"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- 2. Tab URL -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/tabQrUrl"
+                android:layout_width="0dp"
+                android:layout_height="68dp"
+                android:layout_marginStart="3dp"
+                android:layout_marginEnd="3dp"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:focusable="true"
+                app:cardBackgroundColor="@color/colorCardBackground"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/colorBorder"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/ivTabUrlIcon"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_qr_type_url"
+                        app:tint="@color/textPrimary" />
+
+                    <TextView
+                        android:id="@+id/tvTabUrlTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="@string/qr_tab_url"
+                        android:textColor="@color/textPrimary"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- 3. Tab Wi-Fi -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/tabQrWifi"
+                android:layout_width="0dp"
+                android:layout_height="68dp"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:focusable="true"
+                app:cardBackgroundColor="@color/colorCardBackground"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/colorBorder"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/ivTabWifiIcon"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_qr_type_wifi"
+                        app:tint="@color/textPrimary" />
+
+                    <TextView
+                        android:id="@+id/tvTabWifiTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="@string/qr_tab_wifi"
+                        android:textColor="@color/textPrimary"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
+
+        <!-- Tiêu đề và hướng dẫn loại nội dung -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/ivSectionIcon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_qr_type_text"
+                app:tint="@color/qrBlue" />
+
             <LinearLayout
-                android:id="@+id/layoutQrActions"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvSectionTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/qr_header_text_title"
+                    android:textColor="@color/textPrimary"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvSectionSub"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="1dp"
+                    android:text="@string/qr_header_text_sub"
+                    android:textColor="@color/textSecondary"
+                    android:textSize="12sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Khung nhập dữ liệu: Văn bản -->
+        <RelativeLayout
+            android:id="@+id/layoutInputText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/bg_qr_input_box"
+            android:paddingStart="14dp"
+            android:paddingTop="10dp"
+            android:paddingEnd="12dp"
+            android:paddingBottom="10dp"
+            android:visibility="visible">
+
+            <EditText
+                android:id="@+id/etInputText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:gravity="center"
+                android:layout_alignParentStart="true"
+                android:layout_toStartOf="@+id/btnClearText"
+                android:background="@null"
+                android:gravity="top|start"
+                android:hint="@string/enter_qr_content"
+                android:inputType="textMultiLine"
+                android:minLines="3"
+                android:textColor="@color/textPrimary"
+                android:textColorHint="@color/textMuted"
+                android:textSize="14sp" />
+
+            <ImageView
+                android:id="@+id/btnClearText"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentTop="true"
+                android:padding="5dp"
+                android:src="@drawable/ic_close"
+                app:tint="@color/textSecondary" />
+        </RelativeLayout>
+
+        <!-- Khung nhập dữ liệu: URL -->
+        <RelativeLayout
+            android:id="@+id/layoutInputUrl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/bg_qr_input_box"
+            android:paddingStart="14dp"
+            android:paddingTop="12dp"
+            android:paddingEnd="12dp"
+            android:paddingBottom="12dp"
+            android:visibility="gone">
+
+            <EditText
+                android:id="@+id/etInputUrl"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_toStartOf="@+id/btnClearUrl"
+                android:background="@null"
+                android:hint="https://github.com/windoffall303209"
+                android:inputType="textUri"
+                android:maxLines="1"
+                android:textColor="@color/textPrimary"
+                android:textColorHint="@color/textMuted"
+                android:textSize="14sp" />
+
+            <ImageView
+                android:id="@+id/btnClearUrl"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:padding="5dp"
+                android:src="@drawable/ic_close"
+                app:tint="@color/textSecondary" />
+        </RelativeLayout>
+
+        <!-- Khung nhập dữ liệu: Wi-Fi -->
+        <LinearLayout
+            android:id="@+id/layoutInputWifi"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="16dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <!-- SSID -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/qr_wifi_ssid_label"
+                android:textColor="@color/textPrimary"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="6dp"
+                android:background="@drawable/bg_qr_input_box"
+                android:paddingStart="14dp"
+                android:paddingEnd="12dp">
+
+                <EditText
+                    android:id="@+id/etInputWifiSsid"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentStart="true"
+                    android:layout_toStartOf="@+id/btnClearWifiSsid"
+                    android:background="@null"
+                    android:hint="@string/qr_wifi_ssid_hint"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:textColor="@color/textPrimary"
+                    android:textColorHint="@color/textMuted"
+                    android:textSize="14sp" />
+
+                <ImageView
+                    android:id="@+id/btnClearWifiSsid"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:padding="5dp"
+                    android:src="@drawable/ic_close"
+                    app:tint="@color/textSecondary" />
+            </RelativeLayout>
+
+            <!-- Password -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="@string/qr_wifi_password_label"
+                android:textColor="@color/textPrimary"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="6dp"
+                android:background="@drawable/bg_qr_input_box"
+                android:paddingStart="14dp"
+                android:paddingEnd="12dp">
+
+                <EditText
+                    android:id="@+id/etInputWifiPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentStart="true"
+                    android:layout_toStartOf="@+id/btnToggleWifiPassword"
+                    android:background="@null"
+                    android:hint="@string/qr_wifi_password_hint"
+                    android:inputType="textPassword"
+                    android:maxLines="1"
+                    android:textColor="@color/textPrimary"
+                    android:textColorHint="@color/textMuted"
+                    android:textSize="14sp" />
+
+                <ImageView
+                    android:id="@+id/btnToggleWifiPassword"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:padding="3dp"
+                    android:src="@drawable/ic_visibility_eye"
+                    app:tint="@color/textSecondary" />
+            </RelativeLayout>
+
+            <!-- Security type -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="@string/qr_wifi_security_label"
+                android:textColor="@color/textPrimary"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:id="@+id/layoutWifiSecurity"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="6dp"
+                android:background="@drawable/bg_qr_input_box"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:visibility="gone">
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp">
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnSaveQr"
-                    style="@style/Widget.Material3.Button.TonalButton"
+                <TextView
+                    android:id="@+id/tvWifiSecurityValue"
                     android:layout_width="0dp"
-                    android:layout_height="52dp"
-                    android:layout_marginEnd="8dp"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="@string/save"
-                    android:textColor="@color/colorPrimary"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    app:cornerRadius="14dp"
-                    app:icon="@drawable/ic_copy"
-                    app:iconGravity="textStart"
-                    app:iconTint="@color/colorPrimary" />
+                    android:text="WPA/WPA2"
+                    android:textColor="@color/textPrimary"
+                    android:textSize="14sp" />
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnShareQr"
-                    style="@style/Widget.Material3.Button.TonalButton"
-                    android:layout_width="0dp"
-                    android:layout_height="52dp"
-                    android:layout_marginStart="8dp"
-                    android:layout_weight="1"
-                    android:text="@string/share"
-                    android:textColor="@color/colorPrimary"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    app:cornerRadius="14dp"
-                    app:icon="@drawable/ic_share"
-                    app:iconGravity="textStart"
-                    app:iconTint="@color/colorPrimary" />
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_chevron_down"
+                    app:tint="@color/textSecondary" />
             </LinearLayout>
-
         </LinearLayout>
+
+        <!-- Nút Tạo mã QR lớn -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnGenerateQr"
+            style="@style/Widget.Material3.Button"
+            android:layout_width="match_parent"
+            android:layout_height="54dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:backgroundTint="@color/qrBlue"
+            android:text="@string/generate_qr"
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            app:cornerRadius="16dp"
+            app:icon="@drawable/ic_qr_code"
+            app:iconGravity="textStart"
+            app:iconPadding="8dp"
+            app:iconTint="@color/white" />
+
+        <!-- Khung xem trước mã QR bo góc lớn -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardQrPreview"
+            android:layout_width="250dp"
+            android:layout_height="250dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="20dp"
+            app:cardBackgroundColor="@color/white"
+            app:cardCornerRadius="22dp"
+            app:cardElevation="0dp"
+            app:strokeColor="@color/colorBorder"
+            app:strokeWidth="1dp">
+
+            <ImageView
+                android:id="@+id/ivQrCode"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="14dp"
+                android:scaleType="fitCenter" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Bộ 3 thẻ thao tác ở chân màn hình: Tải xuống / Chia sẻ / Sao chép -->
+        <LinearLayout
+            android:id="@+id/layoutQrActions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="18dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="28dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <!-- 1. Tải xuống -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardQrDownload"
+                android:layout_width="0dp"
+                android:layout_height="66dp"
+                android:layout_marginEnd="6dp"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:focusable="true"
+                app:cardBackgroundColor="@color/colorCardBackground"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/colorBorder"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:src="@drawable/ic_download"
+                        app:tint="@color/textPrimary" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="@string/qr_action_download"
+                        android:textColor="@color/textPrimary"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- 2. Chia sẻ -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardQrShare"
+                android:layout_width="0dp"
+                android:layout_height="66dp"
+                android:layout_marginStart="3dp"
+                android:layout_marginEnd="3dp"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:focusable="true"
+                app:cardBackgroundColor="@color/colorCardBackground"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/colorBorder"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:src="@drawable/ic_share"
+                        app:tint="@color/textPrimary" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="@string/qr_action_share"
+                        android:textColor="@color/textPrimary"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- 3. Sao chép -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardQrCopy"
+                android:layout_width="0dp"
+                android:layout_height="66dp"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:focusable="true"
+                app:cardBackgroundColor="@color/colorCardBackground"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/colorBorder"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:src="@drawable/ic_copy"
+                        app:tint="@color/textPrimary" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="@string/qr_action_copy"
+                        android:textColor="@color/textPrimary"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
+
     </LinearLayout>
 </ScrollView>

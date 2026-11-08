@@ -69,6 +69,29 @@
     <string name="enter_qr_content">Nhập nội dung cần tạo mã QR…</string>
     <string name="generate_qr">Tạo mã QR</string>
     <string name="qr_saved_successfully">Đã lưu ảnh mã QR thành công</string>
+    <string name="qr_tab_text">Văn bản</string>
+    <string name="qr_tab_url">URL</string>
+    <string name="qr_tab_wifi">Wi-Fi</string>
+    <string name="qr_header_text_title">Văn bản</string>
+    <string name="qr_header_text_sub">Nhập nội dung để chuyển thành mã QR</string>
+    <string name="qr_header_url_title">URL</string>
+    <string name="qr_header_url_sub">Nhập đường dẫn (website, liên kết, …)</string>
+    <string name="qr_header_wifi_title">Wi-Fi</string>
+    <string name="qr_header_wifi_sub">Tạo mã QR để chia sẻ nhanh mạng Wi-Fi</string>
+    <string name="qr_wifi_ssid_label">Tên Wi-Fi (SSID)</string>
+    <string name="qr_wifi_ssid_hint">Nhập tên Wi-Fi</string>
+    <string name="qr_wifi_password_label">Mật khẩu</string>
+    <string name="qr_wifi_password_hint">Nhập mật khẩu</string>
+    <string name="qr_wifi_security_label">Loại bảo mật</string>
+    <string name="qr_action_download">Tải xuống</string>
+    <string name="qr_action_share">Chia sẻ</string>
+    <string name="qr_action_copy">Sao chép</string>
+    <string name="qr_copied_to_clipboard">Đã sao chép nội dung vào khay nhớ tạm</string>
+    <string name="qr_history_title">Lịch sử tạo mã QR</string>
+    <string name="qr_history_empty">Chưa có mã QR nào được tạo</string>
+    <string name="qr_clear_history">Xóa lịch sử</string>
+    <string name="qr_error_empty_input">Vui lòng nhập nội dung trước khi tạo mã</string>
+    <string name="qr_error_empty_ssid">Vui lòng nhập tên Wi-Fi (SSID)</string>
 
     <!-- 7. Chuyển đổi đơn vị -->
     <string name="tool_unit_converter_title">Chuyển đổi đơn vị</string>
