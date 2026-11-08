@@ -13,16 +13,17 @@ import android.view.HapticFeedbackConstants
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
-import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import com.example.baseproject.R
 import com.example.baseproject.base.BaseToolFragment
+import com.example.baseproject.databinding.DialogFlashlightSettingsBinding
 import com.example.baseproject.databinding.FragmentFlashlightBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import java.util.Locale
 
 /**
  * Màn hình công cụ Đèn pin điều khiển đèn flash camera phần cứng,
- * tùy chỉnh mức sáng (Android 13+), chế độ chớp nháy Strobe, mã Morse SOS và hẹn giờ tự tắt.
+ * hỗ trợ 3 chế độ: Sáng liên tục, Nhấp nháy và phát tín hiệu SOS với hộp thoại cài đặt độ trễ linh hoạt.
  */
 class FlashlightFragment : BaseToolFragment<FragmentFlashlightBinding>() {
 
@@ -37,26 +38,21 @@ class FlashlightFragment : BaseToolFragment<FragmentFlashlightBinding>() {
 
     private var currentMode: FlashMode = FlashMode.CONTINUOUS
     private var isTorchActive: Boolean = false
-    private var currentBrightness: Int = 100
 
     private var cameraManager: CameraManager? = null
     private var cameraId: String? = null
     private var hasFlashHardware: Boolean = false
-    private var maxStrengthLevel: Int = 1
 
     private val flashHandler = Handler(Looper.getMainLooper())
-    private val autoOffHandler = Handler(Looper.getMainLooper())
 
     private lateinit var prefs: SharedPreferences
-    private var autoOffMinutes: Int = 0
+    private var strobeDelayMs: Long = 100L
+    private var sosPulseDelayMs: Long = 180L
+    private var sosCycleDelayMs: Long = 1200L
     private var isHapticEnabled: Boolean = true
 
-    // Mẫu nhấp nháy SOS chuẩn mã Morse (độ dài ms)
-    private val sosPattern = longArrayOf(
-        180, 180, 180, 180, 180, 420, // S: 3 ngắn + khoảng cách ký tự
-        540, 180, 540, 180, 540, 420, // O: 3 dài + khoảng cách ký tự
-        180, 180, 180, 180, 180, 1200 // S: 3 ngắn + khoảng cách từ
-    )
+    // Mẫu nhấp nháy SOS chuẩn mã Morse tính toán động theo cấu hình độ trễ
+    private var sosPattern: LongArray = longArrayOf()
     private var sosStepIndex: Int = 0
 
     // Runnable điều khiển vòng lặp chớp nháy SOS
@@ -67,13 +63,13 @@ class FlashlightFragment : BaseToolFragment<FragmentFlashlightBinding>() {
             setHardwareTorch(shouldTurnOn)
             viewBinding.flashlightVisualView.setTorchState(shouldTurnOn, animated = false)
 
-            val delay = sosPattern[sosStepIndex]
+            val delay = if (sosPattern.isNotEmpty()) sosPattern[sosStepIndex] else 200L
             sosStepIndex = (sosStepIndex + 1) % sosPattern.size
             flashHandler.postDelayed(this, delay)
         }
     }
 
-    // Runnable điều khiển chế độ nhấp nháy liên tục (Strobe ~6Hz)
+    // Runnable điều khiển chế độ nhấp nháy (Strobe) với độ trễ tùy chỉnh
     private var strobeState: Boolean = false
     private val strobeRunnable = object : Runnable {
         override fun run() {
@@ -81,14 +77,7 @@ class FlashlightFragment : BaseToolFragment<FragmentFlashlightBinding>() {
             strobeState = !strobeState
             setHardwareTorch(strobeState)
             viewBinding.flashlightVisualView.setTorchState(strobeState, animated = false)
-            flashHandler.postDelayed(this, 85)
-        }
-    }
-
-    // Runnable tự động tắt đèn pin khi hết thời gian hẹn giờ
-    private val autoOffRunnable = Runnable {
-        if (isTorchActive) {
-            turnOffTorch()
+            flashHandler.postDelayed(this, strobeDelayMs)
         }
     }
 
@@ -100,15 +89,33 @@ class FlashlightFragment : BaseToolFragment<FragmentFlashlightBinding>() {
     // Khởi tạo các thành phần giao diện, camera hardware và cấu hình lưu trữ.
     override fun initViews() {
         prefs = requireContext().getSharedPreferences("flashlight_settings", Context.MODE_PRIVATE)
-        autoOffMinutes = prefs.getInt("pref_auto_off_minutes", 0)
-        isHapticEnabled = prefs.getBoolean("pref_haptic_feedback", true)
+        loadSettingsFromPrefs()
+        rebuildSosPattern()
 
         initCameraHardware()
         setupTopBar()
         setupVisualView()
-        setupBrightnessSlider()
         setupModeCards()
         updateModeCardsUi(FlashMode.CONTINUOUS)
+    }
+
+    // Đọc cấu hình độ trễ nhấp nháy, SOS và rung phản hồi từ SharedPreferences.
+    private fun loadSettingsFromPrefs() {
+        strobeDelayMs = prefs.getLong("pref_strobe_delay_ms", 100L)
+        sosPulseDelayMs = prefs.getLong("pref_sos_pulse_delay_ms", 180L)
+        sosCycleDelayMs = prefs.getLong("pref_sos_cycle_delay_ms", 1200L)
+        isHapticEnabled = prefs.getBoolean("pref_haptic_feedback", true)
+    }
+
+    // Xây dựng lại mảng thời gian nhấp nháy SOS chuẩn mã Morse theo xung nhịp và độ trễ chu kỳ.
+    private fun rebuildSosPattern() {
+        val u = sosPulseDelayMs
+        val c = sosCycleDelayMs
+        sosPattern = longArrayOf(
+            u, u, u, u, u, 3 * u,              // S: 3 ngắn + khoảng cách ký tự
+            3 * u, u, 3 * u, u, 3 * u, 3 * u,  // O: 3 dài + khoảng cách ký tự
+            u, u, u, u, u, c                   // S: 3 ngắn + thời gian nghỉ giữa chu kỳ
+        )
     }
 
     // Dừng toàn bộ đèn flash camera và các luồng hẹn giờ khi rời màn hình.
@@ -123,7 +130,7 @@ class FlashlightFragment : BaseToolFragment<FragmentFlashlightBinding>() {
         turnOffTorch()
     }
 
-    // Khởi tạo phần cứng máy ảnh và phát hiện khả năng chỉnh cường độ đèn flash.
+    // Khởi tạo phần cứng máy ảnh và phát hiện khả năng sử dụng đèn flash camera.
     private fun initCameraHardware() {
         val context = requireContext()
         hasFlashHardware = context.packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH)
@@ -137,11 +144,6 @@ class FlashlightFragment : BaseToolFragment<FragmentFlashlightBinding>() {
                     val flashAvailable = characteristics?.get(CameraCharacteristics.FLASH_INFO_AVAILABLE) == true
                     if (flashAvailable) {
                         cameraId = id
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                            maxStrengthLevel = characteristics.get(
-                                CameraCharacteristics.FLASH_INFO_STRENGTH_MAXIMUM_LEVEL
-                            ) ?: 1
-                        }
                         break
                     }
                 }
@@ -156,7 +158,7 @@ class FlashlightFragment : BaseToolFragment<FragmentFlashlightBinding>() {
         }
     }
 
-    // Thiết lập thanh tiêu đề với nút quay lại và nút mở hộp thoại cài đặt.
+    // Thiết lập thanh tiêu đề với nút quay lại và nút mở hộp thoại cài đặt độ trễ.
     private fun setupTopBar() {
         viewBinding.btnFlashlightBackCard.setOnClickListener {
             triggerHapticFeedback(it)
@@ -175,25 +177,6 @@ class FlashlightFragment : BaseToolFragment<FragmentFlashlightBinding>() {
             triggerHapticFeedback(viewBinding.flashlightVisualView)
             toggleTorchState()
         }
-    }
-
-    // Thiết lập thanh trượt chỉnh độ sáng đèn pin và cập nhật phần trăm hiển thị.
-    private fun setupBrightnessSlider() {
-        viewBinding.seekBrightness.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                val safeProgress = progress.coerceIn(1, 100)
-                currentBrightness = safeProgress
-                viewBinding.tvBrightnessPercent.text = "$safeProgress%"
-                viewBinding.flashlightVisualView.setBeamBrightness(safeProgress)
-
-                if (isTorchActive && currentMode == FlashMode.CONTINUOUS) {
-                    setHardwareTorch(true)
-                }
-            }
-
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
-        })
     }
 
     // Thiết lập sự kiện chuyển đổi giữa các thẻ chế độ: Liên tục, Nhấp nháy và SOS.
@@ -297,8 +280,6 @@ class FlashlightFragment : BaseToolFragment<FragmentFlashlightBinding>() {
                 startSosLoop()
             }
         }
-
-        scheduleAutoOffTimer()
     }
 
     // Tắt toàn bộ đèn pin phần cứng và ngừng các chu kỳ nhấp nháy.
@@ -307,7 +288,6 @@ class FlashlightFragment : BaseToolFragment<FragmentFlashlightBinding>() {
         stopAllLoops()
         setHardwareTorch(false)
         viewBinding.flashlightVisualView.setTorchState(false, animated = true)
-        autoOffHandler.removeCallbacks(autoOffRunnable)
     }
 
     // Dừng các luồng Handler đang chạy cho hiệu ứng nhấp nháy và phát mã SOS.
@@ -316,7 +296,7 @@ class FlashlightFragment : BaseToolFragment<FragmentFlashlightBinding>() {
         flashHandler.removeCallbacks(sosRunnable)
     }
 
-    // Khởi động chu kỳ chớp nháy tần số cao (Strobe).
+    // Khởi động chu kỳ chớp nháy tần số cao (Strobe) theo độ trễ đã cấu hình.
     private fun startStrobeLoop() {
         stopAllLoops()
         strobeState = false
@@ -330,31 +310,13 @@ class FlashlightFragment : BaseToolFragment<FragmentFlashlightBinding>() {
         flashHandler.post(sosRunnable)
     }
 
-    // Điều khiển bật tắt và cấp độ sáng của đèn flash camera phần cứng.
+    // Điều khiển bật tắt đèn flash camera phần cứng.
     private fun setHardwareTorch(enable: Boolean) {
         val id = cameraId ?: return
         try {
-            if (enable) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && maxStrengthLevel > 1) {
-                    val strength = ((currentBrightness / 100f) * maxStrengthLevel).toInt().coerceIn(1, maxStrengthLevel)
-                    cameraManager?.turnOnTorchWithStrengthLevel(id, strength)
-                } else {
-                    cameraManager?.setTorchMode(id, true)
-                }
-            } else {
-                cameraManager?.setTorchMode(id, false)
-            }
+            cameraManager?.setTorchMode(id, enable)
         } catch (e: Exception) {
             e.printStackTrace()
-        }
-    }
-
-    // Lập lịch tự động tắt đèn pin dựa theo cấu hình số phút hẹn giờ.
-    private fun scheduleAutoOffTimer() {
-        autoOffHandler.removeCallbacks(autoOffRunnable)
-        if (autoOffMinutes > 0) {
-            val timeoutMs = autoOffMinutes * 60 * 1000L
-            autoOffHandler.postDelayed(autoOffRunnable, timeoutMs)
         }
     }
 
@@ -365,31 +327,122 @@ class FlashlightFragment : BaseToolFragment<FragmentFlashlightBinding>() {
         }
     }
 
-    // Hiển thị hộp thoại cài đặt hẹn giờ tự tắt và rung phản hồi của đèn pin.
+    // Hiển thị hộp thoại cài đặt tùy chỉnh độ trễ nhấp nháy (Strobe) và độ trễ chu kỳ phát SOS.
     private fun showSettingsDialog() {
-        val timeOptions = arrayOf(
-            getString(R.string.flashlight_auto_off_never),
-            getString(R.string.flashlight_auto_off_1m),
-            getString(R.string.flashlight_auto_off_5m),
-            getString(R.string.flashlight_auto_off_10m)
-        )
-        val minuteValues = intArrayOf(0, 1, 5, 10)
-        var selectedIndex = minuteValues.indexOf(autoOffMinutes).coerceAtLeast(0)
+        val dialogBinding = DialogFlashlightSettingsBinding.inflate(layoutInflater)
+        val dialog = MaterialAlertDialogBuilder(requireContext())
+            .setView(dialogBinding.root)
+            .create()
 
-        MaterialAlertDialogBuilder(requireContext())
-            .setTitle(R.string.flashlight_settings_title)
-            .setSingleChoiceItems(timeOptions, selectedIndex) { _, which ->
-                selectedIndex = which
+        var tempStrobeDelay = strobeDelayMs
+        var tempSosPulse = sosPulseDelayMs
+        var tempSosCycle = sosCycleDelayMs
+        var tempHaptic = isHapticEnabled
+
+        // 1. Cấu hình SeekBar độ trễ nhấp nháy (30ms - 800ms)
+        fun updateStrobeText(delayMs: Long) {
+            val freq = 1000.0 / (2 * delayMs)
+            dialogBinding.tvStrobeDelayValue.text = "$delayMs ms (~${String.format(Locale.US, "%.1f", freq)} Hz)"
+        }
+        val strobeProgress = ((tempStrobeDelay - 30) / 10).toInt().coerceIn(0, 77)
+        dialogBinding.seekStrobeDelay.progress = strobeProgress
+        updateStrobeText(tempStrobeDelay)
+
+        dialogBinding.seekStrobeDelay.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                tempStrobeDelay = 30L + progress * 10L
+                updateStrobeText(tempStrobeDelay)
             }
-            .setPositiveButton(android.R.string.ok) { dialog, _ ->
-                autoOffMinutes = minuteValues[selectedIndex]
-                prefs.edit().putInt("pref_auto_off_minutes", autoOffMinutes).apply()
-                if (isTorchActive) {
-                    scheduleAutoOffTimer()
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+        })
+
+        // 2. Cấu hình SeekBar độ trễ xung nhịp SOS (80ms - 400ms)
+        fun updateSosPulseText(pulseMs: Long) {
+            dialogBinding.tvSosPulseValue.text = "$pulseMs ms"
+        }
+        val sosPulseProgress = ((tempSosPulse - 80) / 10).toInt().coerceIn(0, 32)
+        dialogBinding.seekSosPulse.progress = sosPulseProgress
+        updateSosPulseText(tempSosPulse)
+
+        dialogBinding.seekSosPulse.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                tempSosPulse = 80L + progress * 10L
+                updateSosPulseText(tempSosPulse)
+            }
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+        })
+
+        // 3. Cấu hình SeekBar độ trễ nghỉ giữa chu kỳ SOS (500ms - 4000ms)
+        fun updateSosCycleText(cycleMs: Long) {
+            val seconds = cycleMs / 1000.0
+            dialogBinding.tvSosCycleValue.text = "${String.format(Locale.US, "%.1f", seconds)} s"
+        }
+        val sosCycleProgress = ((tempSosCycle - 500) / 100).toInt().coerceIn(0, 35)
+        dialogBinding.seekSosCycle.progress = sosCycleProgress
+        updateSosCycleText(tempSosCycle)
+
+        dialogBinding.seekSosCycle.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                tempSosCycle = 500L + progress * 100L
+                updateSosCycleText(tempSosCycle)
+            }
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+        })
+
+        // 4. Rung phản hồi
+        dialogBinding.switchHapticFeedback.isChecked = tempHaptic
+        dialogBinding.switchHapticFeedback.setOnCheckedChangeListener { _, isChecked ->
+            tempHaptic = isChecked
+        }
+
+        // 5. Nút Khôi phục mặc định
+        dialogBinding.btnResetSettings.setOnClickListener {
+            tempStrobeDelay = 100L
+            tempSosPulse = 180L
+            tempSosCycle = 1200L
+            tempHaptic = true
+
+            dialogBinding.seekStrobeDelay.progress = ((tempStrobeDelay - 30) / 10).toInt()
+            dialogBinding.seekSosPulse.progress = ((tempSosPulse - 80) / 10).toInt()
+            dialogBinding.seekSosCycle.progress = ((tempSosCycle - 500) / 100).toInt()
+            dialogBinding.switchHapticFeedback.isChecked = true
+
+            updateStrobeText(tempStrobeDelay)
+            updateSosPulseText(tempSosPulse)
+            updateSosCycleText(tempSosCycle)
+        }
+
+        // 6. Nút Lưu cài đặt
+        dialogBinding.btnSaveSettings.setOnClickListener {
+            strobeDelayMs = tempStrobeDelay
+            sosPulseDelayMs = tempSosPulse
+            sosCycleDelayMs = tempSosCycle
+            isHapticEnabled = tempHaptic
+
+            prefs.edit()
+                .putLong("pref_strobe_delay_ms", strobeDelayMs)
+                .putLong("pref_sos_pulse_delay_ms", sosPulseDelayMs)
+                .putLong("pref_sos_cycle_delay_ms", sosCycleDelayMs)
+                .putBoolean("pref_haptic_feedback", isHapticEnabled)
+                .apply()
+
+            rebuildSosPattern()
+
+            // Khởi động lại luồng nếu đang chạy để áp dụng tức thì
+            if (isTorchActive) {
+                when (currentMode) {
+                    FlashMode.STROBE -> startStrobeLoop()
+                    FlashMode.SOS -> startSosLoop()
+                    FlashMode.CONTINUOUS -> {}
                 }
-                dialog.dismiss()
             }
-            .setNegativeButton(android.R.string.cancel, null)
-            .show()
+
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 }

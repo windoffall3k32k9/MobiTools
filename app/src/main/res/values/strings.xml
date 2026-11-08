@@ -55,12 +55,13 @@
     <string name="flashlight_mode_continuous">Sáng liên tục</string>
     <string name="flashlight_mode_strobe">Nhấp nháy</string>
     <string name="flashlight_mode_sos">SOS</string>
-    <string name="flashlight_settings_title">Cài đặt đèn pin</string>
-    <string name="flashlight_auto_off">Tự động tắt sau</string>
-    <string name="flashlight_auto_off_never">Không bao giờ</string>
-    <string name="flashlight_auto_off_1m">1 phút</string>
-    <string name="flashlight_auto_off_5m">5 phút</string>
-    <string name="flashlight_auto_off_10m">10 phút</string>
+    <string name="flashlight_settings_title">Cài đặt nhấp nháy &amp; SOS</string>
+    <string name="flashlight_settings_strobe_title">Chế độ nhấp nháy (Strobe)</string>
+    <string name="flashlight_settings_strobe_delay">Độ trễ nhấp nháy</string>
+    <string name="flashlight_settings_sos_title">Chế độ phát tín hiệu SOS</string>
+    <string name="flashlight_settings_sos_pulse">Độ trễ xung nhịp SOS</string>
+    <string name="flashlight_settings_sos_cycle">Độ trễ nghỉ giữa chu kỳ SOS</string>
+    <string name="flashlight_settings_reset">Mặc định</string>
     <string name="flashlight_haptic">Rung phản hồi khi nhấn nút</string>
 
     <!-- 6. Tạo mã QR -->
