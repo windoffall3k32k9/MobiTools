@@ -6,6 +6,8 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.view.HapticFeedbackConstants
@@ -14,23 +16,29 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.OptIn
+import androidx.appcompat.app.AlertDialog
 import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ExperimentalGetImage
+import androidx.camera.core.FocusMeteringAction
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
+import androidx.camera.core.SurfaceOrientedMeteringPointFactory
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import com.example.baseproject.R
 import com.example.baseproject.base.BaseToolFragment
 import com.example.baseproject.databinding.FragmentBarcodeScannerBinding
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
+import org.json.JSONArray
+import org.json.JSONObject
 import java.util.concurrent.Executors
 
 /**
- * Công cụ quét và giải mã mã vạch, mã QR qua camera sử dụng ML Kit ngoại tuyến.
+ * Công cụ quét mã QR và mã vạch hiện đại với khung quét bo tròn, đèn trợ sáng và quét ảnh từ thư viện.
  */
 class BarcodeScannerFragment : BaseToolFragment<FragmentBarcodeScannerBinding>() {
 
@@ -40,48 +48,72 @@ class BarcodeScannerFragment : BaseToolFragment<FragmentBarcodeScannerBinding>()
     private var camera: Camera? = null
     private var isTorchOn: Boolean = false
     private var isScanningActive: Boolean = true
+    private var isQrMode: Boolean = true
+
     private val cameraExecutor = Executors.newSingleThreadExecutor()
 
+    // Cấu trúc dữ liệu lịch sử quét mã
+    data class ScanHistoryRecord(val content: String, val format: String, val timestamp: Long)
+    private val scanHistoryList = mutableListOf<ScanHistoryRecord>()
+
+    private val prefs by lazy {
+        requireContext().getSharedPreferences("scanner_prefs", Context.MODE_PRIVATE)
+    }
+
+    // Launcher yêu cầu quyền truy cập Camera từ hệ thống
     private val cameraPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         if (isGranted) {
             viewBinding.layoutCameraPermission.visibility = View.GONE
             viewBinding.scannerOverlayView.visibility = View.VISIBLE
-            viewBinding.tvScannerHint.visibility = View.VISIBLE
             startCamera()
         } else {
             viewBinding.layoutCameraPermission.visibility = View.VISIBLE
             viewBinding.scannerOverlayView.visibility = View.GONE
-            viewBinding.tvScannerHint.visibility = View.GONE
         }
     }
 
+    // Launcher chọn ảnh từ thư viện thiết bị để quét mã ngoại tuyến
+    private val galleryPickerLauncher = registerForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        if (uri != null) {
+            decodeBarcodeFromUri(uri)
+        }
+    }
+
+    // Khởi tạo đối tượng ViewBinding cho giao diện FragmentBarcodeScanner.
     override fun provideViewBinding(container: ViewGroup?): FragmentBarcodeScannerBinding {
         return FragmentBarcodeScannerBinding.inflate(layoutInflater, container, false)
     }
 
+    // Khởi tạo các thành phần giao diện, phục hồi lịch sử và thiết lập sự kiện người dùng.
     override fun initViews() {
-        setupToolbarButtons()
+        loadHistoryFromPrefs()
+        setupTopBarActions()
+        setupModePills()
+        setupBottomActions()
         setupResultActions()
         checkCameraPermission()
     }
 
+    // Dừng tia quét và tắt luồng xử lý CameraX khi hủy giao diện.
     override fun onDestroyView() {
         super.onDestroyView()
         viewBinding.scannerOverlayView.stopLaserAnimation()
         cameraExecutor.shutdown()
     }
 
-    // Thiết lập sự kiện cho thanh điều hướng và đèn trợ sáng.
-    private fun setupToolbarButtons() {
-        viewBinding.btnScannerBack.setOnClickListener {
+    // Cấu hình nút quay lại và nút bật tắt đèn pin trợ sáng trên thanh tiêu đề.
+    private fun setupTopBarActions() {
+        viewBinding.btnScannerBackCard.setOnClickListener {
             parentFragmentManager.popBackStack()
         }
 
-        viewBinding.btnScannerTorch.setOnClickListener {
-            isTorchOn = !isTorchOn
-            camera?.cameraControl?.enableTorch(isTorchOn)
+        viewBinding.btnScannerTorchCard.setOnClickListener {
+            toggleTorch()
+            view?.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
         }
 
         viewBinding.btnGrantCameraPermission.setOnClickListener {
@@ -89,19 +121,91 @@ class BarcodeScannerFragment : BaseToolFragment<FragmentBarcodeScannerBinding>()
         }
     }
 
-    // Thiết lập các nút tương tác kết quả quét.
+    // Bật tắt đèn pin Flash của thiết bị và cập nhật hiệu ứng màu nền nút.
+    private fun toggleTorch() {
+        isTorchOn = !isTorchOn
+        camera?.cameraControl?.enableTorch(isTorchOn)
+
+        val activeBg = ContextCompat.getColor(requireContext(), R.color.scanElectricBlue)
+        val inactiveBg = ContextCompat.getColor(requireContext(), R.color.scanLightBlue)
+        val activeIcon = Color.WHITE
+        val inactiveIcon = ContextCompat.getColor(requireContext(), R.color.scanElectricBlue)
+
+        viewBinding.btnScannerTorchCard.setCardBackgroundColor(if (isTorchOn) activeBg else inactiveBg)
+        viewBinding.ivScannerTorch.imageTintList = ColorStateList.valueOf(if (isTorchOn) activeIcon else inactiveIcon)
+    }
+
+    // Thiết lập sự kiện chuyển đổi giữa hai chế độ quét: QR (vuông) và Mã vạch (chữ nhật).
+    private fun setupModePills() {
+        viewBinding.tabScanQr.setOnClickListener {
+            switchScanMode(true)
+            view?.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
+        }
+
+        viewBinding.tabScanBarcode.setOnClickListener {
+            switchScanMode(false)
+            view?.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
+        }
+    }
+
+    // Cập nhật trạng thái màu sắc bộ chuyển đổi chế độ và thay đổi khung ngắm camera.
+    private fun switchScanMode(isQr: Boolean) {
+        isQrMode = isQr
+        val colorActive = ContextCompat.getColor(requireContext(), R.color.scanElectricBlue)
+        val colorTransparent = Color.TRANSPARENT
+        val colorWhite = Color.WHITE
+        val colorSecondary = ContextCompat.getColor(requireContext(), R.color.textSecondary)
+
+        // Cập nhật tab QR
+        viewBinding.tabScanQr.setCardBackgroundColor(if (isQr) colorActive else colorTransparent)
+        viewBinding.ivTabQr.imageTintList = ColorStateList.valueOf(if (isQr) colorWhite else colorSecondary)
+        viewBinding.tvTabQr.setTextColor(if (isQr) colorWhite else colorSecondary)
+
+        // Cập nhật tab Mã vạch
+        viewBinding.tabScanBarcode.setCardBackgroundColor(if (!isQr) colorActive else colorTransparent)
+        viewBinding.ivTabBarcode.imageTintList = ColorStateList.valueOf(if (!isQr) colorWhite else colorSecondary)
+        viewBinding.tvTabBarcode.setTextColor(if (!isQr) colorWhite else colorSecondary)
+
+        // Cập nhật hình dáng khung ngắm trên lớp phủ
+        viewBinding.scannerOverlayView.setScanMode(isQr)
+    }
+
+    // Cấu hình 3 nút hành động dưới cùng: Chọn ảnh thư viện, Nút quét trung tâm và Lịch sử.
+    private fun setupBottomActions() {
+        // Nút mở thư viện
+        viewBinding.btnGalleryCard.setOnClickListener {
+            galleryPickerLauncher.launch("image/*")
+            view?.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
+        }
+
+        // Nút quét chính giữa
+        viewBinding.btnCenterScan.setOnClickListener {
+            resumeScanning()
+            triggerAutoFocus()
+            view?.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
+        }
+
+        // Nút lịch sử quét
+        viewBinding.btnHistoryCard.setOnClickListener {
+            showHistoryDialog()
+            view?.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
+        }
+    }
+
+    // Thiết lập các thao tác tương tác sau khi quét xong: Đóng, Sao chép, Chia sẻ, Quét tiếp.
     private fun setupResultActions() {
         viewBinding.btnCloseResult.setOnClickListener {
-            viewBinding.cardScanResult.visibility = View.GONE
-            viewBinding.tvScannerHint.visibility = View.VISIBLE
-            viewBinding.scannerOverlayView.startLaserAnimation()
-            isScanningActive = true
+            resumeScanning()
+        }
+
+        viewBinding.btnRescan.setOnClickListener {
+            resumeScanning()
         }
 
         viewBinding.btnCopyBarcode.setOnClickListener {
             val text = viewBinding.tvBarcodeContent.text.toString()
             val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-            clipboard.setPrimaryClip(ClipData.newPlainText("Barcode Result", text))
+            clipboard.setPrimaryClip(ClipData.newPlainText("Scanned Code", text))
             Toast.makeText(requireContext(), R.string.copied_to_clipboard, Toast.LENGTH_SHORT).show()
         }
 
@@ -115,24 +219,44 @@ class BarcodeScannerFragment : BaseToolFragment<FragmentBarcodeScannerBinding>()
         }
     }
 
-    // Kiểm tra quyền truy cập Camera trước khi khởi động bộ giải mã.
+    // Tiếp tục chu trình quét mới, kích hoạt lại tia laser và ẩn thẻ kết quả.
+    private fun resumeScanning() {
+        viewBinding.cardScanResult.visibility = View.GONE
+        viewBinding.scannerOverlayView.startLaserAnimation()
+        isScanningActive = true
+    }
+
+    // Kích hoạt tính năng lấy nét tự động vào tâm khung ngắm của camera.
+    private fun triggerAutoFocus() {
+        val cam = camera ?: return
+        val factory = SurfaceOrientedMeteringPointFactory(
+            viewBinding.previewView.width.toFloat(),
+            viewBinding.previewView.height.toFloat()
+        )
+        val centerPoint = factory.createPoint(
+            viewBinding.previewView.width / 2f,
+            viewBinding.previewView.height / 2f
+        )
+        val action = FocusMeteringAction.Builder(centerPoint).build()
+        cam.cameraControl.startFocusAndMetering(action)
+    }
+
+    // Kiểm tra quyền Camera trước khi bắt đầu xem trước từ phần cứng.
     private fun checkCameraPermission() {
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA)
             == PackageManager.PERMISSION_GRANTED
         ) {
             viewBinding.layoutCameraPermission.visibility = View.GONE
             viewBinding.scannerOverlayView.visibility = View.VISIBLE
-            viewBinding.tvScannerHint.visibility = View.VISIBLE
             startCamera()
         } else {
             viewBinding.layoutCameraPermission.visibility = View.VISIBLE
             viewBinding.scannerOverlayView.visibility = View.GONE
-            viewBinding.tvScannerHint.visibility = View.GONE
             cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
         }
     }
 
-    // Khởi tạo luồng xem trước CameraX và cấu hình bộ phân tích ảnh ML Kit.
+    // Cấu hình và kết nối luồng CameraX với bộ quét mã vạch Google ML Kit.
     private fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
         cameraProviderFuture.addListener({
@@ -192,7 +316,28 @@ class BarcodeScannerFragment : BaseToolFragment<FragmentBarcodeScannerBinding>()
         }
     }
 
-    // Xử lý khi phát hiện thành công mã vạch hoặc mã QR.
+    // Giải mã mã QR hoặc mã vạch từ tập tin ảnh được chọn trong thư viện.
+    private fun decodeBarcodeFromUri(uri: Uri) {
+        try {
+            val image = InputImage.fromFilePath(requireContext(), uri)
+            val scanner = BarcodeScanning.getClient()
+            scanner.process(image)
+                .addOnSuccessListener { barcodes ->
+                    if (barcodes.isNotEmpty()) {
+                        onBarcodeDetected(barcodes.first())
+                    } else {
+                        Toast.makeText(requireContext(), R.string.scanner_no_code_found, Toast.LENGTH_SHORT).show()
+                    }
+                }
+                .addOnFailureListener {
+                    Toast.makeText(requireContext(), R.string.scanner_no_code_found, Toast.LENGTH_SHORT).show()
+                }
+        } catch (e: Exception) {
+            Toast.makeText(requireContext(), "Lỗi đọc tệp ảnh: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    // Xử lý khi phát hiện thành công mã vạch hoặc mã QR, lưu lịch sử và hiển thị kết quả.
     private fun onBarcodeDetected(barcode: Barcode) {
         isScanningActive = false
         view?.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
@@ -200,9 +345,12 @@ class BarcodeScannerFragment : BaseToolFragment<FragmentBarcodeScannerBinding>()
         val rawValue = barcode.rawValue ?: ""
         val formatName = getBarcodeFormatName(barcode.format)
 
+        // Lưu vào danh sách lịch sử quét
+        scanHistoryList.add(0, ScanHistoryRecord(rawValue, formatName, System.currentTimeMillis()))
+        saveHistoryToPrefs()
+
         activity?.runOnUiThread {
             viewBinding.scannerOverlayView.stopLaserAnimation()
-            viewBinding.tvScannerHint.visibility = View.GONE
             viewBinding.tvBarcodeFormat.text = formatName
             viewBinding.tvBarcodeContent.text = rawValue
             viewBinding.cardScanResult.visibility = View.VISIBLE
@@ -223,7 +371,67 @@ class BarcodeScannerFragment : BaseToolFragment<FragmentBarcodeScannerBinding>()
         }
     }
 
-    // Lấy tên định dạng mã vạch tương ứng.
+    // Mở hộp thoại hiển thị danh sách lịch sử các mã đã quét thành công.
+    private fun showHistoryDialog() {
+        val context = requireContext()
+        if (scanHistoryList.isEmpty()) {
+            Toast.makeText(context, R.string.scanner_history_empty, Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val items = scanHistoryList.map { "[${it.format}]\n${it.content}" }.toTypedArray()
+        AlertDialog.Builder(context)
+            .setTitle(R.string.scanner_history)
+            .setItems(items) { _, which ->
+                val record = scanHistoryList[which]
+                val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                clipboard.setPrimaryClip(ClipData.newPlainText("Scanned Code", record.content))
+                Toast.makeText(context, R.string.copied_to_clipboard, Toast.LENGTH_SHORT).show()
+            }
+            .setNeutralButton(R.string.scanner_clear_history) { _, _ ->
+                scanHistoryList.clear()
+                saveHistoryToPrefs()
+                Toast.makeText(context, R.string.scanner_clear_history, Toast.LENGTH_SHORT).show()
+            }
+            .setPositiveButton(R.string.close, null)
+            .show()
+    }
+
+    // Lưu danh sách lịch sử quét vào SharedPreferences dưới định dạng JSON.
+    private fun saveHistoryToPrefs() {
+        val array = JSONArray()
+        for (item in scanHistoryList.take(50)) {
+            val obj = JSONObject()
+            obj.put("content", item.content)
+            obj.put("format", item.format)
+            obj.put("time", item.timestamp)
+            array.put(obj)
+        }
+        prefs.edit().putString("scan_history_json", array.toString()).apply()
+    }
+
+    // Khôi phục danh sách lịch sử quét từ SharedPreferences.
+    private fun loadHistoryFromPrefs() {
+        scanHistoryList.clear()
+        val json = prefs.getString("scan_history_json", null) ?: return
+        try {
+            val array = JSONArray(json)
+            for (i in 0 until array.length()) {
+                val obj = array.getJSONObject(i)
+                scanHistoryList.add(
+                    ScanHistoryRecord(
+                        obj.getString("content"),
+                        obj.getString("format"),
+                        obj.getLong("time")
+                    )
+                )
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    // Lấy tên định dạng chuẩn của loại mã vạch hoặc mã QR được phát hiện.
     private fun getBarcodeFormatName(format: Int): String {
         return when (format) {
             Barcode.FORMAT_QR_CODE -> "MÃ QR (QR CODE)"

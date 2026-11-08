@@ -149,4 +149,16 @@
     <string name="calc_angle_rad">Góc: Radian (RAD)</string>
     <string name="calc_error_divide_zero">Không thể chia cho 0</string>
     <string name="calc_error_syntax">Lỗi định dạng</string>
+
+    <!-- Quét mã QR & Mã vạch nâng cao -->
+    <string name="scanner_mode_qr">QR</string>
+    <string name="scanner_mode_barcode">Mã vạch</string>
+    <string name="scanner_gallery">Thư viện</string>
+    <string name="scanner_scan">Quét</string>
+    <string name="scanner_history">Lịch sử</string>
+    <string name="scanner_history_empty">Chưa có mã nào được quét</string>
+    <string name="scanner_clear_history">Xóa lịch sử quét</string>
+    <string name="scanner_no_code_found">Không tìm thấy mã QR hoặc mã vạch trong ảnh</string>
+    <string name="scanner_rescan">Quét tiếp</string>
+    <string name="scanner_open_url">Mở liên kết</string>
 </resources>
