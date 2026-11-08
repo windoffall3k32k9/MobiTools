@@ -117,4 +117,26 @@
     <string name="permissions_status_not_granted">Chưa cấp</string>
     <string name="back_press_again_to_exit">Nhấn quay lại lần nữa để thoát</string>
     <string name="close">Đóng</string>
+
+    <!-- Thước thủy mở rộng -->
+    <string name="level_mode_all">Tất cả</string>
+    <string name="level_mode_horizontal">Ngang</string>
+    <string name="level_mode_vertical">Dọc</string>
+    <string name="level_mode_circular">Tròn</string>
+    <string name="level_fullscreen">Toàn màn hình</string>
+    <string name="level_fullscreen_exit">Thu nhỏ</string>
+    <string name="level_hold_result">Giữ kết quả</string>
+    <string name="level_holding_result">Đang giữ</string>
+    <string name="level_horizontal_label">Ngang (X)</string>
+    <string name="level_vertical_label">Dọc (Y)</string>
+    <string name="level_axis_x_format">X: %s</string>
+    <string name="level_axis_y_format">Y: %s</string>
+    <string name="level_calibrate_menu">Hiệu chuẩn mốc 0</string>
+    <string name="level_reset_menu">Đặt lại mốc 0</string>
+    <string name="level_calibrated_success">Đã hiệu chuẩn mốc 0 thành công</string>
+    <string name="level_reset_success">Đã khôi phục mốc 0 mặc định</string>
+
+    <!-- Đo độ sáng -->
+    <string name="tool_light_meter_title">Đo độ sáng</string>
+    <string name="tool_light_meter_desc">Đo cường độ ánh sáng môi trường theo đơn vị Lux</string>
 </resources>

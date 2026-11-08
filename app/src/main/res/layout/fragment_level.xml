@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorBackground"
     android:orientation="vertical">
 
-    <include layout="@layout/layout_tool_toolbar" />
+    <!-- Thanh tiêu đề công cụ chuẩn -->
+    <include
+        android:id="@+id/toolbarLayout"
+        layout="@layout/layout_tool_toolbar" />
 
     <!-- Cảnh báo thiếu cảm biến gia tốc -->
     <TextView
@@ -14,6 +18,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="20dp"
         android:background="#FEF2F2"
         android:padding="12dp"
@@ -22,135 +27,579 @@
         android:textSize="13sp"
         android:visibility="gone" />
 
-    <!-- Mặt bọt nước thước thủy -->
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:padding="20dp">
-
-        <com.example.baseproject.ui.level.BubbleLevelView
-            android:id="@+id/bubbleLevelView"
-            android:layout_width="280dp"
-            android:layout_height="280dp"
-            android:layout_gravity="center" />
-    </FrameLayout>
-
-    <!-- Thẻ hiển thị số đo góc trước sau và trái phải -->
+    <!-- Thanh chuyển đổi 4 chế độ (Tất cả, Ngang, Dọc, Tròn) -->
     <LinearLayout
+        android:id="@+id/tabModeContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:paddingStart="20dp"
-        android:paddingEnd="20dp">
+        android:paddingStart="16dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="8dp">
 
+        <!-- Tab 1: Tất cả -->
         <com.google.android.material.card.MaterialCardView
+            android:id="@+id/tabModeAll"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="6dp"
             android:layout_weight="1"
-            app:cardBackgroundColor="@color/colorCardBackground"
-            app:cardCornerRadius="16dp"
+            android:clickable="true"
+            android:focusable="true"
+            app:cardBackgroundColor="#F7FEE7"
+            app:cardCornerRadius="14dp"
             app:cardElevation="0dp"
-            app:strokeColor="@color/colorBorder"
-            app:strokeWidth="1dp">
+            app:strokeColor="#84CC16"
+            app:strokeWidth="2dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:gravity="center"
-                android:orientation="vertical"
-                android:padding="16dp">
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/ivTabAll"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:src="@drawable/ic_level_tab_all"
+                    app:tint="#4D7C0F" />
 
                 <TextView
+                    android:id="@+id/tvTabAll"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Trái / Phải"
-                    android:textColor="@color/textSecondary"
-                    android:textSize="13sp" />
-
-                <TextView
-                    android:id="@+id/tvRollValue"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="0.0°"
-                    android:textColor="@color/textPrimary"
-                    android:textSize="22sp"
+                    android:layout_marginStart="4dp"
+                    android:text="@string/level_mode_all"
+                    android:textColor="#4D7C0F"
+                    android:textSize="12sp"
                     android:textStyle="bold" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- Tab 2: Ngang -->
         <com.google.android.material.card.MaterialCardView
+            android:id="@+id/tabModeHorizontal"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="6dp"
             android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
             app:cardBackgroundColor="@color/colorCardBackground"
-            app:cardCornerRadius="16dp"
+            app:cardCornerRadius="14dp"
             app:cardElevation="0dp"
             app:strokeColor="@color/colorBorder"
             app:strokeWidth="1dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:gravity="center"
-                android:orientation="vertical"
-                android:padding="16dp">
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/ivTabHorizontal"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:src="@drawable/ic_level_tab_horizontal"
+                    app:tint="@color/textSecondary" />
 
                 <TextView
+                    android:id="@+id/tvTabHorizontal"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Trước / Sau"
+                    android:layout_marginStart="4dp"
+                    android:text="@string/level_mode_horizontal"
                     android:textColor="@color/textSecondary"
-                    android:textSize="13sp" />
+                    android:textSize="12sp" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Tab 3: Dọc -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/tabModeVertical"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="6dp"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
+            app:cardBackgroundColor="@color/colorCardBackground"
+            app:cardCornerRadius="14dp"
+            app:cardElevation="0dp"
+            app:strokeColor="@color/colorBorder"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/ivTabVertical"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:src="@drawable/ic_level_tab_vertical"
+                    app:tint="@color/textSecondary" />
 
                 <TextView
-                    android:id="@+id/tvPitchValue"
+                    android:id="@+id/tvTabVertical"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="0.0°"
-                    android:textColor="@color/textPrimary"
-                    android:textSize="22sp"
-                    android:textStyle="bold" />
+                    android:layout_marginStart="4dp"
+                    android:text="@string/level_mode_vertical"
+                    android:textColor="@color/textSecondary"
+                    android:textSize="12sp" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Tab 4: Tròn -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/tabModeCircular"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
+            app:cardBackgroundColor="@color/colorCardBackground"
+            app:cardCornerRadius="14dp"
+            app:cardElevation="0dp"
+            app:strokeColor="@color/colorBorder"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/ivTabCircular"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:src="@drawable/ic_level_tab_circular"
+                    app:tint="@color/textSecondary" />
+
+                <TextView
+                    android:id="@+id/tvTabCircular"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:text="@string/level_mode_circular"
+                    android:textColor="@color/textSecondary"
+                    android:textSize="12sp" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
     </LinearLayout>
 
-    <!-- Nút đặt lại mốc 0 chuẩn (Calibrate) -->
+    <!-- Khung nội dung chính chuyển đổi theo chế độ -->
+    <FrameLayout
+        android:id="@+id/contentFrame"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <!-- ============================================== -->
+        <!-- CHẾ ĐỘ 1: TẤT CẢ (ALL)                        -->
+        <!-- ============================================== -->
+        <LinearLayout
+            android:id="@+id/containerModeAll"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:paddingStart="20dp"
+            android:paddingTop="8dp"
+            android:paddingEnd="20dp"
+            android:paddingBottom="8dp"
+            android:visibility="visible">
+
+            <!-- Ống thủy ngang trên đỉnh -->
+            <com.example.baseproject.ui.level.HorizontalVialView
+                android:id="@+id/horizontalVialAll"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginBottom="12dp" />
+
+            <!-- Khung giữa: Thước tròn bên trái và Ống thủy dọc bên phải -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <com.example.baseproject.ui.level.BubbleLevelView
+                    android:id="@+id/bubbleLevelViewAll"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1" />
+
+                <com.example.baseproject.ui.level.VerticalVialView
+                    android:id="@+id/verticalVialAll"
+                    android:layout_width="56dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="14dp" />
+            </LinearLayout>
+
+            <!-- 2 thẻ hiển thị giá trị góc X và Y -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:orientation="horizontal">
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="6dp"
+                    android:layout_weight="1"
+                    app:cardBackgroundColor="@color/colorCardBackground"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="1dp"
+                    app:strokeColor="@color/colorBorder"
+                    app:strokeWidth="1dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="12dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/level_horizontal_label"
+                            android:textColor="@color/textSecondary"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:id="@+id/tvAngleXAll"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="0,0°"
+                            android:textColor="@color/textPrimary"
+                            android:textSize="24sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:layout_weight="1"
+                    app:cardBackgroundColor="@color/colorCardBackground"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="1dp"
+                    app:strokeColor="@color/colorBorder"
+                    app:strokeWidth="1dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="12dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/level_vertical_label"
+                            android:textColor="@color/textSecondary"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:id="@+id/tvAngleYAll"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="0,0°"
+                            android:textColor="@color/textPrimary"
+                            android:textSize="24sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- ============================================== -->
+        <!-- CHẾ ĐỘ 2: NGANG (HORIZONTAL ONLY)             -->
+        <!-- ============================================== -->
+        <LinearLayout
+            android:id="@+id/containerModeHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="24dp"
+            android:visibility="gone">
+
+            <!-- Ống thủy ngang kích thước lớn -->
+            <com.example.baseproject.ui.level.HorizontalVialView
+                android:id="@+id/horizontalVialSingle"
+                android:layout_width="match_parent"
+                android:layout_height="88dp" />
+
+            <!-- Thẻ đo giá trị góc nghiêng ngang nổi bật -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="180dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="36dp"
+                app:cardBackgroundColor="@color/colorCardBackground"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="2dp"
+                app:strokeColor="@color/colorBorder"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:id="@+id/tvAngleHorizontalSingle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0,0°"
+                        android:textColor="@color/textPrimary"
+                        android:textSize="38sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
+
+        <!-- ============================================== -->
+        <!-- CHẾ ĐỘ 3: DỌC (VERTICAL ONLY)                 -->
+        <!-- ============================================== -->
+        <LinearLayout
+            android:id="@+id/containerModeVertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="20dp"
+            android:visibility="gone">
+
+            <!-- Ống thủy dọc kích thước lớn -->
+            <com.example.baseproject.ui.level.VerticalVialView
+                android:id="@+id/verticalVialSingle"
+                android:layout_width="88dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <!-- Thẻ đo giá trị góc nghiêng dọc nổi bật -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="180dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                app:cardBackgroundColor="@color/colorCardBackground"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="2dp"
+                app:strokeColor="@color/colorBorder"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:id="@+id/tvAngleVerticalSingle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0,0°"
+                        android:textColor="@color/textPrimary"
+                        android:textSize="38sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
+
+        <!-- ============================================== -->
+        <!-- CHẾ ĐỘ 4: TRÒN (CIRCULAR BULLSEYE ONLY)       -->
+        <!-- ============================================== -->
+        <LinearLayout
+            android:id="@+id/containerModeCircular"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="20dp"
+            android:visibility="gone">
+
+            <!-- Thước tròn mắt bò kích thước lớn -->
+            <com.example.baseproject.ui.level.BubbleLevelView
+                android:id="@+id/bubbleLevelViewSingle"
+                android:layout_width="260dp"
+                android:layout_height="260dp" />
+
+            <!-- 2 thẻ hiển thị giá trị trục X và Y dạng ngang -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:orientation="horizontal">
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:layout_weight="1"
+                    app:cardBackgroundColor="@color/colorCardBackground"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="1dp"
+                    app:strokeColor="@color/colorBorder"
+                    app:strokeWidth="1dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:padding="14dp">
+
+                        <TextView
+                            android:id="@+id/tvAngleXCircular"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="X: 0,0°"
+                            android:textColor="@color/textPrimary"
+                            android:textSize="22sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    app:cardBackgroundColor="@color/colorCardBackground"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="1dp"
+                    app:strokeColor="@color/colorBorder"
+                    app:strokeWidth="1dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:padding="14dp">
+
+                        <TextView
+                            android:id="@+id/tvAngleYCircular"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Y: 0,0°"
+                            android:textColor="@color/textPrimary"
+                            android:textSize="22sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
+        </LinearLayout>
+
+    </FrameLayout>
+
+    <!-- Thanh thao tác dưới cùng (Toàn màn hình & Giữ kết quả) -->
     <LinearLayout
+        android:id="@+id/bottomActionContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:orientation="horizontal"
-        android:padding="20dp">
+        android:paddingStart="24dp"
+        android:paddingTop="12dp"
+        android:paddingEnd="24dp"
+        android:paddingBottom="20dp">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnResetCalibrate"
-            style="@style/Widget.Material3.Button.TonalButton"
-            android:layout_width="0dp"
-            android:layout_height="52dp"
-            android:layout_marginEnd="8dp"
-            android:layout_weight="1"
-            android:text="@string/reset"
-            android:textSize="14sp"
-            app:cornerRadius="14dp" />
+        <!-- Nút thao tác Toàn màn hình -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="32dp"
+            android:gravity="center"
+            android:orientation="vertical">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnCalibrate"
-            style="@style/Widget.Material3.Button"
-            android:layout_width="0dp"
-            android:layout_height="52dp"
-            android:layout_marginStart="8dp"
-            android:layout_weight="1"
-            android:backgroundTint="@color/colorPrimary"
-            android:text="@string/calibrate"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            app:cornerRadius="14dp" />
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/btnFullscreenCard"
+                android:layout_width="54dp"
+                android:layout_height="54dp"
+                android:clickable="true"
+                android:focusable="true"
+                app:cardBackgroundColor="@color/colorCardBackground"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="1dp"
+                app:strokeColor="@color/colorBorder"
+                app:strokeWidth="1dp">
+
+                <ImageView
+                    android:id="@+id/ivFullscreenIcon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_fullscreen"
+                    app:tint="@color/textPrimary" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <TextView
+                android:id="@+id/tvFullscreenLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="@string/level_fullscreen"
+                android:textColor="@color/textSecondary"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <!-- Nút thao tác Giữ kết quả / Khóa góc đo -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/btnHoldCard"
+                android:layout_width="54dp"
+                android:layout_height="54dp"
+                android:clickable="true"
+                android:focusable="true"
+                app:cardBackgroundColor="@color/colorCardBackground"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="1dp"
+                app:strokeColor="@color/colorBorder"
+                app:strokeWidth="1dp">
+
+                <ImageView
+                    android:id="@+id/ivHoldIcon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_lock"
+                    app:tint="@color/textPrimary" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <TextView
+                android:id="@+id/tvHoldLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="@string/level_hold_result"
+                android:textColor="@color/textSecondary"
+                android:textSize="12sp" />
+        </LinearLayout>
+
     </LinearLayout>
 
 </LinearLayout>
