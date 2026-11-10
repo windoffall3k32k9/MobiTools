@@ -60,8 +60,38 @@
     <string name="qr_saved_successfully">QR code saved to gallery</string>
 
     <!-- 7. Unit Converter -->
-    <string name="tool_unit_converter_title">Unit Converter</string>
-    <string name="tool_unit_converter_desc">Convert length, mass, temperature and digital storage</string>
+    <string name="tool_unit_converter_title">Converter</string>
+    <string name="tool_unit_converter_desc">Convert currency, length, weight, area, time, data, discount, volume, numeral system, speed, temperature and BMI</string>
+    <string name="conv_tab_calculator">Calculator</string>
+    <string name="conv_tab_converter">Converter</string>
+    <string name="conv_cat_currency">Currency</string>
+    <string name="conv_cat_length">Length</string>
+    <string name="conv_cat_weight">Weight</string>
+    <string name="conv_cat_area">Area</string>
+    <string name="conv_cat_time">Time</string>
+    <string name="conv_cat_data">Data</string>
+    <string name="conv_cat_discount">Discount</string>
+    <string name="conv_cat_volume">Volume</string>
+    <string name="conv_cat_numeral">Numeral System</string>
+    <string name="conv_cat_speed">Speed</string>
+    <string name="conv_cat_temp">Temperature</string>
+    <string name="conv_cat_bmi">BMI</string>
+    <string name="conv_all_categories">All Categories</string>
+    <string name="conv_from_unit">From Unit</string>
+    <string name="conv_to_unit">To Unit</string>
+    <string name="conv_all_units_reference">All Units Reference</string>
+    <string name="conv_custom_rate">Custom Rate</string>
+    <string name="conv_reset_rate">Reset Rate</string>
+    <string name="conv_discount_original_price">Original Price</string>
+    <string name="conv_discount_percent">Discount (%)</string>
+    <string name="conv_discount_extra_percent">Extra Discount (%)</string>
+    <string name="conv_discount_final_price">Final Price</string>
+    <string name="conv_discount_saved_amount">You Save</string>
+    <string name="conv_numeral_input_label">Input Value</string>
+    <string name="conv_bmi_height_label">Height (cm)</string>
+    <string name="conv_bmi_weight_label">Weight (kg)</string>
+    <string name="conv_bmi_score_label">Your BMI Score</string>
+    <string name="conv_bmi_ideal_weight_label">Ideal Weight Range</string>
 
     <!-- 8. Compass -->
     <string name="tool_compass_title">Compass</string>

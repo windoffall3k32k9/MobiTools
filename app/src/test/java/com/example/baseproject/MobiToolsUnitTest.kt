@@ -80,4 +80,83 @@ class MobiToolsUnitTest {
         val lineCount = com.example.baseproject.ui.texttools.TextTransformEngine.countLines("1\n2\n3")
         assertEquals(3, lineCount)
     }
+
+    // Kiểm tra đầy đủ 12 danh mục công cụ chuyển đổi trong ConverterEngine.
+    @Test
+    fun testConverterEngineAllTwelveCategories() {
+        val categories = com.example.baseproject.ui.converter.ConverterCategory.entries
+        assertEquals(12, categories.size)
+
+        // 1. Độ dài: 1 km = 1000 m
+        val km = com.example.baseproject.ui.converter.ConverterEngine.lengthUnits.first { it.code == "km" }
+        val m = com.example.baseproject.ui.converter.ConverterEngine.lengthUnits.first { it.code == "m" }
+        assertEquals(1000.0, com.example.baseproject.ui.converter.ConverterEngine.convertLinear(1.0, km, m), 0.001)
+
+        // 2. Trọng lượng: 1 tấn = 1000 kg
+        val ton = com.example.baseproject.ui.converter.ConverterEngine.weightUnits.first { it.code == "t" }
+        val kg = com.example.baseproject.ui.converter.ConverterEngine.weightUnits.first { it.code == "kg" }
+        assertEquals(1000.0, com.example.baseproject.ui.converter.ConverterEngine.convertLinear(1.0, ton, kg), 0.001)
+
+        // 3. Diện tích: 1 ha = 10.000 m2
+        val ha = com.example.baseproject.ui.converter.ConverterEngine.areaUnits.first { it.code == "ha" }
+        val m2 = com.example.baseproject.ui.converter.ConverterEngine.areaUnits.first { it.code == "m2" }
+        assertEquals(10000.0, com.example.baseproject.ui.converter.ConverterEngine.convertLinear(1.0, ha, m2), 0.001)
+
+        // 4. Thời gian: 1 giờ = 3600 giây
+        val hour = com.example.baseproject.ui.converter.ConverterEngine.timeUnits.first { it.code == "h" }
+        val sec = com.example.baseproject.ui.converter.ConverterEngine.timeUnits.first { it.code == "s" }
+        assertEquals(3600.0, com.example.baseproject.ui.converter.ConverterEngine.convertLinear(1.0, hour, sec), 0.001)
+
+        // 5. Dữ liệu: 1 GB = 1024 MB
+        val gb = com.example.baseproject.ui.converter.ConverterEngine.dataUnits.first { it.code == "GB" }
+        val mb = com.example.baseproject.ui.converter.ConverterEngine.dataUnits.first { it.code == "MB" }
+        assertEquals(1024.0, com.example.baseproject.ui.converter.ConverterEngine.convertLinear(1.0, gb, mb), 0.001)
+
+        // 6. Thể tích: 1 m3 = 1000 L
+        val m3 = com.example.baseproject.ui.converter.ConverterEngine.volumeUnits.first { it.code == "m3" }
+        val liter = com.example.baseproject.ui.converter.ConverterEngine.volumeUnits.first { it.code == "L" }
+        assertEquals(1000.0, com.example.baseproject.ui.converter.ConverterEngine.convertLinear(1.0, m3, liter), 0.001)
+
+        // 7. Tốc độ: 36 km/h = 10 m/s
+        val kmh = com.example.baseproject.ui.converter.ConverterEngine.speedUnits.first { it.code == "kmh" }
+        val ms = com.example.baseproject.ui.converter.ConverterEngine.speedUnits.first { it.code == "ms" }
+        assertEquals(10.0, com.example.baseproject.ui.converter.ConverterEngine.convertLinear(36.0, kmh, ms), 0.001)
+
+        // 8. Nhiệt độ: 100 C = 212 F và kiểm tra độ 0 tuyệt đối
+        assertEquals(212.0, com.example.baseproject.ui.converter.ConverterEngine.convertTemperature(100.0, "C", "F"), 0.001)
+        assertTrue(com.example.baseproject.ui.converter.ConverterEngine.isBelowAbsoluteZero(-300.0, "C"))
+    }
+
+    // Kiểm tra tính toán Giảm giá, Hệ thống số và BMI cùng các trường hợp biên/lỗi.
+    @Test
+    fun testDiscountNumeralAndBmiValidation() {
+        // Giảm giá: 500.000 giảm 20%, giảm thêm 10% -> còn 360.000, tiết kiệm 140.000 (28%)
+        val disc = com.example.baseproject.ui.converter.ConverterEngine.calculateDiscount("500000", "20", "10")
+        assertTrue(disc.isValid)
+        assertEquals(360000.0, disc.finalPrice, 0.01)
+        assertEquals(140000.0, disc.savedAmount, 0.01)
+        assertEquals(28.0, disc.effectiveDiscountPercent, 0.01)
+
+        val invalidDisc = com.example.baseproject.ui.converter.ConverterEngine.calculateDiscount("100000", "150", "0")
+        assertTrue(!invalidDisc.isValid)
+
+        // Hệ thống số: 255 (DEC) -> FF (HEX), 377 (OCT), 1111 1111 (BIN)
+        val num = com.example.baseproject.ui.converter.ConverterEngine.convertNumeralSystem("255", 10)
+        assertTrue(num.isValid)
+        assertEquals("FF", num.hexValue)
+        assertEquals("377", num.octValue)
+        assertEquals("1111 1111", num.binValue)
+
+        val invalidBin = com.example.baseproject.ui.converter.ConverterEngine.convertNumeralSystem("10201", 2)
+        assertTrue(!invalidBin.isValid)
+
+        // BMI: Cao 170 cm, nặng 65 kg -> BMI ~ 22.49 (Bình thường)
+        val bmiRes = com.example.baseproject.ui.converter.ConverterEngine.calculateBmi("170", "65")
+        assertTrue(bmiRes.isValid)
+        assertEquals(22.49, bmiRes.bmi, 0.05)
+        assertEquals(com.example.baseproject.ui.converter.BmiStatus.NORMAL, bmiRes.status)
+
+        val invalidBmi = com.example.baseproject.ui.converter.ConverterEngine.calculateBmi("10", "65")
+        assertTrue(!invalidBmi.isValid)
+    }
 }

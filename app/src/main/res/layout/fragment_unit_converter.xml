@@ -1,197 +1,2545 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorBackground"
-    android:fillViewport="true">
+    android:background="@color/colorSurface"
+    android:orientation="vertical">
 
+    <!-- ========================================================= -->
+    <!-- THANH TIÊU ĐỀ CHUẨN: QUAY LẠI | MÁY TÍNH - CHUYỂN ĐỔI | LƯỚI -->
+    <!-- ========================================================= -->
     <LinearLayout
+        android:id="@+id/converterTopBar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="?attr/actionBarSize"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp">
 
-        <include layout="@layout/layout_tool_toolbar" />
+        <!-- Nút quay lại -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/btnConverterBack"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:clickable="true"
+            android:focusable="true"
+            app:cardBackgroundColor="@color/colorCardBackground"
+            app:cardCornerRadius="13dp"
+            app:cardElevation="0dp"
+            app:strokeColor="@color/colorBorder"
+            app:strokeWidth="1dp">
 
-        <!-- Thanh chọn loại chuyển đổi -->
-        <HorizontalScrollView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clipToPadding="false"
-            android:paddingStart="16dp"
-            android:paddingTop="12dp"
-            android:paddingEnd="16dp"
-            android:paddingBottom="8dp"
-            android:scrollbars="none">
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_arrow_back"
+                app:tint="@color/textPrimary" />
+        </com.google.android.material.card.MaterialCardView>
 
-            <com.google.android.material.button.MaterialButtonToggleGroup
-                android:id="@+id/toggleCategoryGroup"
+        <!-- Cụm chuyển tab Máy tính | Chuyển đổi giống thiết kế mẫu -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tvHeaderTabCalculator"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:checkedButton="@id/btnCatLength"
-                app:singleSelection="true">
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                android:paddingStart="12dp"
+                android:paddingTop="8dp"
+                android:paddingEnd="12dp"
+                android:paddingBottom="8dp"
+                android:text="@string/conv_tab_calculator"
+                android:textColor="@color/textMuted"
+                android:textSize="18sp" />
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnCatLength"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:text="Chiều dài"
-                    android:textSize="13sp" />
+            <TextView
+                android:id="@+id/tvHeaderTabConverter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                android:paddingStart="12dp"
+                android:paddingTop="8dp"
+                android:paddingEnd="12dp"
+                android:paddingBottom="8dp"
+                android:text="@string/conv_tab_converter"
+                android:textColor="@color/textPrimary"
+                android:textSize="19sp"
+                android:textStyle="bold" />
+        </LinearLayout>
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnCatWeight"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:text="Khối lượng"
-                    android:textSize="13sp" />
+        <!-- Nút quay về lưới 12 danh mục (hiện khi đang ở màn hình chi tiết) -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/btnShowCategoryGrid"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:visibility="invisible"
+            app:cardBackgroundColor="@color/colorCardBackground"
+            app:cardCornerRadius="13dp"
+            app:cardElevation="0dp"
+            app:strokeColor="@color/colorBorder"
+            app:strokeWidth="1dp">
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnCatTemp"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:text="Nhiệt độ"
-                    android:textSize="13sp" />
+            <ImageView
+                android:layout_width="19dp"
+                android:layout_height="19dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_grid_view"
+                app:tint="@color/textPrimary" />
+        </com.google.android.material.card.MaterialCardView>
+    </LinearLayout>
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnCatData"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:text="Dung lượng"
-                    android:textSize="13sp" />
-            </com.google.android.material.button.MaterialButtonToggleGroup>
-        </HorizontalScrollView>
+    <!-- ========================================================= -->
+    <!-- MÀN HÌNH 1: LƯỚI 12 CHỨC NĂNG CHUYỂN ĐỔI (3 CỘT x 4 HÀNG)  -->
+    <!-- ========================================================= -->
+    <ScrollView
+        android:id="@+id/layoutConverterGridContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:visibility="visible">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="20dp">
+            android:paddingStart="16dp"
+            android:paddingTop="20dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="28dp">
 
-            <!-- Khung nhập giá trị nguồn -->
-            <com.google.android.material.card.MaterialCardView
+            <GridLayout
+                android:id="@+id/gridConverterCategories"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardBackgroundColor="@color/colorCardBackground"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="0dp"
-                app:strokeColor="@color/colorBorder"
-                app:strokeWidth="1dp">
+                android:columnCount="3"
+                android:rowCount="4">
 
+                <!-- 1. Ngoại tệ -->
                 <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:id="@+id/tileCatCurrency"
+                    android:layout_width="0dp"
+                    android:layout_height="116dp"
+                    android:layout_columnWeight="1"
+                    android:layout_margin="6dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="8dp">
+
+                    <FrameLayout
+                        android:layout_width="54dp"
+                        android:layout_height="54dp"
+                        android:background="@drawable/bg_search_bar">
+
+                        <ImageView
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_conv_currency" />
+                    </FrameLayout>
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Từ đơn vị"
-                        android:textColor="@color/textSecondary"
-                        android:textSize="13sp" />
-
-                    <Spinner
-                        android:id="@+id/spinnerFromUnit"
-                        android:layout_width="match_parent"
-                        android:layout_height="48dp"
-                        android:layout_marginTop="4dp" />
-
-                    <EditText
-                        android:id="@+id/etFromValue"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:background="@drawable/bg_search_bar"
-                        android:hint="Nhập giá trị…"
-                        android:importantForAutofill="no"
-                        android:inputType="numberDecimal|numberSigned"
-                        android:padding="12dp"
+                        android:layout_marginTop="10dp"
+                        android:gravity="center"
+                        android:maxLines="1"
+                        android:text="@string/conv_cat_currency"
                         android:textColor="@color/textPrimary"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
+                        android:textSize="14sp" />
                 </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
 
-            <!-- Nút đảo đơn vị chuyển đổi -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnSwapUnits"
-                style="@style/Widget.Material3.Button.TonalButton"
-                android:layout_width="56dp"
-                android:layout_height="56dp"
-                android:layout_gravity="center"
-                android:layout_marginTop="12dp"
-                android:layout_marginBottom="12dp"
-                android:insetLeft="0dp"
-                android:insetTop="0dp"
-                android:insetRight="0dp"
-                android:insetBottom="0dp"
-                android:text="⇅"
-                android:textSize="20sp"
-                app:cornerRadius="28dp" />
-
-            <!-- Khung hiển thị kết quả đích -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:cardBackgroundColor="@color/colorCardBackground"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="0dp"
-                app:strokeColor="@color/colorBorder"
-                app:strokeWidth="1dp">
-
+                <!-- 2. Độ dài -->
                 <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:id="@+id/tileCatLength"
+                    android:layout_width="0dp"
+                    android:layout_height="116dp"
+                    android:layout_columnWeight="1"
+                    android:layout_margin="6dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="8dp">
+
+                    <FrameLayout
+                        android:layout_width="54dp"
+                        android:layout_height="54dp"
+                        android:background="@drawable/bg_search_bar">
+
+                        <ImageView
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_conv_length" />
+                    </FrameLayout>
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Sang đơn vị"
-                        android:textColor="@color/textSecondary"
-                        android:textSize="13sp" />
+                        android:layout_marginTop="10dp"
+                        android:gravity="center"
+                        android:maxLines="1"
+                        android:text="@string/conv_cat_length"
+                        android:textColor="@color/textPrimary"
+                        android:textSize="14sp" />
+                </LinearLayout>
 
-                    <Spinner
-                        android:id="@+id/spinnerToUnit"
-                        android:layout_width="match_parent"
-                        android:layout_height="48dp"
-                        android:layout_marginTop="4dp" />
+                <!-- 3. Trọng lượng -->
+                <LinearLayout
+                    android:id="@+id/tileCatWeight"
+                    android:layout_width="0dp"
+                    android:layout_height="116dp"
+                    android:layout_columnWeight="1"
+                    android:layout_margin="6dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="8dp">
+
+                    <FrameLayout
+                        android:layout_width="54dp"
+                        android:layout_height="54dp"
+                        android:background="@drawable/bg_search_bar">
+
+                        <ImageView
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_conv_weight" />
+                    </FrameLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:gravity="center"
+                        android:maxLines="1"
+                        android:text="@string/conv_cat_weight"
+                        android:textColor="@color/textPrimary"
+                        android:textSize="14sp" />
+                </LinearLayout>
+
+                <!-- 4. Diện tích -->
+                <LinearLayout
+                    android:id="@+id/tileCatArea"
+                    android:layout_width="0dp"
+                    android:layout_height="116dp"
+                    android:layout_columnWeight="1"
+                    android:layout_margin="6dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="8dp">
+
+                    <FrameLayout
+                        android:layout_width="54dp"
+                        android:layout_height="54dp"
+                        android:background="@drawable/bg_search_bar">
+
+                        <ImageView
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_conv_area" />
+                    </FrameLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:gravity="center"
+                        android:maxLines="1"
+                        android:text="@string/conv_cat_area"
+                        android:textColor="@color/textPrimary"
+                        android:textSize="14sp" />
+                </LinearLayout>
+
+                <!-- 5. Thời gian -->
+                <LinearLayout
+                    android:id="@+id/tileCatTime"
+                    android:layout_width="0dp"
+                    android:layout_height="116dp"
+                    android:layout_columnWeight="1"
+                    android:layout_margin="6dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="8dp">
+
+                    <FrameLayout
+                        android:layout_width="54dp"
+                        android:layout_height="54dp"
+                        android:background="@drawable/bg_search_bar">
+
+                        <ImageView
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_conv_time" />
+                    </FrameLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:gravity="center"
+                        android:maxLines="1"
+                        android:text="@string/conv_cat_time"
+                        android:textColor="@color/textPrimary"
+                        android:textSize="14sp" />
+                </LinearLayout>
+
+                <!-- 6. Dữ liệu -->
+                <LinearLayout
+                    android:id="@+id/tileCatData"
+                    android:layout_width="0dp"
+                    android:layout_height="116dp"
+                    android:layout_columnWeight="1"
+                    android:layout_margin="6dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="8dp">
+
+                    <FrameLayout
+                        android:layout_width="54dp"
+                        android:layout_height="54dp"
+                        android:background="@drawable/bg_search_bar">
+
+                        <ImageView
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_conv_data" />
+                    </FrameLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:gravity="center"
+                        android:maxLines="1"
+                        android:text="@string/conv_cat_data"
+                        android:textColor="@color/textPrimary"
+                        android:textSize="14sp" />
+                </LinearLayout>
+
+                <!-- 7. Giảm giá -->
+                <LinearLayout
+                    android:id="@+id/tileCatDiscount"
+                    android:layout_width="0dp"
+                    android:layout_height="116dp"
+                    android:layout_columnWeight="1"
+                    android:layout_margin="6dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="8dp">
+
+                    <FrameLayout
+                        android:layout_width="54dp"
+                        android:layout_height="54dp"
+                        android:background="@drawable/bg_search_bar">
+
+                        <ImageView
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_conv_discount" />
+                    </FrameLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:gravity="center"
+                        android:maxLines="1"
+                        android:text="@string/conv_cat_discount"
+                        android:textColor="@color/textPrimary"
+                        android:textSize="14sp" />
+                </LinearLayout>
+
+                <!-- 8. Thể tích -->
+                <LinearLayout
+                    android:id="@+id/tileCatVolume"
+                    android:layout_width="0dp"
+                    android:layout_height="116dp"
+                    android:layout_columnWeight="1"
+                    android:layout_margin="6dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="8dp">
+
+                    <FrameLayout
+                        android:layout_width="54dp"
+                        android:layout_height="54dp"
+                        android:background="@drawable/bg_search_bar">
+
+                        <ImageView
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_conv_volume" />
+                    </FrameLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:gravity="center"
+                        android:maxLines="1"
+                        android:text="@string/conv_cat_volume"
+                        android:textColor="@color/textPrimary"
+                        android:textSize="14sp" />
+                </LinearLayout>
+
+                <!-- 9. Hệ thống số -->
+                <LinearLayout
+                    android:id="@+id/tileCatNumeral"
+                    android:layout_width="0dp"
+                    android:layout_height="116dp"
+                    android:layout_columnWeight="1"
+                    android:layout_margin="6dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="8dp">
+
+                    <FrameLayout
+                        android:layout_width="54dp"
+                        android:layout_height="54dp"
+                        android:background="@drawable/bg_search_bar">
+
+                        <ImageView
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_conv_numeral" />
+                    </FrameLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:gravity="center"
+                        android:maxLines="1"
+                        android:text="@string/conv_cat_numeral"
+                        android:textColor="@color/textPrimary"
+                        android:textSize="14sp" />
+                </LinearLayout>
+
+                <!-- 10. Tốc độ -->
+                <LinearLayout
+                    android:id="@+id/tileCatSpeed"
+                    android:layout_width="0dp"
+                    android:layout_height="116dp"
+                    android:layout_columnWeight="1"
+                    android:layout_margin="6dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="8dp">
+
+                    <FrameLayout
+                        android:layout_width="54dp"
+                        android:layout_height="54dp"
+                        android:background="@drawable/bg_search_bar">
+
+                        <ImageView
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_conv_speed" />
+                    </FrameLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:gravity="center"
+                        android:maxLines="1"
+                        android:text="@string/conv_cat_speed"
+                        android:textColor="@color/textPrimary"
+                        android:textSize="14sp" />
+                </LinearLayout>
+
+                <!-- 11. Nhiệt độ -->
+                <LinearLayout
+                    android:id="@+id/tileCatTemp"
+                    android:layout_width="0dp"
+                    android:layout_height="116dp"
+                    android:layout_columnWeight="1"
+                    android:layout_margin="6dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="8dp">
+
+                    <FrameLayout
+                        android:layout_width="54dp"
+                        android:layout_height="54dp"
+                        android:background="@drawable/bg_search_bar">
+
+                        <ImageView
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_conv_temp" />
+                    </FrameLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:gravity="center"
+                        android:maxLines="1"
+                        android:text="@string/conv_cat_temp"
+                        android:textColor="@color/textPrimary"
+                        android:textSize="14sp" />
+                </LinearLayout>
+
+                <!-- 12. BMI -->
+                <LinearLayout
+                    android:id="@+id/tileCatBmi"
+                    android:layout_width="0dp"
+                    android:layout_height="116dp"
+                    android:layout_columnWeight="1"
+                    android:layout_margin="6dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="8dp">
+
+                    <FrameLayout
+                        android:layout_width="54dp"
+                        android:layout_height="54dp"
+                        android:background="@drawable/bg_search_bar">
+
+                        <ImageView
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_conv_bmi" />
+                    </FrameLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:gravity="center"
+                        android:maxLines="1"
+                        android:text="@string/conv_cat_bmi"
+                        android:textColor="@color/textPrimary"
+                        android:textSize="14sp" />
+                </LinearLayout>
+
+            </GridLayout>
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- ========================================================= -->
+    <!-- MÀN HÌNH 2: KHÔNG GIAN LÀM VIỆC CHI TIẾT TỪNG CÔNG CỤ     -->
+    <!-- ========================================================= -->
+    <LinearLayout
+        android:id="@+id/layoutConverterDetailContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorBackground"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <!-- Thanh chip chuyển nhanh giữa 12 công cụ -->
+        <HorizontalScrollView
+            android:id="@+id/scrollQuickCategories"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorSurface"
+            android:clipToPadding="false"
+            android:paddingStart="14dp"
+            android:paddingTop="8dp"
+            android:paddingEnd="14dp"
+            android:paddingBottom="10dp"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:id="@+id/containerQuickCategoryChips"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" />
+        </HorizontalScrollView>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/colorBorder" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingStart="16dp"
+                android:paddingTop="14dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="32dp">
+
+                <!-- Header thông tin danh mục đang chọn -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardBackgroundColor="@color/colorCardBackground"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="0dp"
+                    app:strokeColor="@color/colorBorder"
+                    app:strokeWidth="1dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:padding="14dp">
+
+                        <FrameLayout
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:background="@drawable/bg_search_bar">
+
+                            <ImageView
+                                android:id="@+id/ivActiveCategoryIcon"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_conv_currency"
+                                app:tint="@color/calcOrange" />
+                        </FrameLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/tvActiveCategoryTitle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/textPrimary"
+                                android:textSize="16sp"
+                                android:textStyle="bold"
+                                tools:text="Ngoại tệ" />
+
+                            <TextView
+                                android:id="@+id/tvActiveCategorySubtitle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:textColor="@color/textSecondary"
+                                android:textSize="12.5sp"
+                                tools:text="Quy đổi tỷ giá tiền tệ quốc tế" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/btnResetActiveTool"
+                            android:layout_width="wrap_content"
+                            android:layout_height="34dp"
+                            android:background="@drawable/bg_search_bar"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:gravity="center"
+                            android:paddingStart="12dp"
+                            android:paddingEnd="12dp"
+                            android:text="@string/reset"
+                            android:textColor="@color/calcOrange"
+                            android:textSize="12.5sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- ===================================================== -->
+                <!-- KHỐI 1: CHUYỂN ĐỔI ĐƠN VỊ CHUẨN / TIỀN TỆ / NHIỆT ĐỘ  -->
+                <!-- ===================================================== -->
+                <LinearLayout
+                    android:id="@+id/workspaceUnitConverter"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:orientation="vertical"
+                    android:visibility="visible">
+
+                    <!-- Thẻ đơn vị nguồn (Từ đơn vị) -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:cardBackgroundColor="@color/colorCardBackground"
+                        app:cardCornerRadius="18dp"
+                        app:cardElevation="0dp"
+                        app:strokeColor="@color/colorBorder"
+                        app:strokeWidth="1dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="16dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="@string/conv_from_unit"
+                                    android:textColor="@color/textSecondary"
+                                    android:textSize="12.5sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/tvFromUnitCodeBadge"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:background="@drawable/bg_search_bar"
+                                    android:paddingStart="8dp"
+                                    android:paddingTop="2dp"
+                                    android:paddingEnd="8dp"
+                                    android:paddingBottom="2dp"
+                                    android:textColor="@color/calcOrange"
+                                    android:textSize="11.5sp"
+                                    android:textStyle="bold"
+                                    tools:text="USD" />
+                            </LinearLayout>
+
+                            <!-- Nút mở danh sách chọn đơn vị nguồn -->
+                            <LinearLayout
+                                android:id="@+id/btnSelectFromUnit"
+                                android:layout_width="match_parent"
+                                android:layout_height="46dp"
+                                android:layout_marginTop="8dp"
+                                android:background="@drawable/bg_search_bar"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                android:paddingStart="14dp"
+                                android:paddingEnd="14dp">
+
+                                <TextView
+                                    android:id="@+id/tvFromUnitName"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:ellipsize="end"
+                                    android:maxLines="1"
+                                    android:textColor="@color/textPrimary"
+                                    android:textSize="15sp"
+                                    android:textStyle="bold"
+                                    tools:text="Đô la Mỹ (USD)" />
+
+                                <ImageView
+                                    android:layout_width="18dp"
+                                    android:layout_height="18dp"
+                                    android:src="@drawable/ic_chevron_down"
+                                    app:tint="@color/textSecondary" />
+                            </LinearLayout>
+
+                            <!-- Ô nhập giá trị nguồn -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="54dp"
+                                android:layout_marginTop="10dp"
+                                android:background="@drawable/bg_search_bar"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                android:paddingStart="14dp"
+                                android:paddingEnd="10dp">
+
+                                <EditText
+                                    android:id="@+id/etFromValue"
+                                    android:layout_width="0dp"
+                                    android:layout_height="match_parent"
+                                    android:layout_weight="1"
+                                    android:background="@null"
+                                    android:hint="Nhập giá trị…"
+                                    android:importantForAutofill="no"
+                                    android:inputType="numberDecimal|numberSigned"
+                                    android:maxLines="1"
+                                    android:text="1"
+                                    android:textColor="@color/textPrimary"
+                                    android:textColorHint="@color/textMuted"
+                                    android:textSize="22sp"
+                                    android:textStyle="bold" />
+
+                                <ImageView
+                                    android:id="@+id/btnClearFromValue"
+                                    android:layout_width="32dp"
+                                    android:layout_height="32dp"
+                                    android:background="?attr/selectableItemBackgroundBorderless"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:padding="6dp"
+                                    android:src="@drawable/ic_close_circle"
+                                    app:tint="@color/textMuted" />
+                            </LinearLayout>
+
+                            <!-- Hàng chip chọn nhanh số lượng phổ biến -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="10dp"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:id="@+id/chipQuickVal1"
+                                    android:layout_width="0dp"
+                                    android:layout_height="32dp"
+                                    android:layout_marginEnd="6dp"
+                                    android:layout_weight="1"
+                                    android:background="@drawable/bg_search_bar"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:gravity="center"
+                                    android:text="1"
+                                    android:textColor="@color/textSecondary"
+                                    android:textSize="12.5sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/chipQuickVal10"
+                                    android:layout_width="0dp"
+                                    android:layout_height="32dp"
+                                    android:layout_marginEnd="6dp"
+                                    android:layout_weight="1"
+                                    android:background="@drawable/bg_search_bar"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:gravity="center"
+                                    android:text="10"
+                                    android:textColor="@color/textSecondary"
+                                    android:textSize="12.5sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/chipQuickVal100"
+                                    android:layout_width="0dp"
+                                    android:layout_height="32dp"
+                                    android:layout_marginEnd="6dp"
+                                    android:layout_weight="1"
+                                    android:background="@drawable/bg_search_bar"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:gravity="center"
+                                    android:text="100"
+                                    android:textColor="@color/textSecondary"
+                                    android:textSize="12.5sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/chipQuickVal1000"
+                                    android:layout_width="0dp"
+                                    android:layout_height="32dp"
+                                    android:layout_weight="1"
+                                    android:background="@drawable/bg_search_bar"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:gravity="center"
+                                    android:text="1.000"
+                                    android:textColor="@color/textSecondary"
+                                    android:textSize="12.5sp"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <!-- Thanh giữa: Công thức quy đổi + Nút đảo chiều ⇅ + Tùy chỉnh tỷ giá -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginBottom="10dp"
                         android:gravity="center_vertical"
                         android:orientation="horizontal">
 
-                        <TextView
-                            android:id="@+id/tvToResult"
+                        <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="0"
-                            android:textColor="@color/colorPrimary"
-                            android:textSize="24sp"
-                            android:textStyle="bold" />
+                            android:orientation="vertical">
 
-                        <ImageView
-                            android:id="@+id/btnCopyResult"
-                            android:layout_width="36dp"
-                            android:layout_height="36dp"
-                            android:background="?attr/selectableItemBackgroundBorderless"
+                            <TextView
+                                android:id="@+id/tvUnitFormulaInfo"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/textSecondary"
+                                android:textSize="12.5sp"
+                                android:textStyle="bold"
+                                tools:text="1 USD = 25.450 VND" />
+
+                            <TextView
+                                android:id="@+id/btnCustomizeRate"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:background="?attr/selectableItemBackground"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:text="✎ Tùy chỉnh tỷ giá"
+                                android:textColor="@color/calcOrange"
+                                android:textSize="12sp"
+                                android:textStyle="bold"
+                                android:visibility="gone" />
+                        </LinearLayout>
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/btnSwapUnits"
+                            android:layout_width="46dp"
+                            android:layout_height="46dp"
                             android:clickable="true"
                             android:focusable="true"
-                            android:padding="6dp"
-                            android:src="@drawable/ic_copy" />
-                    </LinearLayout>
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+                            app:cardBackgroundColor="@color/calcOrangeLight"
+                            app:cardCornerRadius="23dp"
+                            app:cardElevation="0dp"
+                            app:strokeColor="@color/calcOrange"
+                            app:strokeWidth="1dp">
 
-        </LinearLayout>
+                            <ImageView
+                                android:layout_width="22dp"
+                                android:layout_height="22dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_swap_vert" />
+                        </com.google.android.material.card.MaterialCardView>
+                    </LinearLayout>
+
+                    <!-- Thẻ đơn vị đích (Sang đơn vị) -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:cardBackgroundColor="@color/colorCardBackground"
+                        app:cardCornerRadius="18dp"
+                        app:cardElevation="0dp"
+                        app:strokeColor="@color/calcOrange"
+                        app:strokeWidth="1.5dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="16dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="@string/conv_to_unit"
+                                    android:textColor="@color/textSecondary"
+                                    android:textSize="12.5sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/tvToUnitCodeBadge"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:background="@color/calcOrangeLight"
+                                    android:paddingStart="8dp"
+                                    android:paddingTop="2dp"
+                                    android:paddingEnd="8dp"
+                                    android:paddingBottom="2dp"
+                                    android:textColor="@color/calcOrange"
+                                    android:textSize="11.5sp"
+                                    android:textStyle="bold"
+                                    tools:text="VND" />
+                            </LinearLayout>
+
+                            <!-- Nút mở danh sách chọn đơn vị đích -->
+                            <LinearLayout
+                                android:id="@+id/btnSelectToUnit"
+                                android:layout_width="match_parent"
+                                android:layout_height="46dp"
+                                android:layout_marginTop="8dp"
+                                android:background="@drawable/bg_search_bar"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                android:paddingStart="14dp"
+                                android:paddingEnd="14dp">
+
+                                <TextView
+                                    android:id="@+id/tvToUnitName"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:ellipsize="end"
+                                    android:maxLines="1"
+                                    android:textColor="@color/textPrimary"
+                                    android:textSize="15sp"
+                                    android:textStyle="bold"
+                                    tools:text="Đồng Việt Nam (VND)" />
+
+                                <ImageView
+                                    android:layout_width="18dp"
+                                    android:layout_height="18dp"
+                                    android:src="@drawable/ic_chevron_down"
+                                    app:tint="@color/textSecondary" />
+                            </LinearLayout>
+
+                            <!-- Dòng hiển thị kết quả lớn và nút sao chép -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="12dp"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:id="@+id/tvToResult"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="0"
+                                    android:textColor="@color/calcOrange"
+                                    android:textSize="26sp"
+                                    android:textStyle="bold" />
+
+                                <com.google.android.material.button.MaterialButton
+                                    android:id="@+id/btnCopyResult"
+                                    style="@style/Widget.Material3.Button.TonalButton"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="38dp"
+                                    android:insetTop="0dp"
+                                    android:insetBottom="0dp"
+                                    android:text="@string/copy"
+                                    android:textColor="@color/calcOrange"
+                                    android:textSize="12.5sp"
+                                    android:textStyle="bold"
+                                    app:backgroundTint="@color/calcOrangeLight"
+                                    app:cornerRadius="12dp"
+                                    app:icon="@drawable/ic_copy"
+                                    app:iconSize="16dp"
+                                    app:iconTint="@color/calcOrange" />
+                            </LinearLayout>
+
+                            <TextView
+                                android:id="@+id/tvUnitWarning"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="6dp"
+                                android:textColor="@color/colorDanger"
+                                android:textSize="12sp"
+                                android:visibility="gone"
+                                tools:text="Lưu ý: Giá trị thấp hơn độ không tuyệt đối (-273,15 °C)" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <!-- Bảng quy đổi nhanh toàn bộ đơn vị trong cùng danh mục -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="18dp"
+                        android:layout_marginBottom="8dp"
+                        android:text="@string/conv_all_units_reference"
+                        android:textColor="@color/textPrimary"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:cardBackgroundColor="@color/colorCardBackground"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="0dp"
+                        app:strokeColor="@color/colorBorder"
+                        app:strokeWidth="1dp">
+
+                        <LinearLayout
+                            android:id="@+id/containerAllUnitsRows"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:paddingTop="6dp"
+                            android:paddingBottom="6dp" />
+                    </com.google.android.material.card.MaterialCardView>
+                </LinearLayout>
+
+                <!-- ===================================================== -->
+                <!-- KHỐI 2: CÔNG CỤ TÍNH GIẢM GIÁ (DISCOUNT CALCULATOR)    -->
+                <!-- ===================================================== -->
+                <LinearLayout
+                    android:id="@+id/workspaceDiscountConverter"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:cardBackgroundColor="@color/colorCardBackground"
+                        app:cardCornerRadius="18dp"
+                        app:cardElevation="0dp"
+                        app:strokeColor="@color/colorBorder"
+                        app:strokeWidth="1dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="16dp">
+
+                            <!-- Giá gốc -->
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/conv_discount_original_price"
+                                android:textColor="@color/textSecondary"
+                                android:textSize="13sp"
+                                android:textStyle="bold" />
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="52dp"
+                                android:layout_marginTop="6dp"
+                                android:background="@drawable/bg_search_bar"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                android:paddingStart="14dp"
+                                android:paddingEnd="10dp">
+
+                                <EditText
+                                    android:id="@+id/etDiscountOriginalPrice"
+                                    android:layout_width="0dp"
+                                    android:layout_height="match_parent"
+                                    android:layout_weight="1"
+                                    android:background="@null"
+                                    android:hint="Nhập giá gốc…"
+                                    android:importantForAutofill="no"
+                                    android:inputType="numberDecimal"
+                                    android:maxLines="1"
+                                    android:text="500000"
+                                    android:textColor="@color/textPrimary"
+                                    android:textSize="20sp"
+                                    android:textStyle="bold" />
+
+                                <ImageView
+                                    android:id="@+id/btnClearDiscountPrice"
+                                    android:layout_width="30dp"
+                                    android:layout_height="30dp"
+                                    android:background="?attr/selectableItemBackgroundBorderless"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:padding="5dp"
+                                    android:src="@drawable/ic_close_circle"
+                                    app:tint="@color/textMuted" />
+                            </LinearLayout>
+
+                            <!-- Chip chọn nhanh mệnh giá gốc -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:id="@+id/chipPrice100k"
+                                    android:layout_width="0dp"
+                                    android:layout_height="30dp"
+                                    android:layout_marginEnd="6dp"
+                                    android:layout_weight="1"
+                                    android:background="@drawable/bg_search_bar"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:gravity="center"
+                                    android:text="100K"
+                                    android:textColor="@color/textSecondary"
+                                    android:textSize="12sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/chipPrice250k"
+                                    android:layout_width="0dp"
+                                    android:layout_height="30dp"
+                                    android:layout_marginEnd="6dp"
+                                    android:layout_weight="1"
+                                    android:background="@drawable/bg_search_bar"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:gravity="center"
+                                    android:text="250K"
+                                    android:textColor="@color/textSecondary"
+                                    android:textSize="12sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/chipPrice500k"
+                                    android:layout_width="0dp"
+                                    android:layout_height="30dp"
+                                    android:layout_marginEnd="6dp"
+                                    android:layout_weight="1"
+                                    android:background="@drawable/bg_search_bar"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:gravity="center"
+                                    android:text="500K"
+                                    android:textColor="@color/textSecondary"
+                                    android:textSize="12sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/chipPrice1M"
+                                    android:layout_width="0dp"
+                                    android:layout_height="30dp"
+                                    android:layout_weight="1"
+                                    android:background="@drawable/bg_search_bar"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:gravity="center"
+                                    android:text="1 Triệu"
+                                    android:textColor="@color/textSecondary"
+                                    android:textSize="12sp"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
+
+                            <!-- Phần trăm giảm giá -->
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="14dp"
+                                android:text="@string/conv_discount_percent"
+                                android:textColor="@color/textSecondary"
+                                android:textSize="13sp"
+                                android:textStyle="bold" />
+
+                            <EditText
+                                android:id="@+id/etDiscountPercent"
+                                android:layout_width="match_parent"
+                                android:layout_height="50dp"
+                                android:layout_marginTop="6dp"
+                                android:background="@drawable/bg_search_bar"
+                                android:hint="0 - 100%"
+                                android:importantForAutofill="no"
+                                android:inputType="numberDecimal"
+                                android:maxLines="1"
+                                android:paddingStart="14dp"
+                                android:paddingEnd="14dp"
+                                android:text="20"
+                                android:textColor="@color/textPrimary"
+                                android:textSize="18sp"
+                                android:textStyle="bold" />
+
+                            <!-- Lưới chọn nhanh % giảm giá phổ biến -->
+                            <GridLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:columnCount="4"
+                                android:rowCount="2">
+
+                                <TextView
+                                    android:id="@+id/chipDisc5"
+                                    android:layout_width="0dp"
+                                    android:layout_height="34dp"
+                                    android:layout_columnWeight="1"
+                                    android:layout_margin="3dp"
+                                    android:background="@drawable/bg_search_bar"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:gravity="center"
+                                    android:text="5%"
+                                    android:textColor="@color/textPrimary"
+                                    android:textSize="12.5sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/chipDisc10"
+                                    android:layout_width="0dp"
+                                    android:layout_height="34dp"
+                                    android:layout_columnWeight="1"
+                                    android:layout_margin="3dp"
+                                    android:background="@drawable/bg_search_bar"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:gravity="center"
+                                    android:text="10%"
+                                    android:textColor="@color/textPrimary"
+                                    android:textSize="12.5sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/chipDisc15"
+                                    android:layout_width="0dp"
+                                    android:layout_height="34dp"
+                                    android:layout_columnWeight="1"
+                                    android:layout_margin="3dp"
+                                    android:background="@drawable/bg_search_bar"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:gravity="center"
+                                    android:text="15%"
+                                    android:textColor="@color/textPrimary"
+                                    android:textSize="12.5sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/chipDisc20"
+                                    android:layout_width="0dp"
+                                    android:layout_height="34dp"
+                                    android:layout_columnWeight="1"
+                                    android:layout_margin="3dp"
+                                    android:background="@drawable/bg_search_bar"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:gravity="center"
+                                    android:text="20%"
+                                    android:textColor="@color/textPrimary"
+                                    android:textSize="12.5sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/chipDisc25"
+                                    android:layout_width="0dp"
+                                    android:layout_height="34dp"
+                                    android:layout_columnWeight="1"
+                                    android:layout_margin="3dp"
+                                    android:background="@drawable/bg_search_bar"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:gravity="center"
+                                    android:text="25%"
+                                    android:textColor="@color/textPrimary"
+                                    android:textSize="12.5sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/chipDisc30"
+                                    android:layout_width="0dp"
+                                    android:layout_height="34dp"
+                                    android:layout_columnWeight="1"
+                                    android:layout_margin="3dp"
+                                    android:background="@drawable/bg_search_bar"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:gravity="center"
+                                    android:text="30%"
+                                    android:textColor="@color/textPrimary"
+                                    android:textSize="12.5sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/chipDisc50"
+                                    android:layout_width="0dp"
+                                    android:layout_height="34dp"
+                                    android:layout_columnWeight="1"
+                                    android:layout_margin="3dp"
+                                    android:background="@drawable/bg_search_bar"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:gravity="center"
+                                    android:text="50%"
+                                    android:textColor="@color/textPrimary"
+                                    android:textSize="12.5sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/chipDisc70"
+                                    android:layout_width="0dp"
+                                    android:layout_height="34dp"
+                                    android:layout_columnWeight="1"
+                                    android:layout_margin="3dp"
+                                    android:background="@drawable/bg_search_bar"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:gravity="center"
+                                    android:text="70%"
+                                    android:textColor="@color/textPrimary"
+                                    android:textSize="12.5sp"
+                                    android:textStyle="bold" />
+                            </GridLayout>
+
+                            <!-- Giảm thêm / Voucher (%) -->
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="12dp"
+                                android:text="@string/conv_discount_extra_percent"
+                                android:textColor="@color/textSecondary"
+                                android:textSize="13sp"
+                                android:textStyle="bold" />
+
+                            <EditText
+                                android:id="@+id/etDiscountExtraPercent"
+                                android:layout_width="match_parent"
+                                android:layout_height="46dp"
+                                android:layout_marginTop="6dp"
+                                android:background="@drawable/bg_search_bar"
+                                android:hint="Không bắt buộc (0%)"
+                                android:importantForAutofill="no"
+                                android:inputType="numberDecimal"
+                                android:maxLines="1"
+                                android:paddingStart="14dp"
+                                android:paddingEnd="14dp"
+                                android:text="0"
+                                android:textColor="@color/textPrimary"
+                                android:textSize="16sp" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <!-- Thẻ kết quả tính giảm giá -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        app:cardBackgroundColor="@color/colorCardBackground"
+                        app:cardCornerRadius="18dp"
+                        app:cardElevation="0dp"
+                        app:strokeColor="@color/calcOrange"
+                        app:strokeWidth="1.5dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="16dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="@string/conv_discount_final_price"
+                                    android:textColor="@color/textSecondary"
+                                    android:textSize="13sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/tvDiscountEffectiveBadge"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:background="@color/calcOrangeLight"
+                                    android:paddingStart="8dp"
+                                    android:paddingTop="2dp"
+                                    android:paddingEnd="8dp"
+                                    android:paddingBottom="2dp"
+                                    android:text="-20,0%"
+                                    android:textColor="@color/calcOrange"
+                                    android:textSize="12sp"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:id="@+id/tvDiscountFinalPrice"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="400.000"
+                                    android:textColor="@color/calcOrange"
+                                    android:textSize="28sp"
+                                    android:textStyle="bold" />
+
+                                <com.google.android.material.button.MaterialButton
+                                    android:id="@+id/btnCopyDiscountResult"
+                                    style="@style/Widget.Material3.Button.TonalButton"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="38dp"
+                                    android:insetTop="0dp"
+                                    android:insetBottom="0dp"
+                                    android:text="@string/copy"
+                                    android:textColor="@color/calcOrange"
+                                    android:textSize="12.5sp"
+                                    android:textStyle="bold"
+                                    app:backgroundTint="@color/calcOrangeLight"
+                                    app:cornerRadius="12dp"
+                                    app:icon="@drawable/ic_copy"
+                                    app:iconSize="16dp"
+                                    app:iconTint="@color/calcOrange" />
+                            </LinearLayout>
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:layout_marginTop="12dp"
+                                android:layout_marginBottom="10dp"
+                                android:background="@color/colorBorder" />
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="@string/conv_discount_saved_amount"
+                                    android:textColor="@color/textSecondary"
+                                    android:textSize="13.5sp" />
+
+                                <TextView
+                                    android:id="@+id/tvDiscountSavedAmount"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="100.000"
+                                    android:textColor="@color/colorSuccess"
+                                    android:textSize="16sp"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+                </LinearLayout>
+
+                <!-- ===================================================== -->
+                <!-- KHỐI 3: CHUYỂN ĐỔI HỆ THỐNG SỐ (DEC / HEX / OCT / BIN) -->
+                <!-- ===================================================== -->
+                <LinearLayout
+                    android:id="@+id/workspaceNumeralConverter"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:cardBackgroundColor="@color/colorCardBackground"
+                        app:cardCornerRadius="18dp"
+                        app:cardElevation="0dp"
+                        app:strokeColor="@color/colorBorder"
+                        app:strokeWidth="1dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="16dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Chọn hệ cơ số đầu vào"
+                                android:textColor="@color/textSecondary"
+                                android:textSize="12.5sp"
+                                android:textStyle="bold" />
+
+                            <!-- 4 tab chọn hệ cơ số đầu vào -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:id="@+id/tabRadixDec"
+                                    android:layout_width="0dp"
+                                    android:layout_height="38dp"
+                                    android:layout_marginEnd="6dp"
+                                    android:layout_weight="1"
+                                    android:background="@drawable/bg_search_bar"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:gravity="center"
+                                    android:text="DEC (10)"
+                                    android:textColor="@color/calcOrange"
+                                    android:textSize="12.5sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/tabRadixHex"
+                                    android:layout_width="0dp"
+                                    android:layout_height="38dp"
+                                    android:layout_marginEnd="6dp"
+                                    android:layout_weight="1"
+                                    android:background="@drawable/bg_search_bar"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:gravity="center"
+                                    android:text="HEX (16)"
+                                    android:textColor="@color/textSecondary"
+                                    android:textSize="12.5sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/tabRadixOct"
+                                    android:layout_width="0dp"
+                                    android:layout_height="38dp"
+                                    android:layout_marginEnd="6dp"
+                                    android:layout_weight="1"
+                                    android:background="@drawable/bg_search_bar"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:gravity="center"
+                                    android:text="OCT (8)"
+                                    android:textColor="@color/textSecondary"
+                                    android:textSize="12.5sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/tabRadixBin"
+                                    android:layout_width="0dp"
+                                    android:layout_height="38dp"
+                                    android:layout_weight="1"
+                                    android:background="@drawable/bg_search_bar"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:gravity="center"
+                                    android:text="BIN (2)"
+                                    android:textColor="@color/textSecondary"
+                                    android:textSize="12.5sp"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="52dp"
+                                android:layout_marginTop="12dp"
+                                android:background="@drawable/bg_search_bar"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                android:paddingStart="14dp"
+                                android:paddingEnd="10dp">
+
+                                <EditText
+                                    android:id="@+id/etNumeralInput"
+                                    android:layout_width="0dp"
+                                    android:layout_height="match_parent"
+                                    android:layout_weight="1"
+                                    android:background="@null"
+                                    android:hint="Nhập số cần quy đổi…"
+                                    android:importantForAutofill="no"
+                                    android:inputType="textCapCharacters|textNoSuggestions"
+                                    android:maxLines="1"
+                                    android:text="255"
+                                    android:textColor="@color/textPrimary"
+                                    android:textSize="20sp"
+                                    android:textStyle="bold" />
+
+                                <ImageView
+                                    android:id="@+id/btnClearNumeralInput"
+                                    android:layout_width="30dp"
+                                    android:layout_height="30dp"
+                                    android:background="?attr/selectableItemBackgroundBorderless"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:padding="5dp"
+                                    android:src="@drawable/ic_close_circle"
+                                    app:tint="@color/textMuted" />
+                            </LinearLayout>
+
+                            <!-- Bàn phím phụ nhập nhanh ký tự A-F và 0-1 -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:id="@+id/btnHexKey0"
+                                    android:layout_width="0dp"
+                                    android:layout_height="34dp"
+                                    android:layout_marginEnd="4dp"
+                                    android:layout_weight="1"
+                                    android:background="@drawable/bg_search_bar"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:gravity="center"
+                                    android:text="0"
+                                    android:textColor="@color/textPrimary"
+                                    android:textSize="13sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/btnHexKey1"
+                                    android:layout_width="0dp"
+                                    android:layout_height="34dp"
+                                    android:layout_marginEnd="4dp"
+                                    android:layout_weight="1"
+                                    android:background="@drawable/bg_search_bar"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:gravity="center"
+                                    android:text="1"
+                                    android:textColor="@color/textPrimary"
+                                    android:textSize="13sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/btnHexKeyA"
+                                    android:layout_width="0dp"
+                                    android:layout_height="34dp"
+                                    android:layout_marginEnd="4dp"
+                                    android:layout_weight="1"
+                                    android:background="@drawable/bg_search_bar"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:gravity="center"
+                                    android:text="A"
+                                    android:textColor="@color/calcOrange"
+                                    android:textSize="13sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/btnHexKeyB"
+                                    android:layout_width="0dp"
+                                    android:layout_height="34dp"
+                                    android:layout_marginEnd="4dp"
+                                    android:layout_weight="1"
+                                    android:background="@drawable/bg_search_bar"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:gravity="center"
+                                    android:text="B"
+                                    android:textColor="@color/calcOrange"
+                                    android:textSize="13sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/btnHexKeyC"
+                                    android:layout_width="0dp"
+                                    android:layout_height="34dp"
+                                    android:layout_marginEnd="4dp"
+                                    android:layout_weight="1"
+                                    android:background="@drawable/bg_search_bar"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:gravity="center"
+                                    android:text="C"
+                                    android:textColor="@color/calcOrange"
+                                    android:textSize="13sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/btnHexKeyD"
+                                    android:layout_width="0dp"
+                                    android:layout_height="34dp"
+                                    android:layout_marginEnd="4dp"
+                                    android:layout_weight="1"
+                                    android:background="@drawable/bg_search_bar"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:gravity="center"
+                                    android:text="D"
+                                    android:textColor="@color/calcOrange"
+                                    android:textSize="13sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/btnHexKeyE"
+                                    android:layout_width="0dp"
+                                    android:layout_height="34dp"
+                                    android:layout_marginEnd="4dp"
+                                    android:layout_weight="1"
+                                    android:background="@drawable/bg_search_bar"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:gravity="center"
+                                    android:text="E"
+                                    android:textColor="@color/calcOrange"
+                                    android:textSize="13sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/btnHexKeyF"
+                                    android:layout_width="0dp"
+                                    android:layout_height="34dp"
+                                    android:layout_weight="1"
+                                    android:background="@drawable/bg_search_bar"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:gravity="center"
+                                    android:text="F"
+                                    android:textColor="@color/calcOrange"
+                                    android:textSize="13sp"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
+
+                            <TextView
+                                android:id="@+id/tvNumeralError"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="6dp"
+                                android:textColor="@color/colorDanger"
+                                android:textSize="12sp"
+                                android:visibility="gone" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <!-- Kết quả đồng thời 4 hệ cơ số -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        app:cardBackgroundColor="@color/colorCardBackground"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="0dp"
+                        app:strokeColor="@color/colorBorder"
+                        app:strokeWidth="1dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="14dp">
+
+                            <!-- DEC -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                android:paddingTop="6dp"
+                                android:paddingBottom="6dp">
+
+                                <TextView
+                                    android:layout_width="76dp"
+                                    android:layout_height="wrap_content"
+                                    android:text="DEC (10)"
+                                    android:textColor="@color/textSecondary"
+                                    android:textSize="12.5sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/tvNumeralDecResult"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="255"
+                                    android:textColor="@color/textPrimary"
+                                    android:textSize="16sp"
+                                    android:textStyle="bold" />
+
+                                <ImageView
+                                    android:id="@+id/btnCopyDec"
+                                    android:layout_width="32dp"
+                                    android:layout_height="32dp"
+                                    android:background="?attr/selectableItemBackgroundBorderless"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:padding="6dp"
+                                    android:src="@drawable/ic_copy"
+                                    app:tint="@color/calcOrange" />
+                            </LinearLayout>
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="@color/colorBorder" />
+
+                            <!-- HEX -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                android:paddingTop="6dp"
+                                android:paddingBottom="6dp">
+
+                                <TextView
+                                    android:layout_width="76dp"
+                                    android:layout_height="wrap_content"
+                                    android:text="HEX (16)"
+                                    android:textColor="@color/textSecondary"
+                                    android:textSize="12.5sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/tvNumeralHexResult"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="FF"
+                                    android:textColor="@color/calcOrange"
+                                    android:textSize="16sp"
+                                    android:textStyle="bold" />
+
+                                <ImageView
+                                    android:id="@+id/btnCopyHex"
+                                    android:layout_width="32dp"
+                                    android:layout_height="32dp"
+                                    android:background="?attr/selectableItemBackgroundBorderless"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:padding="6dp"
+                                    android:src="@drawable/ic_copy"
+                                    app:tint="@color/calcOrange" />
+                            </LinearLayout>
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="@color/colorBorder" />
+
+                            <!-- OCT -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                android:paddingTop="6dp"
+                                android:paddingBottom="6dp">
+
+                                <TextView
+                                    android:layout_width="76dp"
+                                    android:layout_height="wrap_content"
+                                    android:text="OCT (8)"
+                                    android:textColor="@color/textSecondary"
+                                    android:textSize="12.5sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/tvNumeralOctResult"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="377"
+                                    android:textColor="@color/textPrimary"
+                                    android:textSize="16sp"
+                                    android:textStyle="bold" />
+
+                                <ImageView
+                                    android:id="@+id/btnCopyOct"
+                                    android:layout_width="32dp"
+                                    android:layout_height="32dp"
+                                    android:background="?attr/selectableItemBackgroundBorderless"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:padding="6dp"
+                                    android:src="@drawable/ic_copy"
+                                    app:tint="@color/calcOrange" />
+                            </LinearLayout>
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="@color/colorBorder" />
+
+                            <!-- BIN -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                android:paddingTop="6dp"
+                                android:paddingBottom="6dp">
+
+                                <TextView
+                                    android:layout_width="76dp"
+                                    android:layout_height="wrap_content"
+                                    android:text="BIN (2)"
+                                    android:textColor="@color/textSecondary"
+                                    android:textSize="12.5sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/tvNumeralBinResult"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:fontFamily="monospace"
+                                    android:text="1111 1111"
+                                    android:textColor="@color/textPrimary"
+                                    android:textSize="14.5sp"
+                                    android:textStyle="bold" />
+
+                                <ImageView
+                                    android:id="@+id/btnCopyBin"
+                                    android:layout_width="32dp"
+                                    android:layout_height="32dp"
+                                    android:background="?attr/selectableItemBackgroundBorderless"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:padding="6dp"
+                                    android:src="@drawable/ic_copy"
+                                    app:tint="@color/calcOrange" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+                </LinearLayout>
+
+                <!-- ===================================================== -->
+                <!-- KHỐI 4: CÔNG CỤ TÍNH CHỈ SỐ KHỐI CƠ THỂ (BMI)         -->
+                <!-- ===================================================== -->
+                <LinearLayout
+                    android:id="@+id/workspaceBmiConverter"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:cardBackgroundColor="@color/colorCardBackground"
+                        app:cardCornerRadius="18dp"
+                        app:cardElevation="0dp"
+                        app:strokeColor="@color/colorBorder"
+                        app:strokeWidth="1dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="16dp">
+
+                            <!-- Nhập chiều cao (cm) -->
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/conv_bmi_height_label"
+                                android:textColor="@color/textSecondary"
+                                android:textSize="13sp"
+                                android:textStyle="bold" />
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="6dp"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:id="@+id/btnBmiHeightMinus"
+                                    android:layout_width="46dp"
+                                    android:layout_height="46dp"
+                                    android:background="@drawable/bg_search_bar"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:gravity="center"
+                                    android:text="−"
+                                    android:textColor="@color/textPrimary"
+                                    android:textSize="22sp"
+                                    android:textStyle="bold" />
+
+                                <EditText
+                                    android:id="@+id/etBmiHeight"
+                                    android:layout_width="0dp"
+                                    android:layout_height="46dp"
+                                    android:layout_marginStart="8dp"
+                                    android:layout_marginEnd="8dp"
+                                    android:layout_weight="1"
+                                    android:background="@drawable/bg_search_bar"
+                                    android:gravity="center"
+                                    android:importantForAutofill="no"
+                                    android:inputType="numberDecimal"
+                                    android:maxLines="1"
+                                    android:text="168"
+                                    android:textColor="@color/textPrimary"
+                                    android:textSize="20sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/btnBmiHeightPlus"
+                                    android:layout_width="46dp"
+                                    android:layout_height="46dp"
+                                    android:background="@drawable/bg_search_bar"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:gravity="center"
+                                    android:text="+"
+                                    android:textColor="@color/calcOrange"
+                                    android:textSize="22sp"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
+
+                            <!-- Chip chọn nhanh chiều cao -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:id="@+id/chipHeight155"
+                                    android:layout_width="0dp"
+                                    android:layout_height="30dp"
+                                    android:layout_marginEnd="4dp"
+                                    android:layout_weight="1"
+                                    android:background="@drawable/bg_search_bar"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:gravity="center"
+                                    android:text="155"
+                                    android:textColor="@color/textSecondary"
+                                    android:textSize="12sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/chipHeight160"
+                                    android:layout_width="0dp"
+                                    android:layout_height="30dp"
+                                    android:layout_marginEnd="4dp"
+                                    android:layout_weight="1"
+                                    android:background="@drawable/bg_search_bar"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:gravity="center"
+                                    android:text="160"
+                                    android:textColor="@color/textSecondary"
+                                    android:textSize="12sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/chipHeight165"
+                                    android:layout_width="0dp"
+                                    android:layout_height="30dp"
+                                    android:layout_marginEnd="4dp"
+                                    android:layout_weight="1"
+                                    android:background="@drawable/bg_search_bar"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:gravity="center"
+                                    android:text="165"
+                                    android:textColor="@color/textSecondary"
+                                    android:textSize="12sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/chipHeight170"
+                                    android:layout_width="0dp"
+                                    android:layout_height="30dp"
+                                    android:layout_marginEnd="4dp"
+                                    android:layout_weight="1"
+                                    android:background="@drawable/bg_search_bar"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:gravity="center"
+                                    android:text="170"
+                                    android:textColor="@color/textSecondary"
+                                    android:textSize="12sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/chipHeight175"
+                                    android:layout_width="0dp"
+                                    android:layout_height="30dp"
+                                    android:layout_weight="1"
+                                    android:background="@drawable/bg_search_bar"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:gravity="center"
+                                    android:text="175"
+                                    android:textColor="@color/textSecondary"
+                                    android:textSize="12sp"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
+
+                            <!-- Nhập cân nặng (kg) -->
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="14dp"
+                                android:text="@string/conv_bmi_weight_label"
+                                android:textColor="@color/textSecondary"
+                                android:textSize="13sp"
+                                android:textStyle="bold" />
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="6dp"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:id="@+id/btnBmiWeightMinus"
+                                    android:layout_width="46dp"
+                                    android:layout_height="46dp"
+                                    android:background="@drawable/bg_search_bar"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:gravity="center"
+                                    android:text="−"
+                                    android:textColor="@color/textPrimary"
+                                    android:textSize="22sp"
+                                    android:textStyle="bold" />
+
+                                <EditText
+                                    android:id="@+id/etBmiWeight"
+                                    android:layout_width="0dp"
+                                    android:layout_height="46dp"
+                                    android:layout_marginStart="8dp"
+                                    android:layout_marginEnd="8dp"
+                                    android:layout_weight="1"
+                                    android:background="@drawable/bg_search_bar"
+                                    android:gravity="center"
+                                    android:importantForAutofill="no"
+                                    android:inputType="numberDecimal"
+                                    android:maxLines="1"
+                                    android:text="62"
+                                    android:textColor="@color/textPrimary"
+                                    android:textSize="20sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/btnBmiWeightPlus"
+                                    android:layout_width="46dp"
+                                    android:layout_height="46dp"
+                                    android:background="@drawable/bg_search_bar"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:gravity="center"
+                                    android:text="+"
+                                    android:textColor="@color/calcOrange"
+                                    android:textSize="22sp"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
+
+                            <!-- Chip chọn nhanh cân nặng -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:id="@+id/chipWeight50"
+                                    android:layout_width="0dp"
+                                    android:layout_height="30dp"
+                                    android:layout_marginEnd="4dp"
+                                    android:layout_weight="1"
+                                    android:background="@drawable/bg_search_bar"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:gravity="center"
+                                    android:text="50 kg"
+                                    android:textColor="@color/textSecondary"
+                                    android:textSize="12sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/chipWeight55"
+                                    android:layout_width="0dp"
+                                    android:layout_height="30dp"
+                                    android:layout_marginEnd="4dp"
+                                    android:layout_weight="1"
+                                    android:background="@drawable/bg_search_bar"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:gravity="center"
+                                    android:text="55 kg"
+                                    android:textColor="@color/textSecondary"
+                                    android:textSize="12sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/chipWeight60"
+                                    android:layout_width="0dp"
+                                    android:layout_height="30dp"
+                                    android:layout_marginEnd="4dp"
+                                    android:layout_weight="1"
+                                    android:background="@drawable/bg_search_bar"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:gravity="center"
+                                    android:text="60 kg"
+                                    android:textColor="@color/textSecondary"
+                                    android:textSize="12sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/chipWeight65"
+                                    android:layout_width="0dp"
+                                    android:layout_height="30dp"
+                                    android:layout_marginEnd="4dp"
+                                    android:layout_weight="1"
+                                    android:background="@drawable/bg_search_bar"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:gravity="center"
+                                    android:text="65 kg"
+                                    android:textColor="@color/textSecondary"
+                                    android:textSize="12sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/chipWeight70"
+                                    android:layout_width="0dp"
+                                    android:layout_height="30dp"
+                                    android:layout_weight="1"
+                                    android:background="@drawable/bg_search_bar"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:gravity="center"
+                                    android:text="70 kg"
+                                    android:textColor="@color/textSecondary"
+                                    android:textSize="12sp"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <!-- Thẻ kết quả phân tích BMI -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        app:cardBackgroundColor="@color/colorCardBackground"
+                        app:cardCornerRadius="18dp"
+                        app:cardElevation="0dp"
+                        app:strokeColor="@color/calcOrange"
+                        app:strokeWidth="1.5dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="16dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="@string/conv_bmi_score_label"
+                                    android:textColor="@color/textSecondary"
+                                    android:textSize="13sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/tvBmiStatusBadge"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:background="@drawable/bg_search_bar"
+                                    android:paddingStart="10dp"
+                                    android:paddingTop="3dp"
+                                    android:paddingEnd="10dp"
+                                    android:paddingBottom="3dp"
+                                    android:text="Bình thường"
+                                    android:textColor="@color/colorSuccess"
+                                    android:textSize="12.5sp"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="6dp"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:id="@+id/tvBmiScoreValue"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="22,0"
+                                    android:textColor="@color/colorSuccess"
+                                    android:textSize="32sp"
+                                    android:textStyle="bold" />
+
+                                <com.google.android.material.button.MaterialButton
+                                    android:id="@+id/btnCopyBmiResult"
+                                    style="@style/Widget.Material3.Button.TonalButton"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="38dp"
+                                    android:insetTop="0dp"
+                                    android:insetBottom="0dp"
+                                    android:text="@string/copy"
+                                    android:textColor="@color/calcOrange"
+                                    android:textSize="12.5sp"
+                                    android:textStyle="bold"
+                                    app:backgroundTint="@color/calcOrangeLight"
+                                    app:cornerRadius="12dp"
+                                    app:icon="@drawable/ic_copy"
+                                    app:iconSize="16dp"
+                                    app:iconTint="@color/calcOrange" />
+                            </LinearLayout>
+
+                            <!-- Thanh phổ màu BMI 4 mức trực quan -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="10dp"
+                                android:layout_marginTop="12dp"
+                                android:orientation="horizontal">
+
+                                <View
+                                    android:layout_width="0dp"
+                                    android:layout_height="match_parent"
+                                    android:layout_marginEnd="2dp"
+                                    android:layout_weight="1"
+                                    android:background="#0284C7" />
+
+                                <View
+                                    android:layout_width="0dp"
+                                    android:layout_height="match_parent"
+                                    android:layout_marginEnd="2dp"
+                                    android:layout_weight="1.2"
+                                    android:background="#059669" />
+
+                                <View
+                                    android:layout_width="0dp"
+                                    android:layout_height="match_parent"
+                                    android:layout_marginEnd="2dp"
+                                    android:layout_weight="1"
+                                    android:background="#D97706" />
+
+                                <View
+                                    android:layout_width="0dp"
+                                    android:layout_height="match_parent"
+                                    android:layout_weight="1"
+                                    android:background="#DC2626" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="&lt; 18,5"
+                                    android:textColor="@color/textMuted"
+                                    android:textSize="10.5sp" />
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1.2"
+                                    android:gravity="center"
+                                    android:text="18,5 - 24,9"
+                                    android:textColor="@color/textMuted"
+                                    android:textSize="10.5sp" />
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:gravity="center"
+                                    android:text="25 - 29,9"
+                                    android:textColor="@color/textMuted"
+                                    android:textSize="10.5sp" />
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:gravity="end"
+                                    android:text="≥ 30"
+                                    android:textColor="@color/textMuted"
+                                    android:textSize="10.5sp" />
+                            </LinearLayout>
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:layout_marginTop="12dp"
+                                android:layout_marginBottom="10dp"
+                                android:background="@color/colorBorder" />
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="@string/conv_bmi_ideal_weight_label"
+                                    android:textColor="@color/textSecondary"
+                                    android:textSize="13sp" />
+
+                                <TextView
+                                    android:id="@+id/tvBmiIdealWeightRange"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="52,2 kg – 70,3 kg"
+                                    android:textColor="@color/textPrimary"
+                                    android:textSize="14sp"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
+
+                            <TextView
+                                android:id="@+id/tvBmiAdviceText"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:textColor="@color/textSecondary"
+                                android:textSize="12.5sp"
+                                tools:text="Cơ thể cân đối! Hãy duy trì chế độ ăn uống và vận động hiện tại." />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+                </LinearLayout>
+
+            </LinearLayout>
+        </ScrollView>
     </LinearLayout>
-</ScrollView>
+</LinearLayout>

@@ -37,16 +37,42 @@
                 app:tint="@color/textPrimary" />
         </com.google.android.material.card.MaterialCardView>
 
-        <TextView
-            android:id="@+id/tvCalcTitle"
+        <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="14dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="@string/tool_calculator_title"
-            android:textColor="@color/textPrimary"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tvCalcTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="12dp"
+                android:paddingTop="8dp"
+                android:paddingEnd="12dp"
+                android:paddingBottom="8dp"
+                android:text="@string/conv_tab_calculator"
+                android:textColor="@color/textPrimary"
+                android:textSize="19sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvCalcTabConverter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                android:paddingStart="12dp"
+                android:paddingTop="8dp"
+                android:paddingEnd="12dp"
+                android:paddingBottom="8dp"
+                android:text="@string/conv_tab_converter"
+                android:textColor="@color/textMuted"
+                android:textSize="18sp" />
+        </LinearLayout>
 
         <!-- Nút mở trang lịch sử tính toán riêng biệt -->
         <com.google.android.material.card.MaterialCardView

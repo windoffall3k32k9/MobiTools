@@ -96,7 +96,7 @@
 
     <!-- 7. Chuyển đổi đơn vị -->
     <string name="tool_unit_converter_title">Chuyển đổi đơn vị</string>
-    <string name="tool_unit_converter_desc">Chuyển đổi chiều dài, khối lượng, nhiệt độ và dung lượng</string>
+    <string name="tool_unit_converter_desc">Chuyển đổi ngoại tệ, độ dài, trọng lượng, diện tích, thời gian, dữ liệu, giảm giá, thể tích, hệ thống số, tốc độ, nhiệt độ và BMI</string>
 
     <!-- 8. La bàn -->
     <string name="tool_compass_title">La bàn</string>
@@ -215,4 +215,35 @@
     <string name="scanner_no_code_found">Không tìm thấy mã QR hoặc mã vạch trong ảnh</string>
     <string name="scanner_rescan">Quét tiếp</string>
     <string name="scanner_open_url">Mở liên kết</string>
+    <!-- Chuyển đổi đa năng (12 chức năng) -->
+    <string name="conv_tab_calculator">Máy tính</string>
+    <string name="conv_tab_converter">Chuyển đổi</string>
+    <string name="conv_cat_currency">Ngoại tệ</string>
+    <string name="conv_cat_length">Độ dài</string>
+    <string name="conv_cat_weight">Trọng lượng</string>
+    <string name="conv_cat_area">Diện tích</string>
+    <string name="conv_cat_time">Thời gian</string>
+    <string name="conv_cat_data">Dữ liệu</string>
+    <string name="conv_cat_discount">Giảm giá</string>
+    <string name="conv_cat_volume">Thể tích</string>
+    <string name="conv_cat_numeral">Hệ thống số</string>
+    <string name="conv_cat_speed">Tốc độ</string>
+    <string name="conv_cat_temp">Nhiệt độ</string>
+    <string name="conv_cat_bmi">BMI</string>
+    <string name="conv_all_categories">Tất cả danh mục</string>
+    <string name="conv_from_unit">Từ đơn vị</string>
+    <string name="conv_to_unit">Sang đơn vị</string>
+    <string name="conv_all_units_reference">Bảng quy đổi toàn bộ đơn vị</string>
+    <string name="conv_custom_rate">Tùy chỉnh tỷ giá</string>
+    <string name="conv_reset_rate">Mặc định</string>
+    <string name="conv_discount_original_price">Giá gốc</string>
+    <string name="conv_discount_percent">Giảm giá (%)</string>
+    <string name="conv_discount_extra_percent">Giảm thêm / Voucher (%)</string>
+    <string name="conv_discount_final_price">Giá sau giảm</string>
+    <string name="conv_discount_saved_amount">Tiết kiệm được</string>
+    <string name="conv_numeral_input_label">Giá trị đầu vào</string>
+    <string name="conv_bmi_height_label">Chiều cao (cm)</string>
+    <string name="conv_bmi_weight_label">Cân nặng (kg)</string>
+    <string name="conv_bmi_score_label">Chỉ số BMI của bạn</string>
+    <string name="conv_bmi_ideal_weight_label">Cân nặng lý tưởng</string>
 </resources>

@@ -16,6 +16,7 @@ import androidx.fragment.app.commit
 import com.example.baseproject.R
 import com.example.baseproject.base.BaseToolFragment
 import com.example.baseproject.databinding.FragmentCalculatorBinding
+import com.example.baseproject.ui.converter.UnitConverterFragment
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.util.Locale
@@ -74,11 +75,19 @@ class CalculatorFragment : BaseToolFragment<FragmentCalculatorBinding>() {
         updateDisplay()
     }
 
-    // Thiết lập thanh tiêu đề với nút quay lại và nút mở trang Lịch sử tính toán riêng biệt.
+    // Thiết lập thanh tiêu đề với nút quay lại, chuyển tab Chuyển đổi và nút mở trang Lịch sử tính toán.
     private fun setupTopBar() {
         viewBinding.btnCalcBack.setOnClickListener {
             vibrateKey()
             parentFragmentManager.popBackStack()
+        }
+
+        viewBinding.tvCalcTabConverter.setOnClickListener {
+            vibrateKey()
+            parentFragmentManager.commit {
+                setReorderingAllowed(true)
+                replace(R.id.fragment_container, UnitConverterFragment())
+            }
         }
 
         viewBinding.btnCalcHistory.setOnClickListener {
